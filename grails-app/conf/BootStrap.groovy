@@ -7,8 +7,11 @@ class BootStrap {
 	def init = { servletContext ->
 
 		loaderService.with {
-			truncateTables()
-			runBenchMark()
+			//truncateTables()
+			//runBenchMark()
+			insertCity1MRows()
+			load_rows_scrollable_resultset()
+			load_rows_with_manual_paging()
 		}
 
 	}

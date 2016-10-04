@@ -3,6 +3,9 @@ package gpbench
 import grails.compiler.GrailsCompileStatic
 import grails.converters.JSON
 import grails.transaction.Transactional
+import groovy.sql.GroovyResultSet
+import groovy.sql.GroovyResultSetProxy
+import groovy.sql.Sql
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.hibernate.SessionFactory
@@ -10,6 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.mock.web.MockHttpServletRequest
 
 import javax.servlet.http.HttpServletRequest
+import java.sql.ResultSet
 
 import static groovyx.gpars.GParsPool.withPool
 
@@ -179,6 +183,67 @@ class LoaderService {
 		}
 
 		return result
+	}
+
+
+	public void load_rows_scrollable_resultset() {
+		Sql sql = new Sql(dataSource)
+
+		sql.resultSetConcurrency = java.sql.ResultSet.CONCUR_READ_ONLY
+		sql.withStatement { stmt -> stmt.fetchSize = Integer.MIN_VALUE }
+
+		int index = 0
+
+		Long start = logBenchStart("Load 1 million rows using scrollable resultset")
+		sql.query("select * from city1M") { ResultSet resultSet ->
+			GroovyResultSet groovyRS = new GroovyResultSetProxy(resultSet).getImpl() //convert to groovy result set so we can tret it as map
+			while (groovyRS.next()) {
+				index++
+			}
+		}
+
+		println "Loaded $index rows"
+		logBenchEnd("Load 1 million rows using scrollable resultset", start)
+	}
+
+	public void load_rows_with_manual_paging() {
+		Sql sql = new Sql(dataSource)
+
+		int index = 0
+		int limit = 200
+		int offset = 0
+		String query = "select * from city1M limit 200 offset ?"
+
+		Long start = logBenchStart("Load 1 million rows using manual paging with limit offset")
+		int count = jdbcTemplate.queryForLong("select count(*) FROM city1M")
+
+		while(offset < (count - 200)) {
+			List<Map> rows = sql.rows(query, [offset])
+			rows.each { index++ }
+			offset = offset + limit
+		}
+
+		println "Loaded $index rows"
+		logBenchEnd("Load 1 million rows using manual paging with limit offset", start)
+	}
+
+	List insertCity1MRows() {
+
+		int count = jdbcTemplate.queryForLong("select count(*) FROM city1M")
+		if(count > 0) return
+
+		println "Inserting million rows into city1M table"
+
+		File file = new File("resources/City100k.csv")
+		String query = "insert into city1M (name, latitude, longitude, short_code, `country.id`, `region.id`) values (?, ?, ?, ?, ?, ?)"
+		Sql sql = new Sql(dataSource)
+		for(int i in (1..10)) {
+			def reader = file.toCsvMapReader()
+			reader.each { Map m ->
+				List params = [m.name, m.latitude as Float, m.longitude as Float, m.shortCode, m['country.id'] as Long, m['region.id'] as Long]
+				sql.execute query, params
+			}
+		}
 	}
 
 
