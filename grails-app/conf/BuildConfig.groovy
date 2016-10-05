@@ -50,6 +50,8 @@ grails.project.dependency.resolution = {
         compile 'org.gperfutils:gbench:0.4.3-groovy-2.4'
         compile "org.codehaus.gpars:gpars:1.2.1"
         runtime 'mysql:mysql-connector-java:5.1.5'
+        compile "org.grails:grails-web-databinding-spring:$grailsVersion"
+        compile 'org.springframework:spring-test:4.1.8.RELEASE'
     }
 
     plugins {
