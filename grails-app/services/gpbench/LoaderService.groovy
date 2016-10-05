@@ -210,16 +210,20 @@ class LoaderService {
 		Sql sql = new Sql(dataSource)
 
 		int index = 0
-		int limit = 200
+		int limit = 10000
 		int offset = 0
-		String query = "select * from city1M limit 200 offset ?"
+		String query = "select * from city1M limit ? offset ?"
 
 		Long start = logBenchStart("Load 1 million rows using manual paging with limit offset")
 		int count = jdbcTemplate.queryForLong("select count(*) FROM city1M")
 
-		while(offset < (count - 200)) {
-			List<Map> rows = sql.rows(query, [offset])
-			rows.each { index++ }
+		while(offset < (count)) {
+			sql.query(query, [limit, offset]) { ResultSet r ->
+				while(r.next()) {
+					index ++
+				}
+			}
+
 			offset = offset + limit
 		}
 
