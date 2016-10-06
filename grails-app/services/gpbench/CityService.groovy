@@ -8,7 +8,7 @@ class CityService {
 
 	@GrailsCompileStatic
 	public void insertWithDataBinding(Map row) {
-		if(City.exists((row.id as Long))) return
+		//if(City.exists((row.id as Long))) return
 		City c = new City(row)
 		c.id = row.id as Long
 		c.save(failOnError: true)

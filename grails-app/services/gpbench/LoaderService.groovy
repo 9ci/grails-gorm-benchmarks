@@ -3,24 +3,26 @@ package gpbench
 import grails.converters.JSON
 import grails.transaction.Transactional
 import groovy.sql.Sql
+import groovy.transform.CompileStatic
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.hibernate.SessionFactory
-import org.springframework.jdbc.core.ColumnMapRowMapper
+import org.springframework.core.io.FileSystemResource
+import org.springframework.core.io.Resource
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.RowMapper
+import org.springframework.jdbc.datasource.init.ScriptUtils
 import org.springframework.mock.web.MockHttpServletRequest
 
 import javax.servlet.http.HttpServletRequest
+import javax.sql.DataSource
+import java.sql.Connection
 import java.sql.ResultSet
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.BlockingQueue
 
 import static grails.async.Promises.task
 import static groovyx.gpars.GParsPool.withPool
-
-import groovyx.gpars.dataflow.DataflowQueue
-import static groovyx.gpars.dataflow.Dataflow.operator
-
 
 class LoaderService {
 	static transactional = false
@@ -29,7 +31,7 @@ class LoaderService {
 
 	def persistenceInterceptor
 
-	def dataSource
+	DataSource dataSource
 	JdbcTemplate jdbcTemplate
 
 	RegionService regionService
@@ -41,10 +43,13 @@ class LoaderService {
 	void runBenchMark() {
 		println "Running benchmark"
 
-		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
-		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
+		load_rows_scrollable_resultset(true) //insert million records with databinding
+		//load_rows_scrollable_resultset(false) //insert million records without databinding
 
+		//runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
+		//runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
 
+		/*
 		println "############"
 		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
 		runImport('GPars_batched_transactions_per_thread', false, true, true) //batched - databinding, typed map
@@ -65,11 +70,10 @@ class LoaderService {
 		runImport('batched_transactions', true, true, true) //batched - databinding, typeless map
 		runImport('batched_transactions', false, true, true) //batched - databinding, typed map
 		runImport('batched_transactions', false, false, true) //batched - without databinding, typed map
-
-
+		*/
 	}
 
-	def runImport(String method, boolean csv, boolean databinding, boolean batched = false) {
+	void runImport(String method, boolean csv, boolean databinding, boolean batched = false) {
 		String extension = csv ? 'csv' : 'json'
 
 		List countries = loadRecordsFromFile("Country.${extension}")
@@ -134,7 +138,7 @@ class LoaderService {
 		}
 	}
 
-	def GPars_single_rec_per_thread_transaction(String name, List<Map> rows, boolean useDataBinding) {
+	void GPars_single_rec_per_thread_transaction(String name, List<Map> rows, boolean useDataBinding) {
 		def service = getService(name)
 
 		withPool(4){
@@ -147,19 +151,19 @@ class LoaderService {
 			}
 		}
 	}
-	
-	def
 
-	GPars_batched_transactions_per_thread(String name, List<List<Map>> rows, boolean useDataBinding) {
+	void GPars_batched_transactions_per_thread(String name, List<List<Map>> rows, boolean useDataBinding) {
 		//println "Gparse batched called"
 		def service = getService(name)
 
 		withPool(4){
 			rows.eachParallel { List batchList ->
 				City.withTransaction {
+					//println "Inserting batch $name : size - ${batchList.size()}"
 					batchList.each{ Map row ->
 						insertRecord(service, row, useDataBinding)
 					}
+					//println "Batch finish"
 					cleanUpGorm()
 				}
 
@@ -192,148 +196,67 @@ class LoaderService {
 	}
 
 
-	/*
-	void load_rows_scrollable_resultset_two() {
+	@CompileStatic
+	public void load_rows_scrollable_resultset(boolean useDataBinding) {
+		//first insert the million rows into test table if not already inserted.
+		insertCity1MRows()
+
+		//we need to insert countries and regions so that we can load cities later.
 		List countries = loadRecordsFromFile("Country.json")
 		List regions = loadRecordsFromFile("Region.json")
 
 		GPars_batched_transactions_per_thread("country", batchChunks(countries, batchSize), false)
 		GPars_batched_transactions_per_thread("region", batchChunks(regions, batchSize), false)
 
-		Sql sql = new Sql(dataSource)
-
-		sql.resultSetConcurrency = java.sql.ResultSet.CONCUR_READ_ONLY
-		sql.withStatement { stmt -> stmt.fetchSize = Integer.MIN_VALUE }
-
-		BlockingQueue<List> queue = new ArrayBlockingQueue<List>(10)
 		//can hold 10 elements (each element is a batch of 50 records)
-
-		int index = 0
-		List batch = []
-		Long start = logBenchStart("Insert 1 million rows using scrollable resultset")
-
-		ColumnMapRowMapper mapper = new ColumnMapRowMapper()
-
-		final def buffer = new DataflowQueue()
-
-		def service = getService("city")
-
-		task {
-			def taken
-			while ((taken = queue.take()) instanceof List) {
-				println "Taken"
-				buffer << taken
-			}
-		}
-
-		operator(inputs:[buffer], outputs:[], maxForks: 4) {List value->
-			println "Executing operator"
-			City.withTransaction {
-				value.each{ Map row ->
-					insertRecord(service, row, true)
-				}
-				cleanUpGorm()
-			}
-
-		}
-
-		sql.query("select * from city1M") { ResultSet resultSet ->
-			while (resultSet.next()) {
-				index++
-				Map row = toGrailsParamsMap(mapper.mapRow(resultSet, index))
-				batch << row
-				if(batch.size() == 200) {
-					queue.put batch
-					batch = []
-
-					println "Queue size is ${queue.size()}"
-				}
-
-			}
-
-			//there could be results left
-			if(batch) {
-				queue.put(batch)
-			}
-
-			queue.put(false)
-
-		}
-
-		println "Loaded $index rows"
-		println "City count ${City.count()}"
-		logBenchEnd("Load 1 million rows using scrollable resultset", start)
-
-
-	}
-	*/
-
-	public void load_rows_scrollable_resultset() {
-		//we first need to insert countries and regions so that we can load cities later.
-		List countries = loadRecordsFromFile("Country.json")
-		List regions = loadRecordsFromFile("Region.json")
-
-		GPars_batched_transactions_per_thread("country", batchChunks(countries, batchSize), false)
-		GPars_batched_transactions_per_thread("region", batchChunks(regions, batchSize), false)
-
-		Sql sql = new Sql(dataSource)
-
-		sql.resultSetConcurrency = java.sql.ResultSet.CONCUR_READ_ONLY
-		sql.withStatement { stmt -> stmt.fetchSize = Integer.MIN_VALUE }
-
-		BlockingQueue<List> queue = new ArrayBlockingQueue<List>(10) //can hold 10 elements (each element is a batch of 50 records)
-
-		int index = 0
-
-		Long start = logBenchStart("Insert 1 million rows using scrollable resultset")
-		ColumnMapRowMapper mapper = new ColumnMapRowMapper()
+		BlockingQueue queue = new ArrayBlockingQueue(3)
 
 		List batch4 = []
-		List batch50 = []
 
-		startGparsConsumer("city", queue)
+		//start the consumer thread
+		startGparsConsumer("city", queue, useDataBinding)
 
-		sql.query("select * from city1M") { ResultSet resultSet ->
-			while (resultSet.next()) {
+		String message = "Insert 1 million city using scrollable resultset: databinding = $useDataBinding"
+		Long start = logBenchStart(message)
+		RowMapper<Map> mapper = new GrailsParameterMapRowMapper()
+		String q = "select * from city1M"
+		ScrollableQuery query = new ScrollableQuery(q, mapper, dataSource)
+
+		int index = 0
+		query.eachBatch(50) { List<Map> batch ->
+			batch4.add(batch)
+			if (batch4.size() == 4) {
 				index++
-				Map row = toGrailsParamsMap(mapper.mapRow(resultSet, index))
-
-				batch50 << row
-				if(batch50.size() == 50) {
-					batch4 << batch50
-					batch50 = []
-				}
-
-				if(batch4.size() == 4) {
-					queue.put(batch4)
-					batch4 = []
-
-					//println "Index is $index"
-					//println "Queuesize is ${queue.size()}"
-				}
-
-			}
-
-			//there could be results left
-			if(batch4 || batch50) {
-				batch4 << batch50
+				//println "put batch $index"
 				queue.put(batch4)
+				batch4 = []
 			}
-
 		}
 
+		//there could be results left
+		if (batch4.size() > 0) {
+			queue.put(batch4)
+		}
+
+		//put false to stop the consumer
 		queue.put(false)
 
-		println "Loaded $index rows"
-		println "City count ${City.count()}"
-		logBenchEnd("Load 1 million rows using scrollable resultset", start)
+		println "City count is ${City.count()}"
+		logBenchEnd(message, start)
+
+		//finally truncate tables
+		truncateTables()
 	}
 
-	public startGparsConsumer(String name, BlockingQueue queue, boolean useDataBinding = true) {
+	@CompileStatic
+	void startGparsConsumer(String name, BlockingQueue queue, boolean useDataBinding = true) {
 		Consumer consumer = new Consumer(queue)
+		int index = 0
 		task {
 			consumer.start { List batch ->
-				GPars_batched_transactions_per_thread(name, batch, false)
+				//index++
+				//println "Got batch $index of size ${batch.size()}"
+				GPars_batched_transactions_per_thread(name, batch, useDataBinding)
 			}
 		}
 	}
@@ -364,15 +287,23 @@ class LoaderService {
 	}
 
 	List insertCity1MRows() {
+		//first create the test table if does nto exist
+		Resource resource = new FileSystemResource("resources/test-tables.sql");
+		Connection connection = sessionFactory.currentSession.connection()
+		ScriptUtils.executeSqlScript(connection, resource)
 
+		//check if records are already inserted
 		int count = jdbcTemplate.queryForLong("select count(*) FROM city1M")
 		if(count > 0) return
 
-		println "Inserting million rows into city1M table"
+		println "Preparing test table with million rows."
 
 		File file = new File("resources/City100k.csv")
 		String query = "insert into city1M (name, latitude, longitude, shortCode, `country.id`, `region.id`) values (?, ?, ?, ?, ?, ?)"
 		Sql sql = new Sql(dataSource)
+
+		//String message = "Insert million records with direct insert queries, no hibernate/grails"
+		//Long start = logBenchStart(message)
 		for(int i in (1..10)) {
 			def reader = file.toCsvMapReader()
 			reader.each { Map m ->
@@ -380,8 +311,9 @@ class LoaderService {
 				sql.execute query, params
 			}
 		}
-	}
 
+		//logBenchEnd(message, start)
+	}
 
 	def cleanUpGorm() {
 		def session = sessionFactory.currentSession
@@ -406,7 +338,7 @@ class LoaderService {
 	//If I pass in a batch size of 3 it will convert [1,2,3,4,5,6,7,8] into [[1,2,3],[4,5,6],[7,8]]
 	//see http://stackoverflow.com/questions/2924395/groovy-built-in-to-split-an-array-into-equal-sized-subarrays
 	//and http://stackoverflow.com/questions/3147537/split-collection-into-sub-collections-in-groovy
-	def batchChunks(theList, batchSize) {
+	List batchChunks(theList, batchSize) {
 		if (!theList) return [] //return and empty list if its already empty
 		
 		def batchedList = []
@@ -424,17 +356,16 @@ class LoaderService {
 		return batchedList    
 	}
 	
-	def logBenchStart(desc) {
+	Long logBenchStart(desc) {
 		def msg = "***** Starting $desc"
 		log.info(msg)
 		println msg
 		return new Long(System.currentTimeMillis())
 	}
 	
-	def logBenchEnd(desc,startTime){
+	void logBenchEnd(String desc, Long startTime){
 		def elapsed = (System.currentTimeMillis() - startTime)/1000
 		def msg = "***** Finshed $desc in $elapsed seconds"
-		log.info(msg)
 		println msg
 	}
 
@@ -459,7 +390,6 @@ class LoaderService {
 	GrailsParameterMap toGrailsParamsMap(Map<String, String> map) {
 		try {
 			HttpServletRequest request = new MockHttpServletRequest()
-			//request.addParameters(map)
 			GrailsParameterMap gmap = new GrailsParameterMap(request)
 			gmap.updateNestedKeys(map)
 			return gmap

@@ -1,7 +1,10 @@
 package gpbench
 
+import groovy.transform.CompileStatic
+
 import java.util.concurrent.BlockingQueue
 
+@CompileStatic
 class Consumer {
 	private BlockingQueue queue
 
@@ -14,6 +17,8 @@ class Consumer {
 		while((taken = queue.take()) instanceof List) {
 			cl(taken)
 		}
+
+		println "Stopping consumer thread"
 	}
 
 }
