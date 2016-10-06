@@ -8,10 +8,8 @@ class BootStrap {
 
 		loaderService.with {
 			truncateTables()
-			//runBenchMark()
-			insertCity1MRows()
+			runBenchMark()
 			//load_rows_scrollable_resultset_two()
-			load_rows_scrollable_resultset()
 			//load_rows_with_manual_paging()
 		}
 
