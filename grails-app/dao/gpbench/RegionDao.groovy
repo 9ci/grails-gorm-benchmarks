@@ -1,18 +1,15 @@
 package gpbench
 
 import grails.compiler.GrailsCompileStatic
+import grails.plugin.dao.GormDaoSupport
 import grails.transaction.Transactional
 import org.springframework.jdbc.core.JdbcTemplate
 
-@Transactional
-class RegionService {
+class RegionDao extends GormDaoSupport {
+	Class domainClass = Region
 
-	@GrailsCompileStatic
-	public void insertWithDataBinding(Map row) {
-		//println row
-		Region r = new Region(row)
-		r.id = row.id as Long
-		r.save(failOnError: true)
+	def beforeInsertSave(region, params) {
+		region.id = params.id as Long
 	}
 
 	@GrailsCompileStatic

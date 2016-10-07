@@ -34,19 +34,21 @@ class LoaderService {
 	DataSource dataSource
 	JdbcTemplate jdbcTemplate
 
-	RegionService regionService
-	CityService cityService
-	CountryService countryService
+	RegionDao regionDao
+	CityDao cityDao
+	CountryDao countryDao
 
 	def batchSize = 50 //this should match the hibernate.jdbc.batch_size in datasources
 
 	void runBenchMark() {
 		println "Running benchmark"
 
+
 		load_rows_scrollable_resultset(true) //insert million records with databinding
 
 		//if you want to run the below benchmarks, comment the above one
 		// otherwise because of some issues, there;s deadlock and it fails.
+
 
 		/*
 		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
@@ -55,23 +57,18 @@ class LoaderService {
 
 		println "############"
 		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
-		runImport('GPars_batched_transactions_per_thread', false, true, true) //batched - databinding, typed map
 		runImport('GPars_batched_transactions_per_thread', false, false, true) //batched - without databinding, typed map
 
 		runImport('GPars_single_rec_per_thread_transaction', true, true) //databinding, typeless map
-		runImport('GPars_single_rec_per_thread_transaction', false, true) //databinding, typed map
 		runImport('GPars_single_rec_per_thread_transaction', false, false) //without databinding, typed map
 
 		runImport('single_transaction', true, true) //databinding, typeless map
-		runImport('single_transaction', false, true) //databinding, typed map
 		runImport('single_transaction', false, false) //without databinding, typed map
 
 		runImport('commit_each_save', true, true) //databinding, typeless map
-		runImport('commit_each_save', false, true)  //databinding, typed map
 		runImport('commit_each_save', false, false) //without databinding, typed map
 
 		runImport('batched_transactions', true, true, true) //batched - databinding, typeless map
-		runImport('batched_transactions', false, true, true) //batched - databinding, typed map
 		runImport('batched_transactions', false, false, true) //batched - without databinding, typed map
 		*/
 
@@ -377,13 +374,13 @@ class LoaderService {
 
 	def getService(String name) {
 		name = name.substring(0,1).toLowerCase() + name.substring(1);
-		return this."${name}Service"
+		return this."${name}Dao"
 	}
 
 	void insertRecord(def service, Map row, boolean useDataBinding) {
 		try {
 			if (useDataBinding) {
-				service.insertWithDataBinding(row)
+				service.insert(row) //regular insert
 			} else {
 				service.insertWithSetter(row)
 			}

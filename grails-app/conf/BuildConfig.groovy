@@ -55,6 +55,7 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
+        compile "org.grails.plugins:dao:1.0.3"
         compile "org.grails.plugins:csv:0.3.1"
         build ":tomcat:7.0.55.2" // or ":tomcat:8.0.20"
         runtime ":hibernate4:4.3.8.1" // or ":hibernate:3.6.10.18"

@@ -57,6 +57,8 @@ grails {
         // escapes all not-encoded output at final stage of outputting
         // filteringCodecForContentType.'text/html' = 'html'
     }
+
+    databinding.useSpringBinder = true //legacy databinder support
 }
 
 
