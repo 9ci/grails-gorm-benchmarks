@@ -44,12 +44,15 @@ class LoaderService {
 		println "Running benchmark"
 
 		load_rows_scrollable_resultset(true) //insert million records with databinding
-		//load_rows_scrollable_resultset(false) //insert million records without databinding
 
-		//runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
-		//runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
+		//if you want to run the below benchmarks, comment the above one
+		// otherwise because of some issues, there;s deadlock and it fails.
 
 		/*
+		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
+		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
+
+
 		println "############"
 		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
 		runImport('GPars_batched_transactions_per_thread', false, true, true) //batched - databinding, typed map
@@ -71,6 +74,7 @@ class LoaderService {
 		runImport('batched_transactions', false, true, true) //batched - databinding, typed map
 		runImport('batched_transactions', false, false, true) //batched - without databinding, typed map
 		*/
+
 	}
 
 	void runImport(String method, boolean csv, boolean databinding, boolean batched = false) {
@@ -198,6 +202,7 @@ class LoaderService {
 
 	@CompileStatic
 	public void load_rows_scrollable_resultset(boolean useDataBinding) {
+		println "load_rows_scrollable_resultset"
 		//first insert the million rows into test table if not already inserted.
 		insertCity1MRows()
 
@@ -205,6 +210,7 @@ class LoaderService {
 		List countries = loadRecordsFromFile("Country.json")
 		List regions = loadRecordsFromFile("Region.json")
 
+		println "prepare country/city"
 		GPars_batched_transactions_per_thread("country", batchChunks(countries, batchSize), false)
 		GPars_batched_transactions_per_thread("region", batchChunks(regions, batchSize), false)
 
@@ -244,7 +250,7 @@ class LoaderService {
 		println "City count is ${City.count()}"
 		logBenchEnd(message, start)
 
-		//finally truncate tables
+		println "Truncating tables"
 		truncateTables()
 	}
 
