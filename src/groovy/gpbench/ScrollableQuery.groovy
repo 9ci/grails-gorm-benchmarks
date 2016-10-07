@@ -28,7 +28,7 @@ class ScrollableQuery {
 	//Executes this query and calls closure with a map for each record.
 	public void eachRow(Closure cl) {
 		Sql sql = prepareSql()
-		int index = 1
+		int index = 0
 
 		sql.query(query) { ResultSet r ->
 			while(r.next()) {

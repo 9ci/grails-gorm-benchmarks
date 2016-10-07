@@ -4,6 +4,8 @@ import grails.converters.JSON
 import grails.transaction.Transactional
 import groovy.sql.Sql
 import groovy.transform.CompileStatic
+import groovyx.gpars.dataflow.DataflowQueue
+import groovyx.gpars.dataflow.operator.PoisonPill
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.hibernate.SessionFactory
@@ -18,11 +20,9 @@ import javax.servlet.http.HttpServletRequest
 import javax.sql.DataSource
 import java.sql.Connection
 import java.sql.ResultSet
-import java.util.concurrent.ArrayBlockingQueue
-import java.util.concurrent.BlockingQueue
 
-import static grails.async.Promises.task
 import static groovyx.gpars.GParsPool.withPool
+import static groovyx.gpars.dataflow.Dataflow.operator
 
 class LoaderService {
 	static transactional = false
@@ -198,51 +198,44 @@ class LoaderService {
 
 
 	@CompileStatic
-	public void load_rows_scrollable_resultset(boolean useDataBinding) {
+	public void load_rows_scrollable_resultset(final boolean useDataBinding) {
 		println "load_rows_scrollable_resultset"
-		//first insert the million rows into test table if not already inserted.
-		insertCity1MRows()
 
-		//we need to insert countries and regions so that we can load cities later.
-		List countries = loadRecordsFromFile("Country.json")
-		List regions = loadRecordsFromFile("Region.json")
-
-		println "prepare country/city"
-		GPars_batched_transactions_per_thread("country", batchChunks(countries, batchSize), false)
-		GPars_batched_transactions_per_thread("region", batchChunks(regions, batchSize), false)
-
-		//can hold 10 elements (each element is a batch of 50 records)
-		BlockingQueue queue = new ArrayBlockingQueue(3)
-
-		List batch4 = []
-
-		//start the consumer thread
-		startGparsConsumer("city", queue, useDataBinding)
+		prepare1MRowsForInsert()
 
 		String message = "Insert 1 million city using scrollable resultset: databinding = $useDataBinding"
 		Long start = logBenchStart(message)
+
 		RowMapper<Map> mapper = new GrailsParameterMapRowMapper()
 		String q = "select * from city1M"
 		ScrollableQuery query = new ScrollableQuery(q, mapper, dataSource)
 
-		int index = 0
-		query.eachBatch(50) { List<Map> batch ->
-			batch4.add(batch)
-			if (batch4.size() == 4) {
-				index++
-				//println "put batch $index"
-				queue.put(batch4)
-				batch4 = []
+		DataflowQueue queue = new DataflowQueue()
+
+		//start the dataflow operator with 4 threads. This is our consumer.
+		def op1 = operator(inputs: [queue], outputs: [], maxForks:4) {List<Map> batch ->
+			City.withTransaction {
+				batch.each { Map row ->
+					insertRecord(cityDao, row, useDataBinding)
+				}
+				cleanUpGorm()
 			}
 		}
 
-		//there could be results left
-		if (batch4.size() > 0) {
-			queue.put(batch4)
+
+		final int MAX_QUEUE_SIZE = 10
+		query.eachBatch(50) { List<Map> batch ->
+			while (queue.length() > MAX_QUEUE_SIZE) {
+				//queue has 10 batches stocked, yield, let consumer consume few before we put more.
+				Thread.yield()
+			}
+			queue << batch
 		}
 
-		//put false to stop the consumer
-		queue.put(false)
+		//give operator a poision pill, so it will stop after finishing whatever batches are still in queue (cold shutdown).
+		queue << PoisonPill.instance
+
+		op1.join() //wait for operator to finish
 
 		println "City count is ${City.count()}"
 		logBenchEnd(message, start)
@@ -251,17 +244,17 @@ class LoaderService {
 		truncateTables()
 	}
 
-	@CompileStatic
-	void startGparsConsumer(String name, BlockingQueue queue, boolean useDataBinding = true) {
-		Consumer consumer = new Consumer(queue)
-		int index = 0
-		task {
-			consumer.start { List batch ->
-				//index++
-				//println "Got batch $index of size ${batch.size()}"
-				GPars_batched_transactions_per_thread(name, batch, useDataBinding)
-			}
-		}
+
+	public void prepare1MRowsForInsert() {
+		//first insert the million rows into test table if not already inserted.
+		insertCity1MRows()
+
+		//we need to insert countries and regions so that we can load cities later.
+		List countries = loadRecordsFromFile("Country.json")
+		List regions = loadRecordsFromFile("Region.json")
+
+		GPars_batched_transactions_per_thread("country", batchChunks(countries, batchSize), false)
+		GPars_batched_transactions_per_thread("region", batchChunks(regions, batchSize), false)
 	}
 
 	public void load_rows_with_manual_paging() {
