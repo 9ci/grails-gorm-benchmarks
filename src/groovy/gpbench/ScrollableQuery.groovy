@@ -17,11 +17,13 @@ class ScrollableQuery {
 	private String query
 	private DataSource dataSource
 	private RowMapper rowMapper
+	private int fetchSize
 
-	public ScrollableQuery(String query, RowMapper mapper, DataSource dataSource) {
+	public ScrollableQuery(String query, RowMapper mapper, DataSource dataSource, int fetchSize = Integer.MIN_VALUE) {
 		this.query = query
 		this.dataSource = dataSource
 		this.rowMapper = mapper
+		this.fetchSize = fetchSize
 	}
 
 
@@ -57,7 +59,7 @@ class ScrollableQuery {
 	protected Sql prepareSql() {
 		Sql sql = new Sql(dataSource)
 		sql.resultSetConcurrency = java.sql.ResultSet.CONCUR_READ_ONLY
-		sql.withStatement { Statement stmt -> stmt.fetchSize = Integer.MIN_VALUE }
+		sql.withStatement { Statement stmt -> stmt.fetchSize = fetchSize }
 		return sql
 	}
 
