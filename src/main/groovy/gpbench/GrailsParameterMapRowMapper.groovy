@@ -1,7 +1,7 @@
 package gpbench
 
+import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.transform.CompileStatic
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.jdbc.core.ColumnMapRowMapper
 import org.springframework.jdbc.support.JdbcUtils
 import org.springframework.mock.web.MockHttpServletRequest

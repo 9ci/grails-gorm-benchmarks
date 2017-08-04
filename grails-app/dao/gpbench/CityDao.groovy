@@ -2,12 +2,14 @@ package gpbench
 
 import grails.compiler.GrailsCompileStatic
 import grails.plugin.dao.GormDaoSupport
+import grails.transaction.Transactional
 
-
-class CityDao extends GormDaoSupport {
+@Transactional
+class CityDao extends GormDaoSupport<City> {
 	Class domainClass = City
 
-	def beforeInsertSave(city, params) {
+	@Override
+	void beforeInsertSave(City city, Map params) {
 		city.id = params.id as Long
 	}
 

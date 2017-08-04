@@ -1,13 +1,14 @@
 package gpbench
 
 import grails.converters.JSON
+import grails.plugin.dao.DaoUtil
 import grails.transaction.Transactional
+import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.sql.Sql
 import groovy.transform.CompileStatic
 import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.dataflow.operator.PoisonPill
-import org.codehaus.groovy.grails.web.json.JSONObject
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
+import org.grails.web.json.JSONObject
 import org.hibernate.SessionFactory
 import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.Resource
@@ -44,13 +45,13 @@ class LoaderService {
 		println "Running benchmark"
 
 
-		load_rows_scrollable_resultset(true) //insert million records with databinding
+		//load_rows_scrollable_resultset(true) //insert million records with databinding
 
 		//if you want to run the below benchmarks, comment the above one
 		// otherwise because of some issues, there;s deadlock and it fails.
 
 
-		/*
+
 		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
 		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
 
@@ -70,7 +71,7 @@ class LoaderService {
 
 		runImport('batched_transactions', true, true, true) //batched - databinding, typeless map
 		runImport('batched_transactions', false, false, true) //batched - without databinding, typed map
-		*/
+
 
 	}
 
@@ -312,11 +313,7 @@ class LoaderService {
 	}
 
 	def cleanUpGorm() {
-		def session = sessionFactory.currentSession
-		session.flush()
-		session.clear()
-		def propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
-		propertyInstanceMap.get().clear()
+		DaoUtil.flushAndClear()
 	}
 
 	def truncateTables() {
