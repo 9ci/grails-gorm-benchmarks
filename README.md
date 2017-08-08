@@ -11,6 +11,13 @@ So I jammed the beginnings of one together and here it is.
 [Zach](http://grails.1312388.n4.nabble.com/Grails-Hang-with-Bulk-Data-Import-Using-GPars-td3410441.html)
 posted a link to a project he was having problems with using [GPars][] to do a bulk data import with GPars and I ran with that as a good base.
 
+How to run the benchmarks
+-------
+- Make sure mysql is running
+- Create a database with name gpbench
+- Run the application with command ```gradle bootRun```
+- Benchmarks are run from the BootStrap.groovy. You should see the results on console. 
+
 GPars
 -------
 
