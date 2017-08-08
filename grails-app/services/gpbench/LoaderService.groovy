@@ -47,10 +47,8 @@ class LoaderService {
 
 		//load_rows_scrollable_resultset(true) //insert million records with databinding
 
-		//if you want to run the below benchmarks, comment the above one
+		//if you want to run the above benchmarks, comment the below all
 		// otherwise because of some issues, there;s deadlock and it fails.
-
-
 
 		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
 		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
@@ -290,7 +288,7 @@ class LoaderService {
 		ScriptUtils.executeSqlScript(connection, resource)
 
 		//check if records are already inserted
-		int count = jdbcTemplate.queryForLong("select count(*) FROM city1M")
+		int count = jdbcTemplate.queryForObject("select count(*) FROM city1M", Long)
 		if(count > 0) return
 
 		println "Preparing test table with million rows."
