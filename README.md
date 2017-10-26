@@ -41,7 +41,7 @@ The 4 key factors I have discovered so far to really speed things up are..
 4. Don't use GORM data binding if you can avoid it (it almost takes double time).
   * DON"T do this -> new SomeGormClass(yourPropSettings) or someGormInstance.properties = [name:'jim',color:'red'] or use bindData()
   * DO explicitly set the values on the fields or your gorm object -> someGormInstance.name = 'jim' ...etc
-
+5. Disabling domain autowiring improves performance. Autowiring adds 10 to 20 seconds overhead for 115K records insert.
 
 My Bench Mark Results and details
 -------
