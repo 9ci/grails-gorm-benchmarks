@@ -66,10 +66,10 @@ My Bench Mark Results and details
 |with databinding| 52.962 |
 |no binding | 28.886 |
 |no autowire | xxx |
-|no autowire, no binding | xxxx |
+|no validation | xxx |
 |no binding, no autowire,  no validation | xxxxx |
-|date stamp fields | xxx |
-|audit-trail stamp fields | xxx |
+|grails date stamp fields | xxx |
+|audit-trail stamp fields (user and dates)| xxx |
 |no dao | xxx |
 |DataflowQueue (CED Way) | xxx |
 
