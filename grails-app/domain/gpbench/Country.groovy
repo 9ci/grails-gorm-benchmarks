@@ -1,6 +1,7 @@
 package gpbench
 
 class Country {
+	transient loaderService
 
 	String name
 	String capital

@@ -1,6 +1,7 @@
 package gpbench;
 
 class City {
+	transient loaderService
 
 	String name
 	String shortCode
@@ -8,10 +9,11 @@ class City {
 	Float latitude
 	Float longitude
 
+
 	static belongsTo = [region:Region, country:Country]
 
 	static mapping = {
-		id generator: "assigned"
+		//id generator: "assigned"
 		cache true
 	}
 

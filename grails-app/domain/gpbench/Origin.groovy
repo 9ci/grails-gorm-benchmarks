@@ -2,6 +2,8 @@ package gpbench
 
 
 class Origin {
+	transient loaderService
+
 	Country country
 	Region state
 	City city
