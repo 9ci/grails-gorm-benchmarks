@@ -14,11 +14,12 @@ class CountryDao extends GormDaoSupport<Country> {
 
 
 	@GrailsCompileStatic
-	public void insertWithSetter(Map row) {
+	public Country insertWithSetter(Map row) {
 		Country c = new Country()
 		c.id = row.id as Long
 		DomainUtils.copyDomain(c, row)
 		c.save(failOnError: true)
+		return c
 	}
 
 

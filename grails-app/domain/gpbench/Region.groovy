@@ -1,6 +1,7 @@
 package gpbench
 
 class Region {
+	transient loaderService
 
 	String name
 	String code

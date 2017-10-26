@@ -45,16 +45,15 @@ class LoaderService {
 		println "Running benchmark"
 
 
-		//load_rows_scrollable_resultset(true) //insert million records with databinding
+		//load_rows_scrollable_resultset(false) //insert million records with databinding
 
 		//if you want to run the above benchmarks, comment the below all
 		// otherwise because of some issues, there;s deadlock and it fails.
-
+		//Run a benchmark here, just to heat up the jvm, dont consider results of this benchmark.
 		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
-		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
 
 
-		println "############"
+		println "############ "
 		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
 		runImport('GPars_batched_transactions_per_thread', false, false, true) //batched - without databinding, typed map
 
@@ -78,7 +77,7 @@ class LoaderService {
 
 		List countries = loadRecordsFromFile("Country.${extension}")
 		List regions = loadRecordsFromFile("Region.${extension}")
-		List cities = loadRecordsFromFile("City.${extension}")
+		List cities = loadRecordsFromFile("City100k.${extension}")
 		if(batched) {
 			countries = batchChunks(countries, batchSize)
 			regions = batchChunks(regions, batchSize)
@@ -329,28 +328,16 @@ class LoaderService {
 	//If I pass in a batch size of 3 it will convert [1,2,3,4,5,6,7,8] into [[1,2,3],[4,5,6],[7,8]]
 	//see http://stackoverflow.com/questions/2924395/groovy-built-in-to-split-an-array-into-equal-sized-subarrays
 	//and http://stackoverflow.com/questions/3147537/split-collection-into-sub-collections-in-groovy
-	List batchChunks(theList, batchSize) {
+	List batchChunks(List theList, batchSize) {
 		if (!theList) return [] //return and empty list if its already empty
-		
-		def batchedList = []
-		int chunkCount = theList.size() / batchSize
-
-		chunkCount.times { chunkNum ->
-			def start = chunkNum * batchSize 
-			def end = start + batchSize - 1
-			batchedList << theList[start..end]    
-		}
-
-		if (theList.size() % batchSize){
-			batchedList << theList[chunkCount * batchSize..-1]
-		}
+		def batchedList = theList.collate(batchSize)
 		return batchedList    
 	}
 	
 	Long logBenchStart(desc) {
 		def msg = "***** Starting $desc"
-		log.info(msg)
-		println msg
+		//log.info(msg)
+		//println msg
 		return new Long(System.currentTimeMillis())
 	}
 	
