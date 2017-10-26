@@ -71,6 +71,7 @@ My Bench Mark Results and details
 |date stamp fields | xxx |
 |audit-trail stamp fields | xxx |
 |no dao | xxx |
+|DataflowQueue (CED Way) | xxx |
 
 **Note:** unless noted, validation, ajutowiring and databinding are enabled
 
