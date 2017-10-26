@@ -59,9 +59,20 @@ My Bench Mark Results and details
 | Without data binding | 95.867                            | 120.361            | 74.225                               | **28.886**                         | 90.627                               |
 |                      |                                   |                    |                                      |                                    |                                      |
 
+**Note:** All Numbers are in Seconds. 
 
-**Note:** All Numbers are in Seconds.  
+| gpars benchs      | time |
+|-------------------|------|
+|with databinding| 52.962 |
+|no binding | 28.886 |
+|no autowire | xxx |
+|no autowire, no binding | xxxx |
+|no binding, no autowire,  no validation | xxxxx |
+|date stamp fields | xxx |
+|audit-trail stamp fields | xxx |
+|no dao | xxx |
 
+**Note:** unless noted, validation, ajutowiring and databinding are enabled
 
 More background and reading
 ---------------
