@@ -74,6 +74,15 @@ My Bench Mark Results and details
 |no dao            | 23.788 |
 |DataflowQueue (CED Way) | 360.013 |
 
+
+
+CPU Load during Gparse batch insert
+--------
+It can be seen that cpu load goes highest during Gparse batch insert
+  
+![Image of Yaktocat](./cupload.png)
+
+
 **Note:** 
 - All Numbers are in Seconds.
 - Domain autowiring is disabled (As per Grails 3.x Default), validation and databinding are enabled, unless explicitely specified
@@ -84,7 +93,7 @@ System specs
 ------------
 - Macbook Pro 2.5 GHz Intel Core i7 Quad core, 16 GB RAM
 - Gparse pool size of 8
-- GRAILS_OPTS="-Xmx2048M -server -XX:MaxPermSize=512M -XX:PermSize=128M -XX:+UseParallelGC"
+- GRAILS_OPTS="-Xmx2048M -server -XX:+UseParallelGC"
 
 
 More background and reading
