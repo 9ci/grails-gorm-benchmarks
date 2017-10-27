@@ -1,7 +1,9 @@
 package gpbench
 
 import grails.converters.JSON
+import grails.core.GrailsApplication
 import grails.plugin.dao.DaoUtil
+import grails.plugins.csv.CSVMapReader
 import grails.transaction.Transactional
 import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.sql.Sql
@@ -40,6 +42,7 @@ class LoaderService {
 	RegionDao regionDao
 	CityDao cityDao
 	CountryDao countryDao
+	GrailsApplication grailsApplication
 
 	def batchSize = 50 //this should match the hibernate.jdbc.batch_size in datasources
 
@@ -218,9 +221,11 @@ class LoaderService {
 
 	List<Map> loadRecordsFromFile(String fileName) {
 		List<Map> result = []
-		File file = new File("resources/${fileName}")
+		Resource resource = grailsApplication.mainContext.getResource("classpath:$fileName")
+		assert resource.exists()
+
 		if(fileName.endsWith("csv")) {
-			def reader = file.toCsvMapReader()
+			def reader = new CSVMapReader(new InputStreamReader(resource.inputStream))
 			reader.each { Map m ->
 				//need to convert to grails parameter map, so that it can be binded. because csv is all string:string
 				m = toGrailsParamsMap(m)
@@ -228,7 +233,7 @@ class LoaderService {
 			}
 		} else {
 			String line
-			file.withReader { Reader reader ->
+			resource.inputStream.withReader { Reader reader ->
 				while (line = reader.readLine()) {
 					JSONObject json = JSON.parse(line)
 					result.add json

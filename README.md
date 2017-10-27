@@ -10,9 +10,8 @@ So I jammed the beginnings of one together and here it is.
 
 How to run the benchmarks
 -------
-- Make sure mysql is running
-- Create a database with name gpbench
-- Run the application with command ```grails run-app ``` or ```grails run-app -Dgrails.env=production``` or just deploy the war to tomcat.
+- build runnable war using command, ```gradle assemble```
+- Go to build/lib directory, Run the application with command ```java -jar grails-gpars-batch-load-benchmark-0.1.war``` 
 - Benchmarks are run from the BootStrap.groovy. You will see the results on console. 
 
 
@@ -48,7 +47,7 @@ The 4 key factors I have discovered so far to really speed things up are..
 My Bench Mark Results and details
 -------
 
-* 115k CSV records on a MacBook pro 2.5 GHz Intel Core i7. 2048 mb ram was given to the VM and these were run using grails run-app -Dgrails.env=production
+* 115k CSV records on a MacBook pro 2.5 GHz Intel Core i7. 2048 mb ram was given to the VM and these were run using ```java -jar grails-gpars-batch-load-benchmark-0.1.war```
 * I'm using MySql as the DB and its installed on my mac too so GPars can't really get all the cores
 * all of these have jdbc.batch_size = 50 and use the principals from #2 above and flush/clear every 50 rows
 * The test where the batch insert happen in a single transaction can't be tested with GPars since a single transaction can't span multiple threads
@@ -57,22 +56,22 @@ My Bench Mark Results and details
 
 |                      | All records in single transaction | Commit each record | Batched Transaction - Without Gpars  | Batched Transactions - With Gpars  | Gpars single transaction per thread  |
 |----------------------|-----------------------------------|--------------------|--------------------------------------|------------------------------------|--------------------------------------|
-| With data binding    | 112.583                           | **268.17**         | 139.832                              | 32.743                             | 66.181                               |
-| Without data binding | 47.383                            | 91.332             | 44.563                               | **14.02**                          | 32.762                               |
+| With data binding    | 53.156                           | **111.44**          | 43.746                              | 22.257                             | 26.549                               |
+| Without data binding | 24.662                            | 48.716             | 21.786                               | **8.224**                          | 15.863                               |
 |                      |                                   |                    |                                      |                                    |                                      |
 
 
 | gpars benchs      | time |
 |-------------------|------|
-|with databinding   | 32.743 |
-|no binding         | 14.02 |
+|with databinding   | 22.257  |
+|no binding         | 8.224 |
 |no autowire        | 30.532 |
-|no validation      | 21.462 |
-|no binding, no autowire,  no validation | 10.294 |
-|grails date stamp fields | 32.297 |
-|audit-trail stamp fields (user and dates)| 27.495 |
-|no dao            | 23.788 |
-|DataflowQueue (CED Way) | 360.013 |
+|no validation      | 10.341 |
+|no binding, no autowire,  no validation | 6.472 |
+|grails date stamp fields | 23.10 |
+|audit-trail stamp fields (user and dates)| 23.40 |
+|no dao            | 22.542 |
+|DataflowQueue (CED Way) | 250.013 |
 
 
 
