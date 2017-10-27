@@ -59,7 +59,9 @@ My Bench Mark Results and details
 | Without data binding | 95.867                            | 120.361            | 74.225                               | **28.886**                         | 90.627                               |
 |                      |                                   |                    |                                      |                                    |                                      |
 
-**Note:** All Numbers are in Seconds. 
+**Note:** 
+- All Numbers are in Seconds.
+- Domain autowiring is disabled (Grails 3.x Default)
 
 | gpars benchs      | time |
 |-------------------|------|
@@ -73,7 +75,7 @@ My Bench Mark Results and details
 |no dao | xxx |
 |DataflowQueue (CED Way) | xxx |
 
-**Note:** unless noted, validation, ajutowiring and databinding are enabled
+**Note:** unless noted, validation and databinding are enabled
 
 More background and reading
 ---------------
