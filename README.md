@@ -1,6 +1,6 @@
 
 GORM : batch importing large datasets and a performance benchmarking app
-===================================	 
+===================================
 
 Summary
 --------
@@ -21,6 +21,8 @@ The Bemchmarks
 1. GPars_batched_transactions_per_thread : Runs the batches in parallel, each batch being the same size as jdbc batch size (50).
 2. GPars_single_rec_per_thread_transaction : Gpars Single thread par transaction
 3. single_transaction : Insert all records in a single transaction and commit at the end. No Gpars.
+4. GPars_batched_transactions_without_validation : Gparse batched, with data binding, without validation
+5. GPars_batched_transactions_without_binding_validation: Gparse without data binding, without validation
 4. commit_each_save: Insert each record in individual transactions and commit. No Gpars.
 5. batched_transactions: Run batch insert as 1) but without Gparse.
 
