@@ -1,4 +1,4 @@
-package gpbench;
+package gpbench
 
 class City {
 	transient loaderService
@@ -8,7 +8,6 @@ class City {
 
 	Float latitude
 	Float longitude
-
 
 	static belongsTo = [region:Region, country:Country]
 
@@ -22,5 +21,4 @@ class City {
 	}
 
 	String toString() { name }
-
 }

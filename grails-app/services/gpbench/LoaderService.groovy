@@ -8,6 +8,7 @@ import groovy.sql.Sql
 import groovy.transform.CompileStatic
 import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.dataflow.operator.PoisonPill
+import org.grails.datastore.gorm.GormEntity
 import org.grails.web.json.JSONObject
 import org.hibernate.SessionFactory
 import org.springframework.core.io.FileSystemResource
@@ -26,6 +27,7 @@ import static groovyx.gpars.GParsPool.withPool
 import static groovyx.gpars.dataflow.Dataflow.operator
 
 class LoaderService {
+	private final static int POOL_SIZE = 8
 	static transactional = false
 
 	SessionFactory sessionFactory
@@ -42,20 +44,24 @@ class LoaderService {
 	def batchSize = 50 //this should match the hibernate.jdbc.batch_size in datasources
 
 	void runBenchMark() {
+
 		println "Running benchmark"
 
-
-		//load_rows_scrollable_resultset(false) //insert million records with databinding
+		//warmup()
+		//load_rows_scrollable_resultset(true) //insert million records with databinding
 
 		//if you want to run the above benchmarks, comment the below all
 		// otherwise because of some issues, there;s deadlock and it fails.
-		//Run a benchmark here, just to heat up the jvm, dont consider results of this benchmark.
-		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
 
-
+		warmup()
 		println "############ "
+
 		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
 		runImport('GPars_batched_transactions_per_thread', false, false, true) //batched - without databinding, typed map
+
+		runImport('GPars_batched_transactions_without_validation', false, true, true) //without validation
+		runImport('GPars_batched_transactions_without_binding_validation', false, false, true) //without validation
+
 
 		runImport('GPars_single_rec_per_thread_transaction', true, true) //databinding, typeless map
 		runImport('GPars_single_rec_per_thread_transaction', false, false) //without databinding, typed map
@@ -72,6 +78,16 @@ class LoaderService {
 
 	}
 
+	void warmup() {
+		List countries = loadRecordsFromFile("Country.json")
+		List regions = loadRecordsFromFile("Region.json")
+
+		GPars_batched_transactions_per_thread("country", batchChunks(countries, batchSize), false)
+		GPars_batched_transactions_per_thread("region", batchChunks(regions, batchSize), false)
+		truncateTables()
+		Thread.sleep(10 * 1000)
+	}
+
 	void runImport(String method, boolean csv, boolean databinding, boolean batched = false) {
 		String extension = csv ? 'csv' : 'json'
 
@@ -85,7 +101,6 @@ class LoaderService {
 		}
 
 		String desc = method + ':' + (databinding ? "with-databinding" : 'without-databinding')
-		desc = desc +  ':' + (csv ? 'typeless-map' : 'typed-map')
 
 		try {
 			Long startTime = logBenchStart(desc)
@@ -140,7 +155,7 @@ class LoaderService {
 	void GPars_single_rec_per_thread_transaction(String name, List<Map> rows, boolean useDataBinding) {
 		def service = getService(name)
 
-		withPool(4){
+		withPool(POOL_SIZE){
 			rows.eachWithIndexParallel { Map row, int index ->
 				withPersistence {
 					insertRecord(service, row, useDataBinding)
@@ -155,7 +170,7 @@ class LoaderService {
 		//println "Gparse batched called"
 		def service = getService(name)
 
-		withPool(4){
+		withPool(POOL_SIZE){
 			rows.eachParallel { List batchList ->
 				City.withTransaction {
 					//println "Inserting batch $name : size - ${batchList.size()}"
@@ -166,6 +181,36 @@ class LoaderService {
 					cleanUpGorm()
 				}
 
+			}
+		}
+
+	}
+
+	void GPars_batched_transactions_without_validation(String name, List<List<Map>> rows, boolean useDataBinding) {
+		withPool(POOL_SIZE){
+			rows.eachParallel { List batchList ->
+				City.withTransaction {
+					batchList.each{ Map row ->
+						insertRecordWithoutValidation(name, row)
+					}
+					cleanUpGorm()
+				}
+			}
+		}
+
+	}
+
+	void GPars_batched_transactions_without_binding_validation(String name, List<List<Map>> rows, boolean useDataBinding) {
+		def service = getService(name)
+
+		withPool(POOL_SIZE){
+			rows.eachParallel { List batchList ->
+				City.withTransaction {
+					batchList.each{ Map row ->
+						insertRecordWithoutValidationAndDataBinding(service, row)
+					}
+					cleanUpGorm()
+				}
 			}
 		}
 
@@ -206,12 +251,12 @@ class LoaderService {
 
 		RowMapper<Map> mapper = new GrailsParameterMapRowMapper()
 		String q = "select * from city1M"
-		ScrollableQuery query = new ScrollableQuery(q, mapper, dataSource)
+		ScrollableQuery query = new ScrollableQuery(q, mapper, dataSource, 50)
 
 		DataflowQueue queue = new DataflowQueue()
 
 		//start the dataflow operator with 4 threads. This is our consumer.
-		def op1 = operator(inputs: [queue], outputs: [], maxForks:4) {List<Map> batch ->
+		def op1 = operator(inputs: [queue], outputs: [], maxForks:POOL_SIZE) {List<Map> batch ->
 			City.withTransaction {
 				batch.each { Map row ->
 					insertRecord(cityDao, row, useDataBinding)
@@ -319,7 +364,7 @@ class LoaderService {
 		jdbcTemplate.update("DELETE FROM city")
 		jdbcTemplate.update("DELETE FROM region")
 		jdbcTemplate.update("DELETE FROM country")
-		jdbcTemplate.update("RESET QUERY CACHE") //reset mysql query cache to try and be fair
+		//jdbcTemplate.update("RESET QUERY CACHE") //reset mysql query cache to try and be fair
 		//println "Truncating tables complete"
 
 	}
@@ -363,6 +408,17 @@ class LoaderService {
 			println row
 			e.printStackTrace()
 		}
+	}
+
+	void insertRecordWithoutValidation(String domain, Map row) {
+		GormEntity entity = Class.forName("gpbench.$domain").newInstance()
+		entity.properties = row
+		entity.id = row['id'] as Long
+		entity.save(false)
+	}
+
+	void insertRecordWithoutValidationAndDataBinding(def service, Map row) {
+		service.insertWithoutValidation(row)
 	}
 
 	GrailsParameterMap toGrailsParamsMap(Map<String, String> map) {

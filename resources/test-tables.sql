@@ -1,11 +1,10 @@
-
-CREATE TABLE IF NOT EXISTS city1M
+CREATE TABLE city1M
 (
-    id BIGINT(20) PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,
-    shortCode VARCHAR(255) NOT NULL,
-    latitude FLOAT NOT NULL,
-    longitude FLOAT NOT NULL,
-    `country.id` BIGINT(20) NOT NULL,
-    `region.id` BIGINT(20) NOT NULL
+  "id" BIGINT AUTO_INCREMENT PRIMARY KEY,
+  "name" VARCHAR(255) NOT NULL,
+  "shortCode" VARCHAR(255) NOT NULL,
+  "latitude" FLOAT NOT NULL,
+  "longitude" FLOAT NOT NULL,
+  "country.id" BIGINT NOT NULL,
+  "region.id" BIGINT NOT NULL
 );

@@ -55,27 +55,35 @@ My Bench Mark Results and details
 
 |                      | All records in single transaction | Commit each record | Batched Transaction - Without Gpars  | Batched Transactions - With Gpars  | Gpars single transaction per thread  |
 |----------------------|-----------------------------------|--------------------|--------------------------------------|------------------------------------|--------------------------------------|
-| With data binding    | 169.3                             | **358.5**              | 144.423                          | 52.962                             | 105.595                              |
-| Without data binding | 95.867                            | 120.361            | 74.225                               | **28.886**                         | 90.627                               |
+| With data binding    | 112.583                           | **268.17**         | 139.832                              | 32.743                             | 66.181                               |
+| Without data binding | 47.383                            | 91.332             | 44.563                               | **14.02**                          | 32.762                               |
 |                      |                                   |                    |                                      |                                    |                                      |
 
-**Note:** 
-- All Numbers are in Seconds.
-- Domain autowiring is disabled (Grails 3.x Default)
 
 | gpars benchs      | time |
 |-------------------|------|
-|with databinding| 52.962 |
-|no binding | 28.886 |
-|no autowire | xxx |
-|no validation | xxx |
-|no binding, no autowire,  no validation | xxxxx |
-|grails date stamp fields | xxx |
-|audit-trail stamp fields (user and dates)| xxx |
-|no dao | xxx |
-|DataflowQueue (CED Way) | xxx |
+|with databinding   | 32.743 |
+|no binding         | 14.02 |
+|no autowire        | 30.532 |
+|no validation      | 21.462 |
+|no binding, no autowire,  no validation | 10.294 |
+|grails date stamp fields | 32.297 |
+|audit-trail stamp fields (user and dates)| 27.495 |
+|no dao            | 23.788 |
+|DataflowQueue (CED Way) | 360.013 |
 
-**Note:** unless noted, validation and databinding are enabled
+**Note:** 
+- All Numbers are in Seconds.
+- Domain autowiring is disabled (As per Grails 3.x Default), validation and databinding are enabled, unless explicitely specified
+- H2 In memory database is used.
+
+
+System specs
+------------
+- Macbook Pro 2.5 GHz Intel Core i7 Quad core, 16 GB RAM
+- Gparse pool size of 8
+- GRAILS_OPTS="-Xmx2048M -server -XX:MaxPermSize=512M -XX:PermSize=128M -XX:+UseParallelGC"
+
 
 More background and reading
 ---------------

@@ -54,6 +54,8 @@ dependencies {
     compile("org.grails.plugin:dao:3.0.3-SNAPSHOT") { changing = true}
     compile 'org.grails.plugins:csv:1.0'
 
+    compile "org.grails.plugins:audit-trail:3.0.4-SNAPSHOT"
+
     compile "org.springframework:spring-test:4.3.7.RELEASE"
     testCompile "org.grails:grails-plugin-testing"
     //testCompile "org.grails.plugins:geb"
