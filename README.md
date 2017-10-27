@@ -48,7 +48,6 @@ My Bench Mark Results and details
 -------
 
 * 115k CSV records on a MacBook pro 2.5 GHz Intel Core i7. 2048 mb ram was given to the VM and these were run using ```java -jar grails-gpars-batch-load-benchmark-0.1.war```
-* I'm using MySql as the DB and its installed on my mac too so GPars can't really get all the cores
 * all of these have jdbc.batch_size = 50 and use the principals from #2 above and flush/clear every 50 rows
 * The test where the batch insert happen in a single transaction can't be tested with GPars since a single transaction can't span multiple threads
 * the winner seems to be gpars and batched (smaller chunks) transactions
