@@ -91,7 +91,7 @@ The key conclusions as per my observation are as below
 4. JDBC Batch size of 50 Gave the best results, as batch size goes higher, performance started to degrade.
 4. Don't use GORM data binding if you can avoid it (it almost takes double time).
 5. Disabling validation improves performance eg. ```domain.save(false)```
-6. Grails Date stamp fields, or audit stamp doesn't have any noticeable effects on performance.
+6. Grails Date stamp fields, or audit stamp doesn't have any noticeable effects on performance. That is probably the Event listeners gets called regardless if domain has date stamp fields or not.
 7. I did not see any noticeable difference if Domain autowiring is enabled or disabled. (Domain with dependency on one service).
    It made just 2 to 3 seconds difference for 115K records.
 8. Using eight threads on quad core processor does not make the performance faster by eight times (Needs more investigation !?)
