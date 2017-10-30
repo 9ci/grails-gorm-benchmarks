@@ -57,7 +57,9 @@ class LoaderService {
 		// otherwise because of some issues, there;s deadlock and it fails.
 
 		warmup()
-		println "############ "
+		println "Max memory: " + (Runtime.getRuntime().maxMemory() / 1024 )+ " KB"
+		println "Total Memory available memory: " + (Runtime.getRuntime().totalMemory() / 1024 )+ " KB"
+		println "Free memory: " + freeMemory
 
 		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
 		runImport('GPars_batched_transactions_per_thread', false, false, true) //batched - without databinding, typed map
@@ -79,6 +81,10 @@ class LoaderService {
 		runImport('batched_transactions', false, false, true) //batched - without databinding, typed map
 
 
+	}
+
+	String getFreeMemory() {
+		(Runtime.getRuntime().freeMemory() / 1024 ) + " KB"
 	}
 
 	void warmup() {
@@ -394,7 +400,7 @@ class LoaderService {
 	
 	void logBenchEnd(String desc, Long startTime){
 		def elapsed = (System.currentTimeMillis() - startTime)/1000
-		def msg = "***** Finshed $desc in $elapsed seconds"
+		def msg = "***** Finshed $desc in $elapsed seconds, free Memory: " + freeMemory
 		println msg
 	}
 
