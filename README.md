@@ -35,14 +35,15 @@ Key conclusions
 
 The 4 key factors I have discovered so far to really speed things up are..
 
-1. Use GPars so you are not firing on the proverbial 1 cylinder. 
+1. Gparse with batch insert has the best performance 
 2. follow the concepts in the hibernate suggestions here in http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html for chaps 13.1 and 13.2 and set your jdbc.batch_size then go to Ted's article here http://naleid.com/blog/2009/10/01/batch-import-performance-with-grails-and-mysql/
 3. use small transaction batches and keep them the same size as the jdbc.batch_size. DO NOT (auto)commit on every insert
 4. JDBC Batch size of 50 Gave the best results, as batch size goes higher, performance started to degrade.
 4. Don't use GORM data binding if you can avoid it (it almost takes double time).
   * DON"T do this -> new SomeGormClass(yourPropSettings) or someGormInstance.properties = [name:'jim',color:'red'] or use bindData()
   * DO explicitly set the values on the fields or your gorm object -> someGormInstance.name = 'jim' ...etc
-5. Disabling domain autowiring improves performance. Autowiring adds 10 to 20 seconds overhead for 115K records insert.
+5. Disabling validation improves performance eg. domain.save(false)
+6. Grails Date stamp fields, or audit stamp doesn't have any noticable effects on performance.
 
 My Bench Mark Results and details
 -------
@@ -64,13 +65,13 @@ My Bench Mark Results and details
 |-------------------|------|
 |with databinding   | 22.257  |
 |no binding         | 8.224 |
-|no autowire        | 30.532 |
+|no autowire        | 22.197 |
 |no validation      | 10.341 |
 |no binding, no autowire,  no validation | 6.472 |
-|grails date stamp fields | 23.10 |
-|audit-trail stamp fields (user and dates)| 23.40 |
+|grails date stamp fields | 22.823 |
+|audit-trail stamp fields (user and dates)| 16.001 |
 |no dao            | 22.542 |
-|DataflowQueue (CED Way) | 250.013 |
+|DataflowQueue (CED Way) 1 Million records | 432.96 |
 
 
 
@@ -84,8 +85,8 @@ It can be seen that cpu load goes highest during Gparse batch insert
 **Note:** 
 - All Numbers are in Seconds.
 - Domain autowiring is disabled (As per Grails 3.x Default), validation and databinding are enabled, unless explicitely specified
+- One service is injected in each of three domains For the benchmark whith autowiring enabled.
 - H2 In memory database is used.
-
 
 System specs
 ------------

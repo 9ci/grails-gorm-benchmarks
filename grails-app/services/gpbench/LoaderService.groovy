@@ -332,7 +332,8 @@ class LoaderService {
 
 	List insertCity1MRows() {
 		//first create the test table if does nto exist
-		Resource resource = new FileSystemResource("resources/test-tables.sql");
+		Resource resource = grailsApplication.mainContext.getResource("classpath:test-tables.sql")
+		assert resource.exists()
 		Connection connection = sessionFactory.currentSession.connection()
 		ScriptUtils.executeSqlScript(connection, resource)
 
