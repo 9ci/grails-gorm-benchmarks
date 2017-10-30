@@ -93,6 +93,7 @@ The key conclusions as per my observation are as below
 5. Disabling validation improves performance eg. ```domain.save(false)```
 6. Grails Date stamp fields, or audit stamp doesn't have any noticeable effects on performance.
 7. I did not see any noticeable difference if Domain autowiring is enabled or disabled. (Domain with dependency on one service).
+   It made just 2 to 3 seconds difference for 115K records.
 8. Using eight threads on quad core processor does not make the performance faster by eight times (Needs more investigation !?)
 
 
