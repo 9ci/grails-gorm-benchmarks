@@ -27,23 +27,9 @@ The Bemchmarks
 
 Note: All of above benchmarks are run with and without data binding, and you will see the results for both.
 
-By default, all beanchmarks are run with Gorm domain autowiring enabled. 
+**By default, all benchmarks are run with Gorm domain autowiring enabled.** 
 If you want to see effect of autowiring domains, just set gorm autowire to false in application.yml
 
-Key conclusions
--------
-
-The 4 key factors I have discovered so far to really speed things up are..
-
-1. Gparse with batch insert has the best performance 
-2. follow the concepts in the hibernate suggestions here in http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html for chaps 13.1 and 13.2 and set your jdbc.batch_size then go to Ted's article here http://naleid.com/blog/2009/10/01/batch-import-performance-with-grails-and-mysql/
-3. use small transaction batches and keep them the same size as the jdbc.batch_size. DO NOT (auto)commit on every insert
-4. JDBC Batch size of 50 Gave the best results, as batch size goes higher, performance started to degrade.
-4. Don't use GORM data binding if you can avoid it (it almost takes double time).
-  * DON"T do this -> new SomeGormClass(yourPropSettings) or someGormInstance.properties = [name:'jim',color:'red'] or use bindData()
-  * DO explicitly set the values on the fields or your gorm object -> someGormInstance.name = 'jim' ...etc
-5. Disabling validation improves performance eg. domain.save(false)
-6. Grails Date stamp fields, or audit stamp doesn't have any noticable effects on performance.
 
 My Bench Mark Results and details
 -------
@@ -65,13 +51,13 @@ My Bench Mark Results and details
 |-------------------|------|
 |with databinding   | 22.257  |
 |no binding         | 8.224 |
-|no autowire        | 22.197 |
+|With autowire        | 24.094 |
 |no validation      | 10.341 |
 |no binding, no autowire,  no validation | 6.472 |
 |grails date stamp fields | 22.823 |
 |audit-trail stamp fields (user and dates)| 16.001 |
 |no dao            | 22.542 |
-|DataflowQueue (CED Way) 1 Million records | 432.96 |
+|DataflowQueue (CED Way) 1 Million records | 16.285 |
 
 
 
@@ -93,6 +79,21 @@ System specs
 - Macbook Pro 2.5 GHz Intel Core i7 Quad core, 16 GB RAM
 - Gparse pool size of 8
 - GRAILS_OPTS="-Xmx2048M -server -XX:+UseParallelGC"
+
+
+Conclusions
+-------
+
+The key conclusions as per my observation are as below
+
+1. Gparse with batch insert has the best performance 
+3. use small transaction batches and keep them the same size as the jdbc.batch_size. DO NOT (auto)commit on every insert
+4. JDBC Batch size of 50 Gave the best results, as batch size goes higher, performance started to degrade.
+4. Don't use GORM data binding if you can avoid it (it almost takes double time).
+5. Disabling validation improves performance eg. ```domain.save(false)```
+6. Grails Date stamp fields, or audit stamp doesn't have any noticeable effects on performance.
+7. I did not see any noticeable difference if Domain autowiring is enabled or disabled. (Domain with dependency on one service).
+8. Using eight threads on quad core processor does not make the performance faster by eight times (Needs more investigation !?)
 
 
 More background and reading

@@ -50,11 +50,13 @@ class LoaderService {
 
 		println "Running benchmark"
 
+
 		//warmup()
 		//load_rows_scrollable_resultset(true) //insert million records with databinding
 
 		//if you want to run the above benchmarks, comment the below all
 		// otherwise because of some issues, there;s deadlock and it fails.
+
 
 		warmup()
 		println "Max memory: " + (Runtime.getRuntime().maxMemory() / 1024 )+ " KB"
@@ -80,7 +82,7 @@ class LoaderService {
 		runImport('batched_transactions', true, true, true) //batched - databinding, typeless map
 		runImport('batched_transactions', false, false, true) //batched - without databinding, typed map
 
-
+		*/
 	}
 
 	String getFreeMemory() {
@@ -349,20 +351,14 @@ class LoaderService {
 
 		println "Preparing test table with million rows."
 
-		File file = new File("resources/City100k.csv")
+		List<Map> cityRecords = loadRecordsFromFile("City100k.csv")
 		String query = "insert into city1M (name, latitude, longitude, shortCode, `country.id`, `region.id`) values (?, ?, ?, ?, ?, ?)"
 		Sql sql = new Sql(dataSource)
 
-		//String message = "Insert million records with direct insert queries, no hibernate/grails"
-		//Long start = logBenchStart(message)
-		for(int i in (1..10)) {
-			def reader = file.toCsvMapReader()
-			reader.each { Map m ->
+		cityRecords.each { Map m ->
 				List params = [m.name, m.latitude as Float, m.longitude as Float, m.shortCode, m['country.id'] as Long, m['region.id'] as Long]
 				sql.execute query, params
 			}
-		}
-
 		//logBenchEnd(message, start)
 	}
 
