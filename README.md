@@ -28,7 +28,7 @@ The Bemchmarks
 Note: All of above benchmarks are run with and without data binding, and you will see the results for both.
 
 **By default, all benchmarks are run with Gorm domain autowiring enabled.** 
-If you want to see effect of autowiring domains, just set gorm autowire to false in application.yml
+If you want to see effect of disabling autowiring in domains, just set gorm autowire to false in application.yml
 
 
 My Bench Mark Results and details
@@ -40,24 +40,36 @@ My Bench Mark Results and details
 * the winner seems to be gpars and batched (smaller chunks) transactions
 
 
+**Results with Gparse pool size 8 **
+
 |                      | All records in single transaction | Commit each record | Batched Transaction - Without Gpars  | Batched Transactions - With Gpars  | Gpars single transaction per thread  |
 |----------------------|-----------------------------------|--------------------|--------------------------------------|------------------------------------|--------------------------------------|
-| With data binding    | 53.156                           | **111.44**          | 43.746                              | 22.257                             | 26.549                               |
-| Without data binding | 24.662                            | 48.716             | 21.786                               | **8.224**                          | 15.863                               |
+| With data binding    | 40.807                           | **81.521**          | 43.569                              |  12.32                              | 22.372                               |
+| Without data binding | 20.295                            | 43.498             | 20.283                               | **6.842**                          | 16.432                               |
 |                      |                                   |                    |                                      |                                    |                                      |
+
+
+**Results for Gparse batched with different pool sizes **
+
+| Pool size                             |  2 threads | 3 threads | 4 threads | 5 threads | 6 threads | 7 threads | 8 threads | 9 threads | 10 threads | 11 threads | 12 threads |
+|---------------------------------------|------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|------------|------------|------------|
+| Gparse Batched - With data binding    | 24.522     | 22.473    | 16.063    | 17.363    | 16.698    | 14.53     | 12.32     | 12.012    | 12.145     | 14.785     | 14.081     |
+| Gparse batched - Without data binding | 12.302     | 12.593    | 9.52      | 8.586     | 8.509     | 7.46      | 6.842     | 6.27      | 6.696      | 6.896      | 7.074      |
+| Without validation                    | 15.335     | 17.588    | 9.906     | 10.3      | 10.724    | 9.489     | 7.993     | 8.112     | 8.203      | 9.069      | 9.032      |
+| Without validation or data binding    | 10.619     | 9.311     | 7.088     | 7.59      | 7.997     | 8.088     | 6.558     | 5.896     | 5.683      | 6.223      | 6.594      |
 
 
 | gpars benchs      | time |
 |-------------------|------|
-|with databinding   | 22.257  |
-|no binding         | 8.224 |
-|With autowire        | 24.094 |
-|no validation      | 10.341 |
-|no binding, no autowire,  no validation | 6.472 |
-|grails date stamp fields | 22.823 |
-|audit-trail stamp fields (user and dates)| 16.001 |
-|no dao            | 22.542 |
-|DataflowQueue (CED Way) 1 Million records | 16.285 |
+|with databinding   | 12.32  |
+|no binding         | 6.842 |
+|No autowire        | 12.969 |
+|no validation      | 7.993 |
+|no binding, no autowire,  no validation | 6.221 |
+|grails date stamp fields | 14.726 |
+|audit-trail stamp fields (user and dates)| 21.728 |
+|no dao            | 10.603 |
+|DataflowQueue (CED Way) | 14.6 |
 
 
 
@@ -70,8 +82,8 @@ It can be seen that cpu load goes highest during Gparse batch insert
 
 **Note:** 
 - All Numbers are in Seconds.
-- Domain autowiring is disabled (As per Grails 3.x Default), validation and databinding are enabled, unless explicitely specified
-- One service is injected in each of three domains For the benchmark whith autowiring enabled.
+- Domain autowiring, validation and databinding are enabled, unless explicitly specified.
+- One service is injected in each of the domains.
 - H2 In memory database is used.
 
 System specs
@@ -86,17 +98,19 @@ Conclusions
 
 The key conclusions as per my observation are as below
 
-1. Gparse with batch insert has the best performance 
+1. Gparse with batch insert has the best performance amongst all.
+2. Don't use GORM data binding if you can avoid it (it almost takes double time).
 3. use small transaction batches and keep them the same size as the jdbc.batch_size. DO NOT (auto)commit on every insert
 4. JDBC Batch size of 50 Gave the best results, as batch size goes higher, performance started to degrade.
-4. Don't use GORM data binding if you can avoid it (it almost takes double time).
 5. Disabling validation improves performance eg. ```domain.save(false)```
-6. Grails Date stamp fields, or audit stamp doesn't have any noticeable effects on performance. That is probably the Event listeners gets called regardless if domain has date stamp fields or not.
-7. I did not see any noticeable difference if Domain autowiring is enabled or disabled. (Domain with dependency on one service).
-   It made just 2 to 3 seconds difference for 115K records.
-8. Using Gpars pool size of 4 on a quad core system seems optimal, Smaller pool size takes longer time, but higher pool size doesnt make any noticeable improvements.
-
-
+6. Grails Date stamp fields does not have any noticeable effect on performance.
+7. AuditTrail stamp takes higher time then the grails time stamping
+8. I did not see any noticeable difference if Domain autowiring is enabled or disabled. (Domain with dependency on one service).
+9. From above table, it can be seen that 
+   Going from 2 cores to 4 improves numbers significantly
+   Going from 4 cores to 8 numbers improves slowly
+   from pool size 9 onward, performance starts degrading
+   
 
 More background and reading
 ---------------
