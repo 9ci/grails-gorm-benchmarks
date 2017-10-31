@@ -112,6 +112,12 @@ The key conclusions as per my observation are as below
    from pool size 9 onward, performance starts degrading
    
 
+The default Gpars pool size is Runtime.getRuntime().availableProcessors() + 1 see [here](https://github.com/vaclav/GPars/blob/master/src/main/groovy/groovyx/gpars/util/PoolUtils.java#L43)
+And this indeed gives better performance. 
+
+As per Gpars performance tips [here](http://www.gpars.org/1.0.0/guide/guide/tips.html)
+> In many scenarios changing the pool size from the default value may give you performance benefits. Especially if your tasks perform IO operations, like file or database access, networking and such, increasing the number of threads in the pool is likely to help performance.
+
 More background and reading
 ---------------
 
