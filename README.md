@@ -40,7 +40,7 @@ My Bench Mark Results and details
 * the winner seems to be gpars and batched (smaller chunks) transactions
 
 
-**Results with Gparse pool size 8 **
+**Results with Gparse pool size 8**
 
 |                      | All records in single transaction | Commit each record | Batched Transaction - Without Gpars  | Batched Transactions - With Gpars  | Gpars single transaction per thread  |
 |----------------------|-----------------------------------|--------------------|--------------------------------------|------------------------------------|--------------------------------------|
@@ -49,7 +49,7 @@ My Bench Mark Results and details
 |                      |                                   |                    |                                      |                                    |                                      |
 
 
-**Results for Gparse batched with different pool sizes **
+**Results for Gparse batched with different pool sizes**
 
 | Pool size                             |  2 threads | 3 threads | 4 threads | 5 threads | 6 threads | 7 threads | 8 threads | 9 threads | 10 threads | 11 threads | 12 threads |
 |---------------------------------------|------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|------------|------------|------------|
