@@ -94,8 +94,7 @@ The key conclusions as per my observation are as below
 6. Grails Date stamp fields, or audit stamp doesn't have any noticeable effects on performance. That is probably the Event listeners gets called regardless if domain has date stamp fields or not.
 7. I did not see any noticeable difference if Domain autowiring is enabled or disabled. (Domain with dependency on one service).
    It made just 2 to 3 seconds difference for 115K records.
-8. Using Gpars pool size of 4 on a quad core system seems optimal, using a bigger pool doesnt make any noticeable improvements.
-   Smaller pool size takes longer time, but higher pool size doesnt make any noticeable improvements.
+8. Using Gpars pool size of 4 on a quad core system seems optimal, Smaller pool size takes longer time, but higher pool size doesnt make any noticeable improvements.
 
 
 
