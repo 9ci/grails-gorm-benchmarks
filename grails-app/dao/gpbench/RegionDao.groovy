@@ -1,5 +1,6 @@
 package gpbench
 
+import gorm.tools.GormUtils
 import grails.compiler.GrailsCompileStatic
 import grails.plugin.dao.GormDaoSupport
 import grails.transaction.NotTransactional
@@ -18,7 +19,7 @@ class RegionDao extends GormDaoSupport<Region> {
 		Country country = Country.load(row['country']['id'] as Long);
 		Region r = new Region()
 		r.id = row.id as Long
-		DomainUtils.copyDomain(r, row)
+		GormUtils.copyDomain(r, row)
 		r.country = country
 		return r
 	}

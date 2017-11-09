@@ -13,7 +13,6 @@ import groovyx.gpars.dataflow.operator.PoisonPill
 import org.grails.datastore.gorm.GormEntity
 import org.grails.web.json.JSONObject
 import org.hibernate.SessionFactory
-import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.Resource
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
@@ -27,9 +26,11 @@ import java.sql.ResultSet
 
 import static groovyx.gpars.GParsPool.withPool
 import static groovyx.gpars.dataflow.Dataflow.operator
+import gorm.tools.jdbc.ScrollableQuery
+import gorm.tools.jdbc.GrailsParameterMapRowMapper
 
 class LoaderService {
-	private final static int POOL_SIZE = 8
+	private static int POOL_SIZE = 8
 	static transactional = false
 
 	SessionFactory sessionFactory
@@ -264,7 +265,7 @@ class LoaderService {
 
 		RowMapper<Map> mapper = new GrailsParameterMapRowMapper()
 		String q = "select * from city1M"
-		ScrollableQuery query = new ScrollableQuery(q, mapper, dataSource, 50)
+		ScrollableQuery query = new ScrollableQuery(mapper, dataSource, 50)
 
 		DataflowQueue queue = new DataflowQueue()
 
@@ -280,7 +281,7 @@ class LoaderService {
 
 
 		final int MAX_QUEUE_SIZE = 10
-		query.eachBatch(50) { List<Map> batch ->
+		query.eachBatch(q, 50) { List<Map> batch ->
 			while (queue.length() > MAX_QUEUE_SIZE) {
 				//queue has 10 batches stocked, yield, let consumer consume few before we put more.
 				Thread.yield()

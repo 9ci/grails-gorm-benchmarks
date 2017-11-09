@@ -33,6 +33,10 @@ repositories {
     }
 }
 
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 1, 'seconds'
+}
+
 dependencies {
     compile "org.springframework.boot:spring-boot-starter-logging"
     compile "org.springframework.boot:spring-boot-autoconfigure"
@@ -51,7 +55,7 @@ dependencies {
     runtime "com.bertramlabs.plugins:asset-pipeline-grails:2.14.1"
 
     runtime 'mysql:mysql-connector-java:5.1.5'
-    compile("org.grails.plugin:dao:3.0.3-SNAPSHOT") { changing = true}
+    compile("org.grails.plugins:dao:3.1.1-SNAPSHOT") { changing = true}
     compile 'org.grails.plugins:csv:1.0'
 
     compile "org.grails.plugins:audit-trail:3.0.4-SNAPSHOT"
