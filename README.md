@@ -133,7 +133,7 @@ As per Gpars performance tips [here](http://www.gpars.org/1.0.0/guide/guide/tips
 Effect of databinding on performance
 ---
 As it can be seen from above results. Databinding has huge overhead on performance, especially when doing huge batch inserts.
-The overhead is causing by iterating over each property of the domain for every instance that needs to be bind, calling type conversion system
+The overhead is caused by iterating over each property of the domain for every instance that needs to be bind, calling type conversion system
 and other stuff done by GrailsWebDataBinder.
 
 Dataflow queue
