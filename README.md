@@ -10,9 +10,21 @@ So I jammed the beginnings of one together and here it is.
 
 How to run the benchmarks
 -------
-- build runnable war using command, ```gradle assemble```
+- build runnable war using command, ```gradle clean assemble```
 - Go to build/lib directory, Run the application with command ```java -jar grails-gpars-batch-load-benchmark-0.1.war``` 
 - Benchmarks are run from the BootStrap.groovy. You will see the results on console. 
+
+
+Build war with AuditTrail enabled
+----
+By default AuditTrail is disabled.  
+Audit trail AST Transformation can be enabled by passing system property auditTrail.enabled=true during compilation time.  
+```gradle clean assemble -DauditTrail.enabled=true```
+
+Run with autowire disabled
+----
+By default Gorm domain autowire is enabled. Domain autowiring can be disabled by passing system property autowire.enabled=false
+```java -Dautowire.enabled=false -jar grails-gpars-batch-load-benchmark-0.1.war```
 
 
 The Bemchmarks
@@ -117,6 +129,16 @@ And this indeed gives better performance.
 
 As per Gpars performance tips [here](http://www.gpars.org/1.0.0/guide/guide/tips.html)
 > In many scenarios changing the pool size from the default value may give you performance benefits. Especially if your tasks perform IO operations, like file or database access, networking and such, increasing the number of threads in the pool is likely to help performance.
+
+Effect of databinding on performance
+---
+As it can be seen from above results. Databinding has huge overhead on performance, especially when doing huge batch inserts.
+The overhead is causing by iterating over each property of the domain for every instance that needs to be bind, calling type conversion system
+and other stuff done by GrailsWebDataBinder.
+
+Dataflow queue
+---
+Dataflow queue is little slower because it uses the Scrollable resultset to simultaneously load records from other table and do insert. 
 
 More background and reading
 ---------------
