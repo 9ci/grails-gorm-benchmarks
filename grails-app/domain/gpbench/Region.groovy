@@ -1,5 +1,8 @@
 package gpbench
 
+import gorm.AuditStamp
+
+@AuditStamp
 class Region {
 	transient loaderService
 

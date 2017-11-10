@@ -23,6 +23,7 @@ apply plugin:"asset-pipeline"
 repositories {
     mavenLocal()
     maven { url "https://repo.grails.org/grails/core" }
+    maven { url = "https://dl.bintray.com/9ci/grails-plugins"}
 
     maven {
         url "http://repo.9ci.com/artifactory/grails-plugins"
@@ -58,7 +59,7 @@ dependencies {
     compile("org.grails.plugins:dao:3.1.1-SNAPSHOT") { changing = true}
     compile 'org.grails.plugins:csv:1.0'
 
-    compile "org.grails.plugins:audit-trail:3.0.4-SNAPSHOT"
+    compile "org.grails.plugins:audit-trail:3.0.6"
 
     compile "org.springframework:spring-test:4.3.7.RELEASE"
     testCompile "org.grails:grails-plugin-testing"
@@ -72,6 +73,15 @@ bootRun {
     addResources = true
 }
 
+compileGroovy {
+    options.fork = true
+    String auditTrailEnabled = System.getProperty("auditTrail.enabled", "false")
+    options.forkOptions.jvmArgs = ["-DauditTrail.enabled=$auditTrailEnabled".toString()]
+}
+
+tasks.withType(org.springframework.boot.gradle.run.BootRunTask) {
+    systemProperties = System.properties
+}
 
 assets {
     minifyJs = true

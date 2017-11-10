@@ -1,5 +1,9 @@
 package gpbench
 
+import gorm.AuditStamp
+
+
+@AuditStamp
 class City {
 	transient loaderService
 

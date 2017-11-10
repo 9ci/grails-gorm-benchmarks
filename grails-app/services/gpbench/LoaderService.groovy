@@ -30,7 +30,7 @@ import gorm.tools.jdbc.ScrollableQuery
 import gorm.tools.jdbc.GrailsParameterMapRowMapper
 
 class LoaderService {
-	private static int POOL_SIZE = 8
+	private static int POOL_SIZE = 9
 	static transactional = false
 
 	SessionFactory sessionFactory
@@ -45,12 +45,11 @@ class LoaderService {
 	CountryDao countryDao
 	GrailsApplication grailsApplication
 
+	boolean mute = false
+
 	def batchSize = 50 //this should match the hibernate.jdbc.batch_size in datasources
 
 	void runBenchMark() {
-
-		println "Running benchmark"
-
 
 		//warmup()
 		//load_rows_scrollable_resultset(true) //insert million records with databinding
@@ -58,18 +57,36 @@ class LoaderService {
 		//if you want to run the above benchmarks, comment the below all
 		// otherwise because of some issues, there;s deadlock and it fails.
 
-
-		warmup()
+		println "--- Environment info ---"
 		println "Max memory: " + (Runtime.getRuntime().maxMemory() / 1024 )+ " KB"
-		println "Total Memory available memory: " + (Runtime.getRuntime().totalMemory() / 1024 )+ " KB"
+		println "Total Memory: " + (Runtime.getRuntime().totalMemory() / 1024 )+ " KB"
 		println "Free memory: " + freeMemory
+		println "Available processors: " + Runtime.getRuntime().availableProcessors()
+		println "Autowire enabled: " + System.getProperty("autowire.enabled", "true")
 
+		mute = true
+		println "--- Warming up JVM --- "
+		//warmup by running some benchmarks
 		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
 		runImport('GPars_batched_transactions_per_thread', false, false, true) //batched - without databinding, typed map
 
 		runImport('GPars_batched_transactions_without_validation', false, true, true) //without validation
 		runImport('GPars_batched_transactions_without_binding_validation', false, false, true) //without validation
 
+		mute = false
+		println "Running Benchmarks"
+		println "#### With pool size of $POOL_SIZE"
+
+
+		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
+		runImport('GPars_batched_transactions_per_thread', false, false, true) //batched - without databinding, typed map
+
+		runImport('GPars_batched_transactions_without_dao', false, true, true) //without dao
+		runImport('GPars_batched_transactions_without_validation', false, true, true) //without validation
+		runImport('GPars_batched_transactions_without_binding_validation', false, false, true) //without validation
+
+		runImport('batched_transactions', true, true, true) //batched - databinding, typeless map
+		runImport('batched_transactions', false, false, true) //batched - without databinding, typed map
 
 		runImport('GPars_single_rec_per_thread_transaction', true, true) //databinding, typeless map
 		runImport('GPars_single_rec_per_thread_transaction', false, false) //without databinding, typed map
@@ -80,25 +97,83 @@ class LoaderService {
 		runImport('commit_each_save', true, true) //databinding, typeless map
 		runImport('commit_each_save', false, false) //without databinding, typed map
 
-		runImport('batched_transactions', true, true, true) //batched - databinding, typeless map
-		runImport('batched_transactions', false, false, true) //batched - without databinding, typed map
+		/*
+		println "#### With pool size of $POOL_SIZE"
+		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
+		runImport('GPars_batched_transactions_per_thread', false, false, true) //batched - without databinding, typed map
 
+		runImport('GPars_batched_transactions_without_dao', false, true, true) //without dao
+		runImport('GPars_batched_transactions_without_validation', false, true, true) //without validation
+		runImport('GPars_batched_transactions_without_binding_validation', false, false, true) //without validation
+
+		POOL_SIZE++
+		println "#### With pool size of $POOL_SIZE"
+
+
+		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
+		runImport('GPars_batched_transactions_per_thread', false, false, true) //batched - without databinding, typed map
+
+		runImport('GPars_batched_transactions_without_dao', false, true, true) //without dao
+		runImport('GPars_batched_transactions_without_validation', false, true, true) //without validation
+		runImport('GPars_batched_transactions_without_binding_validation', false, false, true) //without validation
+
+		POOL_SIZE++
+		println "#### With pool size of $POOL_SIZE"
+
+		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
+		runImport('GPars_batched_transactions_per_thread', false, false, true) //batched - without databinding, typed map
+
+		runImport('GPars_batched_transactions_without_dao', false, true, true) //without dao
+		runImport('GPars_batched_transactions_without_validation', false, true, true) //without validation
+		runImport('GPars_batched_transactions_without_binding_validation', false, false, true) //without validation
+
+		POOL_SIZE++
+		println "#### With pool size of $POOL_SIZE"
+
+
+		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
+		runImport('GPars_batched_transactions_per_thread', false, false, true) //batched - without databinding, typed map
+
+		runImport('GPars_batched_transactions_without_validation', false, true, true) //without validation
+		runImport('GPars_batched_transactions_without_binding_validation', false, false, true) //without validation
+
+		POOL_SIZE++
+		println "#### With pool size of $POOL_SIZE"
+
+		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
+		runImport('GPars_batched_transactions_per_thread', false, false, true) //batched - without databinding, typed map
+
+		runImport('GPars_batched_transactions_without_dao', false, true, true) //without dao
+		runImport('GPars_batched_transactions_without_validation', false, true, true) //without validation
+		runImport('GPars_batched_transactions_without_binding_validation', false, false, true) //without validation
+
+		POOL_SIZE++
+		println "#### With pool size of $POOL_SIZE"
+
+		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
+		runImport('GPars_batched_transactions_per_thread', false, false, true) //batched - without databinding, typed map
+
+		runImport('GPars_batched_transactions_without_dao', false, true, true) //without dao
+		runImport('GPars_batched_transactions_without_validation', false, true, true) //without validation
+		runImport('GPars_batched_transactions_without_binding_validation', false, false, true) //without validation
+
+		POOL_SIZE++
+		println "#### With pool size of $POOL_SIZE"
+
+		runImport('GPars_batched_transactions_per_thread', true, true, true) //batched - databinding, typeless map
+		runImport('GPars_batched_transactions_per_thread', false, false, true) //batched - without databinding, typed map
+
+		runImport('GPars_batched_transactions_without_dao', false, true, true) //without dao
+		runImport('GPars_batched_transactions_without_validation', false, true, true) //without validation
+		runImport('GPars_batched_transactions_without_binding_validation', false, false, true) //without validation
 		*/
+
 	}
 
 	String getFreeMemory() {
 		(Runtime.getRuntime().freeMemory() / 1024 ) + " KB"
 	}
 
-	void warmup() {
-		List countries = loadRecordsFromFile("Country.json")
-		List regions = loadRecordsFromFile("Region.json")
-
-		GPars_batched_transactions_per_thread("country", batchChunks(countries, batchSize), false)
-		GPars_batched_transactions_per_thread("region", batchChunks(regions, batchSize), false)
-		truncateTables()
-		Thread.sleep(10 * 1000)
-	}
 
 	void runImport(String method, boolean csv, boolean databinding, boolean batched = false) {
 		String extension = csv ? 'csv' : 'json'
@@ -131,7 +206,6 @@ class LoaderService {
 		}
 
 	}
-
 
 	@Transactional
 	void single_transaction(String name, List<Map> rows, boolean useDataBinding) {
@@ -204,6 +278,20 @@ class LoaderService {
 				City.withTransaction {
 					batchList.each{ Map row ->
 						insertRecordWithoutValidation(name, row)
+					}
+					cleanUpGorm()
+				}
+			}
+		}
+
+	}
+
+	void GPars_batched_transactions_without_dao(String name, List<List<Map>> rows, boolean useDataBinding) {
+		withPool(POOL_SIZE){
+			rows.eachParallel { List batchList ->
+				City.withTransaction {
+					batchList.each{ Map row ->
+						insertRecordWithoutDao(name, row)
 					}
 					cleanUpGorm()
 				}
@@ -359,7 +447,7 @@ class LoaderService {
 		cityRecords.each { Map m ->
 				List params = [m.name, m.latitude as Float, m.longitude as Float, m.shortCode, m['country.id'] as Long, m['region.id'] as Long]
 				sql.execute query, params
-			}
+		}
 		//logBenchEnd(message, start)
 	}
 
@@ -398,7 +486,7 @@ class LoaderService {
 	void logBenchEnd(String desc, Long startTime){
 		def elapsed = (System.currentTimeMillis() - startTime)/1000
 		def msg = "***** Finshed $desc in $elapsed seconds, free Memory: " + freeMemory
-		println msg
+		if(!mute) println msg
 	}
 
 	def getService(String name) {
@@ -418,6 +506,14 @@ class LoaderService {
 			e.printStackTrace()
 		}
 	}
+
+	void insertRecordWithoutDao(String domain, Map row) {
+		GormEntity entity = Class.forName("gpbench.$domain").newInstance()
+		entity.properties = row
+		entity.id = row['id'] as Long
+		entity.save()
+	}
+
 
 	void insertRecordWithoutValidation(String domain, Map row) {
 		GormEntity entity = Class.forName("gpbench.$domain").newInstance()
