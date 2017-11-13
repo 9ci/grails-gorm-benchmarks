@@ -169,6 +169,9 @@ Gpars batch insert without data binding and validation.
 **Do custom Id generator slow it down** 
 - No
  
+**Do using Dataflow queue/operator make it faster** 
+- No, it has no noticeable effect 
+ 
 More background and reading
 ---------------
 
