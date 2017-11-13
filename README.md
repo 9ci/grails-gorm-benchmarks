@@ -119,7 +119,7 @@ The key conclusions Are as below
 10. Did not see any noticeable difference if Domain autowiring is enabled or disabled. (Domain with dependency on one service).
 11. Dao does not have any major noticable effect on performance.
 12. Disabling validation has slight performance benifits but not significant (see below for details)
-13. Using custom (idgenerator)[https://yakworks.github.io/gorm-tools/id-generation/] does not have any noticable effect  
+13. Using custom [idgenerator](https://yakworks.github.io/gorm-tools/id-generation/) does not have any noticable effect  
 14. From above table, it can be seen that 
    Going from 2 cores to 4 improves numbers significantly
    Going from 4 cores to 8 numbers improves slowly
@@ -128,12 +128,12 @@ The key conclusions Are as below
 
 Optimum setting for Gpars pool size.
 ----
-It is observed that 9 core gave the best results for (i7-4870HQ)[https://ark.intel.com/products/83504] which has four physical cores.
+It is observed that 9 core gave the best results for [i7-4870HQ](https://ark.intel.com/products/83504) which has four physical cores.
 But the system shows the OS and Java total of 8 cores and uses Hyper threading.
 
 Gparse will utilize and benefit if it is given 8 cores even if there are just four physical cores and four virtual cores. 
 
-The default Gpars pool size is Runtime.getRuntime().availableProcessors() + 1 see [here](https://github.com/vaclav/GPars/blob/master/src/main/groovy/groovyx/gpars/util/PoolUtils.java#L43)
+The default Gpars pool size is Runtime.getRuntime().availableProcessors() + 1 see ()here](https://github.com/vaclav/GPars/blob/master/src/main/groovy/groovyx/gpars/util/PoolUtils.java#L43)
 And this indeed gives better performance. 
 
 As per Gpars performance tips [here](http://www.gpars.org/1.0.0/guide/guide/tips.html)
