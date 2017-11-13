@@ -4,60 +4,47 @@ GORM : batch importing large datasets and a performance benchmarking app
 
 Summary
 --------
+The application runs large batch inserts (115K records) in different ways. The goal is to decide the optimum way to run large batch inserts with Gorm.
 
 questions we want a good benchmark to constantly measure and answer
 
 - fastest way to persist/insert gorm
 - show advantages of using multi-core (shown)
-- does binding slow it down (yes), why (started exaplantion), can it be optimized, best alternative ….
+- does binding slow it down (yes), why, can it be optimized, best alternative ….
 - does valiation slow it down (yes), why …. can it be optimized
-- does auditstamp slow it down (yest), can it be optimized
+- does auditstamp slow it down (yes), can it be optimized
 - do daos slow it down ……
 - does differerent id generateord such as BatchIdGenerator slow it down or speed it up
 - does @compileStatic speed things up, where does it matter? does it help to have it on the domains?
 
 How to run the benchmarks
 -------
-- build runnable war using command, ```gradle clean assemble```
-- Go to build/lib directory, Run the application with command ```java -jar grails-gpars-batch-load-benchmark-0.1.war``` 
-- Benchmarks are run from the BootStrap.groovy. You will see the results on console. 
-
-
-Build war with AuditTrail enabled
-----
-By default AuditTrail is disabled.  
-Audit trail AST Transformation can be enabled by passing system property auditTrail.enabled=true during compilation time.  
-```gradle clean assemble -DauditTrail.enabled=true```
-
-Run with autowire disabled
-----
-By default Gorm domain autowire is enabled. Domain autowiring can be disabled by passing system property autowire.enabled=false
-```java -Dautowire.enabled=false -jar grails-gpars-batch-load-benchmark-0.1.war```
+- There is a script ```run-benchmarks.sh``` which will run the benchmarks
+- Run ```./run-benchmarks.sh```
+- See the script for more details.
 
 
 The Bemchmarks
 -------
-1. GPars_batched_transactions_per_thread : Runs the batches in parallel, each batch being the same size as jdbc batch size (50).
-2. GPars_single_rec_per_thread_transaction : Gpars Single thread par transaction
-3. single_transaction : Insert all records in a single transaction and commit at the end. No Gpars.
-4. GPars_batched_transactions_without_validation : Gparse batched, with data binding, without validation
-5. GPars_batched_transactions_without_binding_validation: Gparse without data binding, without validation
-4. commit_each_save: Insert each record in individual transactions and commit. No Gpars.
-5. batched_transactions: Run batch insert as 1) but without Gparse.
+- GparsBatchInsertBenchmark - Runs the batches in parallel, each batch with the same size as jdbc batch size (50).
+- GparsBatchInsertWithoutDaoBenchmark - Same as above, but without using dao for inserting records.
+- GparsBatchInsertWithoutValidation - Runs the batches with gpars but with grails domain validation tunred off during save using ```domain.save(false)```
+- GparsThreadPerTransactionBenchmark - Runs the inserts in parallel with one thread per transaction.
+- BatchInsertWithDataFlawQueueBenchmark - Runs the batch inserts in parallel using Gprase dataflow operator [see](http://www.gpars.org/webapp/quickstart/index.html#__strong_dataflow_concurrency_strong)
+- SimpleBatchInsertBenchmark - Batch inserts but without gpars parallelism.
+- CommitEachSaveBenchmark - Insert each record in individual transactions.
+- OneBigTransactionBenchmark - Inserts all records within a single big transaction.
+- DataFlawQueueWithScrollableQueryBenchmark : same as BatchInsertWithDataFlawQueueBenchmark but the data is being loaded from another table simultanously using scrollable resultset.
 
 Note: All of above benchmarks are run with and without data binding, and you will see the results for both.
-
-**By default, all benchmarks are run with Gorm domain autowiring enabled.** 
-If you want to see effect of disabling autowiring in domains, just set gorm autowire to false in application.yml
 
 
 My Bench Mark Results and details
 -------
 
 * 115k CSV records on a MacBook pro 2.5 GHz Intel Core i7. 2048 mb ram was given to the VM and these were run using ```java -jar grails-gpars-batch-load-benchmark-0.1.war```
-* all of these have jdbc.batch_size = 50 and use the principals from #2 above and flush/clear every 50 rows
-* The test where the batch insert happen in a single transaction can't be tested with GPars since a single transaction can't span multiple threads
-* the winner seems to be gpars and batched (smaller chunks) transactions
+* All of these have jdbc.batch_size = 50 and use the principals from #2 above and flush/clear every 50 rows
+* The winner seems to be gpars and batched (smaller chunks) transactions
 
 
 **Results with Gparse pool size 8**
@@ -65,8 +52,7 @@ My Bench Mark Results and details
 |                      | All records in single transaction | Commit each record | Batched Transaction - Without Gpars  | Batched Transactions - With Gpars  | Gpars single transaction per thread  |
 |----------------------|-----------------------------------|--------------------|--------------------------------------|------------------------------------|--------------------------------------|
 | With data binding    | 40.807                           | **81.521**          | 43.569                              |  12.32                              | 22.372                               |
-| Without data binding | 20.295                            | 43.498             | 20.283                               | **6.842**                          | 16.432                               |
-|                      |                                   |                    |                                      |                                    |                                      |
+
 
 
 **Results for Gparse batched with different pool sizes**
@@ -79,7 +65,7 @@ My Bench Mark Results and details
 | No validation & No data binding    | 10.619     | 9.311     | 7.088     | 7.59      | 7.997     | 8.088     | 6.558     | 5.896     | 5.683      | 6.223      | 6.594      |
 
 
-| gpars benchs      | time |
+| Gpars Benchs      | time |
 |-------------------|------|
 |with databinding   | 12.32  |
 |no binding         | 6.842 |
@@ -90,8 +76,6 @@ My Bench Mark Results and details
 |audit-trail stamp fields (user and dates)| 21.728 |
 |no dao            | 10.603 |
 |DataflowQueue (CED Way) | 14.6 |
-
-
 
 CPU Load during Gparse batch insert
 --------
@@ -108,29 +92,41 @@ It can be seen that cpu load goes highest during Gparse batch insert
 
 System specs
 ------------
-- Macbook Pro 2.5 GHz Intel Core i7 Quad core, 16 GB RAM
-- Gparse pool size of 8
+- Macbook Pro Intel(R) Core(TM) i7-4870HQ CPU @ 2.50GHz
+- Gparse pool size of 9
 - GRAILS_OPTS="-Xmx2048M -server -XX:+UseParallelGC"
 
 
 Conclusions
 -------
 
-The key conclusions as per my observation are as below
+The key conclusions Are as below
 
-1. Gparse with batch insert has the best performance amongst all.
-2. Don't use GORM data binding if you can avoid it (it almost takes double time).
-3. use small transaction batches and keep them the same size as the jdbc.batch_size. DO NOT (auto)commit on every insert
-4. JDBC Batch size of 50 Gave the best results, as batch size goes higher, performance started to degrade.
-5. Disabling validation improves performance eg. ```domain.save(false)```
-6. Grails Date stamp fields does not have any noticeable effect on performance.
-7. AuditTrail stamp takes higher time then the grails time stamping
-8. I did not see any noticeable difference if Domain autowiring is enabled or disabled. (Domain with dependency on one service).
-9. From above table, it can be seen that 
+1. Gparse with batch insert is the optimum way to do large batch inserts.
+2. Gparse batch insert along with data binding and validation disabled has best performance. 
+3. Inserting each record in seperate transaction has worst performance
+4. Grails databinding almost doubles the time required for inserts.
+5. use small transaction batches and keep them the same size as the jdbc.batch_size. DO NOT (auto)commit on every insert
+6. JDBC Batch size of 50 Gave the best results, as batch size goes higher, performance started to degrade.
+7. Disabling validation improves performance eg. ```domain.save(false)```
+8. Grails Date stamp fields does not have any noticeable effect on performance.
+9. AuditTrail stamp affects performance (see below for details)
+10. Did not see any noticeable difference if Domain autowiring is enabled or disabled. (Domain with dependency on one service).
+11. Dao does not have any major noticable effect on performance.
+12. Disabling validation has slight performance benifits but not significant (see below for details)
+13. Using custom (idgenerator)[https://yakworks.github.io/gorm-tools/id-generation/] does not have any noticable effect  
+14. From above table, it can be seen that 
    Going from 2 cores to 4 improves numbers significantly
    Going from 4 cores to 8 numbers improves slowly
-   from pool size 9 onward, performance starts degrading
-   
+   from pool size 9 onward, performance starts degrading   
+
+
+Optimum setting for Gpars pool size.
+----
+It is observed that 9 core gave the best results for (i7-4870HQ)[https://ark.intel.com/products/83504] which has four physical cores.
+But the system shows the OS and Java total of 8 cores and uses Hyper threading.
+
+Gparse will utilize and benefit if it is given 8 cores even if there are just four physical cores and four virtual cores. 
 
 The default Gpars pool size is Runtime.getRuntime().availableProcessors() + 1 see [here](https://github.com/vaclav/GPars/blob/master/src/main/groovy/groovyx/gpars/util/PoolUtils.java#L43)
 And this indeed gives better performance. 
@@ -144,10 +140,17 @@ As it can be seen from above results. Databinding has huge overhead on performan
 The overhead is caused by iterating over each property of the domain for every instance that needs to be bind, calling type conversion system
 and other stuff done by GrailsWebDataBinder.
 
-Dataflow queue
----
-Dataflow queue is little slower because it uses the Scrollable resultset to simultaneously load records from other table and do insert. 
+Effect of Validation
+----
+Disabling validation has slight performance benefit. That is because Grails validation (GrailsDomainClassValidator) has to iterate over each constrained property of domain class 
+and invoke validators on it for every instance. 
 
+Effect of AuditTrail 
+----
+Audit trail has noticeable effect on performance. Thats because audit trail plugin hooks into validation and gets called every time when the domain is validated. 
+It does some reflection to check for properties/value and checks in hibernate persistence context if the instance is being inserted or being updated. All this makes it little slower.
+ 
+ 
 More background and reading
 ---------------
 

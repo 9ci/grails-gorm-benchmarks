@@ -7,7 +7,7 @@ import groovy.transform.CompileStatic
  */
 @CompileStatic
 abstract class AbstractBenchmark {
-	Long timeTaken
+	BigDecimal timeTaken
 
 	void setup() {}
 	void cleanup(){}
@@ -17,7 +17,7 @@ abstract class AbstractBenchmark {
 		Long start = System.currentTimeMillis()
 		execute()
 		Long end = System.currentTimeMillis()
-		timeTaken = ((end - start) / 1000).longValue()
+		timeTaken = ((end - start) / 1000)
 		cleanup()
 	}
 
