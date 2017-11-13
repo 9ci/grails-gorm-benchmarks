@@ -24,6 +24,11 @@ How to run the benchmarks
 - See the script for more details.
 
 
+Changing default pool size
+----
+By default benchmarks uses default gpars pool size which is (availableProcessors + 1) which can be modified by passing system property ```gpars.poolsize=xx```
+Example: ```java -Dgpars.poolsize=5 -jar grails-gpars-batch-load-benchmark-0.1.war```
+
 The Bemchmarks
 -------
 - GparsBatchInsertBenchmark - Runs the batches in parallel, each batch with the same size as jdbc batch size (50).

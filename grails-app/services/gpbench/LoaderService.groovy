@@ -9,6 +9,7 @@ import grails.plugin.dao.GormDaoSupport
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import groovyx.gpars.GParsPool
+import groovyx.gpars.util.PoolUtils
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 
 class LoaderService {
@@ -26,12 +27,15 @@ class LoaderService {
 
 	@CompileStatic
 	void runBenchMarks() {
+		//use default poolsize, it can be updated by passing system property -Dgpars.poolsize=xx
+		POOL_SIZE = PoolUtils.retrieveDefaultPoolSize()
 
 		println "--- Environment info ---"
 		println "Max memory: " + (Runtime.getRuntime().maxMemory() / 1024 )+ " KB"
 		println "Total Memory: " + (Runtime.getRuntime().totalMemory() / 1024 )+ " KB"
 		println "Free memory: " + (Runtime.getRuntime().freeMemory() / 1024 ) + " KB"
 		println "Available processors: " + Runtime.getRuntime().availableProcessors()
+		println "Gpars pool size: " + POOL_SIZE
 		println "Autowire enabled: " + System.getProperty("autowire.enabled", "true")
 		println "IdGenerator enabled: " + System.getProperty("idgenerator.enabled", "false")
 
