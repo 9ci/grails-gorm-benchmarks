@@ -5,8 +5,16 @@ GORM : batch importing large datasets and a performance benchmarking app
 Summary
 --------
 
-We have a new client that will be importing large payment data files into out application and it appears that this topic ([Zach][]) has some common mind share right now. Over the years I have seem many recommendations for hibernate performance tuning with large sets of data and most recently for GORM as well. What I haven't seen are any sample straight forward benchmark apps to fiddle with.
-So I jammed the beginnings of one together and here it is. 
+questions we want a good benchmark to constantly measure and answer
+
+- fastest way to persist/insert gorm
+- show advantages of using multi-core (shown)
+- does binding slow it down (yes), why (started exaplantion), can it be optimized, best alternative ….
+- does valiation slow it down (yes), why …. can it be optimized
+- does auditstamp slow it down (yest), can it be optimized
+- do daos slow it down ……
+- does differerent id generateord such as BatchIdGenerator slow it down or speed it up
+- does @compileStatic speed things up, where does it matter? does it help to have it on the domains?
 
 How to run the benchmarks
 -------
