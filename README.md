@@ -81,6 +81,7 @@ My Bench Mark Results and details
 |audit-trail stamp fields (user and dates)| 21.728 |
 |no dao            | 10.603 |
 |DataflowQueue (CED Way) | 14.6 |
+|Custom IdGenerator | 12.532 |
 
 CPU Load during Gparse batch insert
 --------
@@ -139,22 +140,34 @@ And this indeed gives better performance.
 As per Gpars performance tips [here](http://www.gpars.org/1.0.0/guide/guide/tips.html)
 > In many scenarios changing the pool size from the default value may give you performance benefits. Especially if your tasks perform IO operations, like file or database access, networking and such, increasing the number of threads in the pool is likely to help performance.
 
-Effect of databinding on performance
----
-As it can be seen from above results. Databinding has huge overhead on performance, especially when doing huge batch inserts.
-The overhead is caused by iterating over each property of the domain for every instance that needs to be bind, calling type conversion system
-and other stuff done by GrailsWebDataBinder.
 
-Effect of Validation
+Questions answered by above conclusion.
 ----
-Disabling validation has slight performance benefit. That is because Grails validation (GrailsDomainClassValidator) has to iterate over each constrained property of domain class 
-and invoke validators on it for every instance. 
+**Fastest way to persist/insert gorm**
+Gpars batch insert without data binding and validation.
 
-Effect of AuditTrail 
-----
-Audit trail has noticeable effect on performance. Thats because audit trail plugin hooks into validation and gets called every time when the domain is validated. 
-It does some reflection to check for properties/value and checks in hibernate persistence context if the instance is being inserted or being updated. All this makes it little slower.
+**Does binding slow it down, why, can it be optimized, best alternative**
+- Yes, databinding has huge overhead on performance
+- The overhead is caused by iterating over each property of the domain for every instance that needs to be bind, calling type conversion system
+  and other stuff done by GrailsWebDataBinder.
+- There is nothing much can be done other then not using databinding  
+
+**Does valiation slow it down, why, can it be optimized**
+- Yes, it has slight performance impact
+- That is because Grails validation (GrailsDomainClassValidator) has to iterate over each constrained property of domain class 
+  and invoke validators on it for every instance. 
+
+**Does Auditstamp slow it down, can it be optimized**
+- Yes
+- Thats because audit trail plugin hooks into validation and gets called every time when the domain is validated. 
+  It does some reflection to check for properties/value and checks in hibernate persistence context if the instance is being inserted or being updated. All this makes it little slower.
+- Need to try what can be done in audit trail plugin to improve performance.   
+
+**Do daos slow it down** 
+- No, very very little effect some thing around 1 to 1.5 seconds for 115K records.
  
+**Do custom Id generator slow it down** 
+- No
  
 More background and reading
 ---------------
