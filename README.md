@@ -80,7 +80,7 @@ My Bench Mark Results and details
 |grails date stamp fields | 14.726 |
 |audit-trail stamp fields (user and dates)| 21.728 |
 |no dao            | 10.603 |
-|DataflowQueue (CED Way) | 14.6 |
+|DataflowQueue (CED Way) | 12.356 |
 |Custom IdGenerator | 12.532 |
 
 CPU Load during Gparse batch insert
