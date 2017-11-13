@@ -5,17 +5,16 @@ import grails.compiler.GrailsCompileStatic
 import grails.plugin.dao.GormDaoSupport
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 
 @Transactional
+@GrailsCompileStatic
 class CityDao extends GormDaoSupport<City> {
 	Class domainClass = City
 
-	@Override
-	void beforeInsertSave(City city, Map params) {
-		//city.id = params.id as Long
-	}
-
 	@NotTransactional
+	@CompileStatic(TypeCheckingMode.SKIP)
 	City bind(Map row) {
 		Region r = Region.load(row['region']['id'] as Long)
 		Country country = Country.load(row['country']['id'] as Long)

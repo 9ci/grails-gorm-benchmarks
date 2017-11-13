@@ -16,12 +16,16 @@ class City {
 	static belongsTo = [region:Region, country:Country]
 
 	static mapping = {
-		//id generator: "assigned"
+		if(System.getProperty('idgenerator.enabled', 'false') == "true") {
+			id column: 'id', generator:'gorm.tools.idgen.SpringIdGenerator'
+		}
+
 		cache true
 	}
 
 	static constraints = {
-		name blank: false
+		name blank: false, nullable: false
+		shortCode blank: false, nullable: false
 	}
 
 	String toString() { name }

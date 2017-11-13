@@ -7,6 +7,7 @@ import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 
 @Transactional
+@GrailsCompileStatic
 class RegionDao extends GormDaoSupport<Region> {
 	Class domainClass = Region
 

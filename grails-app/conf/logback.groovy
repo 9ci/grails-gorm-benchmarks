@@ -33,4 +33,6 @@ if (Environment.isDevelopmentMode() && targetDir != null) {
     }
     logger("StackTrace", ERROR, ['FULL_STACKTRACE'], false)
 }
+
+logger("gpbench.helpers.RecordsLoader", ERROR)
 root(ERROR, ['STDOUT'])
