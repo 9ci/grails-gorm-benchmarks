@@ -9,7 +9,7 @@ import groovy.transform.CompileStatic
 import org.springframework.jdbc.core.JdbcTemplate
 
 @CompileStatic
-abstract class BaseBenchmark extends AbstractBenchmark implements BatchInsertBenchmark {
+abstract class BaseBenchmark extends AbstractBenchmark {
 	JdbcTemplate jdbcTemplate
 
 	CsvReader csvReader

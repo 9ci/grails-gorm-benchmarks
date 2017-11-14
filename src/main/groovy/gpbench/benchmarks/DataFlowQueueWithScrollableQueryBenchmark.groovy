@@ -25,7 +25,10 @@ import static groovyx.gpars.dataflow.Dataflow.operator
  * while records are simalutanelously loaded from another table using scrollable query. CED Way.
  */
 @CompileStatic
-class DataFlawQueueWithScrollableQueryBenchmark extends AbstractBenchmark implements GparsBenchmark, BatchInsertBenchmark {
+class DataFlowQueueWithScrollableQueryBenchmark extends AbstractBenchmark {
+	int poolSize
+	int batchSize
+
 	BenchmarkHelper benchmarkHelper
 	JdbcTemplate jdbcTemplate
 	DataSource dataSource

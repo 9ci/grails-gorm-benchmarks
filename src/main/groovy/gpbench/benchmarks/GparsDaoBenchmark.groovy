@@ -13,12 +13,12 @@ import groovyx.gpars.GParsPool
  * Runs batch inserts in parallel using gparse.
  */
 @CompileStatic
-class GparsBatchInsertBenchmark extends BaseBatchInsertBenchmark implements GparsBenchmark, BatchInsertBenchmark {
+class GparsDaoBenchmark extends BaseBatchInsertBenchmark  {
 
 	boolean validate = true
 	String bindingMethod //= 'grails'
 
-	GparsBatchInsertBenchmark(boolean databinding = true, boolean validate = true, String bindingMethod = 'grails') {
+	GparsDaoBenchmark(boolean databinding = true, boolean validate = true, String bindingMethod = 'grails') {
 		super(databinding)
 		this.validate = validate
 		this.bindingMethod = bindingMethod
@@ -27,12 +27,12 @@ class GparsBatchInsertBenchmark extends BaseBatchInsertBenchmark implements Gpar
 	@Override
 	def execute() {
 		assert City.count() == 0
-		insert(cities, cityDao)
+		cityDao.insertGpars(cities, [poolSize:poolSize, validate:validate, bindingMethod:bindingMethod ])
 		assert City.count() == 115000
 	}
 
 	@CompileDynamic
-	void insert(List<List<Map>> batchList, CityDao dao) {
+	void insertGpars(List<List<Map>> batchList, CityDao dao) {
 		GParsPool.withPool(poolSize) {
 			batchList.eachParallel { List<Map> batch ->
 				insertBatch(batch, dao)

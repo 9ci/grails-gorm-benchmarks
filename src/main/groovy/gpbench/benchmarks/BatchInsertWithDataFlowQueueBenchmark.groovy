@@ -15,9 +15,9 @@ import static groovyx.gpars.dataflow.Dataflow.operator
  * Runs batch inserts in parallel using gparse dataflow queue.
  */
 @CompileStatic
-class BatchInsertWithDataFlawQueueBenchmark extends BaseBatchInsertBenchmark implements GparsBenchmark, BatchInsertBenchmark {
+class BatchInsertWithDataFlowQueueBenchmark extends BaseBatchInsertBenchmark {
 
-	BatchInsertWithDataFlawQueueBenchmark(boolean databinding) {
+	BatchInsertWithDataFlowQueueBenchmark(boolean databinding) {
 		super(databinding)
 	}
 

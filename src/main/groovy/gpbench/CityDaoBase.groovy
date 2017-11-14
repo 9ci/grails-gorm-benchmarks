@@ -4,6 +4,7 @@ import gorm.tools.GormUtils
 import grails.compiler.GrailsCompileStatic
 import grails.plugin.dao.DaoDomainTrait
 import grails.plugin.dao.DaoMessage
+import grails.plugin.dao.DaoUtil
 import grails.plugin.dao.GormDaoSupport
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
@@ -12,6 +13,7 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import gpbench.*
+import groovyx.gpars.GParsPool
 import org.grails.datastore.gorm.GormEntity
 
 @Transactional
@@ -25,7 +27,6 @@ class CityDaoBase<T extends BaseCity & GormEntity & WebDataBinding> extends Gorm
 	}
 
 	@NotTransactional
-	//@CompileStatic
 	T bindWithCopyDomain(Map row) {
 		Region r = Region.load(row['region']['id'] as Long)
 		Country country = Country.load(row['country']['id'] as Long)
@@ -38,7 +39,6 @@ class CityDaoBase<T extends BaseCity & GormEntity & WebDataBinding> extends Gorm
 	}
 
 	@NotTransactional
-	//@CompileStatic
 	T bindWithSetters(Map row) {
 		Region r = Region.load(row['region']['id'] as Long)
 		Country country = Country.load(row['country']['id'] as Long)
@@ -90,6 +90,27 @@ class CityDaoBase<T extends BaseCity & GormEntity & WebDataBinding> extends Gorm
 	@CompileDynamic
 	void bindGrails(entity, row){
 		entity.properties = row
+	}
+
+	@NotTransactional
+	@CompileDynamic
+	void insertGpars(List<List<Map>> batchList, Map args) {
+		GParsPool.withPool(args.poolSize) {
+			batchList.eachParallel { List<Map> batch ->
+				insertBatch(batch, args)
+			}
+		}
+	}
+
+	void insertBatch(List<Map> batch, Map args) {
+		for (Map record : batch) {
+			insertRow(record, args)
+		}
+		DaoUtil.flushAndClear()
+	}
+
+	void insertRow(Map row, Map args) {
+		insert(row, args)
 	}
 
 

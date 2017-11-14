@@ -50,7 +50,7 @@ class LoaderSimpleService {
 			println "- Warmming up JVM"
 			//runBenchmark(new GparsBatchInsertBenchmark(false), true)
 			//runBenchmark(new GparsBatchInsertBenchmark(), true)
-			runBenchmark(new GparsBatchInsertWithoutDaoBenchmark(), true)
+			runBenchmark(new GparsBaselineBenchmark(), true)
 			//runBenchmark(new BatchInsertWithDataFlawQueueBenchmark(true), true)
 		}
 
@@ -75,37 +75,37 @@ class LoaderSimpleService {
 	void runMultiThreads(String msg){
 		println "********* $msg multi-threaded "
 		println "- Grails Baseline"
-		runBenchmark(new GparsBatchInsertWithoutDaoBenchmark())
-		runBenchmark(new GparsBatchInsertWithoutDaoBenchmark(false, true))
-		runBenchmark(new GparsBatchInsertWithoutDaoBenchmark(true, false))
-		runBenchmark(new GparsBatchInsertWithoutDaoBenchmark(false, false))
+		runBenchmark(new GparsBaselineBenchmark())
+		runBenchmark(new GparsBaselineBenchmark(false, true))
+		runBenchmark(new GparsBaselineBenchmark(true, false))
+		runBenchmark(new GparsBaselineBenchmark(false, false))
 
 		println "\n- Gorm Tools DataFlawQueue"
-		runBenchmark(new BatchInsertWithDataFlawQueueBenchmark(true))
+		runBenchmark(new BatchInsertWithDataFlowQueueBenchmark(true))
 
 		println "\n- Gorm Tools Dao Baseline"
-		runBenchmark(new GparsBatchInsertBenchmark())
-		runBenchmark(new GparsBatchInsertBenchmark(false,true,"copy"))
-		runBenchmark(new GparsBatchInsertBenchmark(true,false))
-		runBenchmark(new GparsBatchInsertBenchmark(false,false,"copy"))
+		runBenchmark(new GparsDaoBenchmark())
+		runBenchmark(new GparsDaoBenchmark(false,true,"copy"))
+		runBenchmark(new GparsDaoBenchmark(true,false))
+		runBenchmark(new GparsDaoBenchmark(false,false,"copy"))
 
 		println "\n   -dao with dynamic binding method calls"
-		runBenchmark(new GparsBatchInsertBenchmark(false,true,"bindWithSetters"))
-		runBenchmark(new GparsBatchInsertBenchmark(false,true,"bindWithCopyDomain"))
+		runBenchmark(new GparsDaoBenchmark(false,true,"bindWithSetters"))
+		runBenchmark(new GparsDaoBenchmark(false,true,"bindWithCopyDomain"))
 
 		println "\n   -dao with static binding method calls"
-		runBenchmark(new GparsBatchInsertBenchmark(false,true,"setter"))
-		runBenchmark(new GparsBatchInsertBenchmark(false,true,"copy"))
-		runBenchmark(new GparsBatchInsertBenchmark(false,true,"bindWithSetters"))
-		runBenchmark(new GparsBatchInsertBenchmark(false,true,"bindWithCopyDomain"))
-		runBenchmark(new GparsBatchInsertBenchmark(false,true,"setter"))
-		runBenchmark(new GparsBatchInsertBenchmark(false,true,"copy"))
-		runBenchmark(new GparsBatchInsertBenchmark(false,true,"bindWithSetters"))
-		runBenchmark(new GparsBatchInsertBenchmark(false,true,"bindWithCopyDomain"))
-		runBenchmark(new GparsBatchInsertBenchmark(false,true,"setter"))
-		runBenchmark(new GparsBatchInsertBenchmark(false,true,"copy"))
-		runBenchmark(new GparsBatchInsertBenchmark(false,true,"bindWithSetters"))
-		runBenchmark(new GparsBatchInsertBenchmark(false,true,"bindWithCopyDomain"))
+		runBenchmark(new GparsDaoBenchmark(false,true,"setter"))
+		runBenchmark(new GparsDaoBenchmark(false,true,"copy"))
+		runBenchmark(new GparsDaoBenchmark(false,true,"bindWithSetters"))
+		runBenchmark(new GparsDaoBenchmark(false,true,"bindWithCopyDomain"))
+		runBenchmark(new GparsDaoBenchmark(false,true,"setter"))
+		runBenchmark(new GparsDaoBenchmark(false,true,"copy"))
+		runBenchmark(new GparsDaoBenchmark(false,true,"bindWithSetters"))
+		runBenchmark(new GparsDaoBenchmark(false,true,"bindWithCopyDomain"))
+		runBenchmark(new GparsDaoBenchmark(false,true,"setter"))
+		runBenchmark(new GparsDaoBenchmark(false,true,"copy"))
+		runBenchmark(new GparsDaoBenchmark(false,true,"bindWithSetters"))
+		runBenchmark(new GparsDaoBenchmark(false,true,"bindWithCopyDomain"))
 
 	}
 
@@ -138,8 +138,8 @@ class LoaderSimpleService {
 
 	@CompileStatic(TypeCheckingMode.SKIP)
 	void runBenchmark(AbstractBenchmark benchmark, boolean mute = false) {
-		if(benchmark instanceof GparsBenchmark) benchmark.poolSize = POOL_SIZE
-		if(benchmark instanceof BatchInsertBenchmark) benchmark.batchSize = BATCH_SIZE
+		if(benchmark.hasProperty("poolSize")) benchmark.poolSize = POOL_SIZE
+		if(benchmark.hasProperty("batchSize")) benchmark.batchSize = BATCH_SIZE
 		autowire(benchmark)
 		benchmark.run()
 

@@ -2,23 +2,26 @@ package gpbench.benchmarks
 
 import gpbench.City
 import gpbench.CityDao
-import grails.plugin.dao.DaoUtil
 import grails.transaction.Transactional
-import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
-import groovy.transform.TypeCheckingMode
 
 /**
- * Runs batch inserts in parallel without using dao.
+ * Baseline benchmark with grails out of the box
  */
 
 //@CompileStatic
-class GparsBatchInsertWithoutDaoBenchmark extends GparsBatchInsertBenchmark {
+class GparsBaselineBenchmark extends GparsDaoBenchmark {
 
-	GparsBatchInsertWithoutDaoBenchmark(boolean databinding = true, boolean validate = true) {
+	GparsBaselineBenchmark(boolean databinding = true, boolean validate = true) {
 		super(databinding,validate)
 	}
 
+	@Override
+	def execute() {
+		assert City.count() == 0
+		insertGpars(cities, cityDao)
+		//cityDao.insertGpars(cities, [validate:validate, bindingMethod:bindingMethod ])
+		assert City.count() == 115000
+	}
 
 	@Transactional
 	void insertRow(Map row, CityDao dao) {

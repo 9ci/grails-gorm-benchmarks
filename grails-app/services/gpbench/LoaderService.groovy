@@ -46,26 +46,26 @@ class LoaderService {
 
 		//run two benchmarks without displaying numbers just to warmup jvm
 		println "--- Warmming up JVM ---"
-		runBenchmark(new GparsBatchInsertBenchmark(false), true)
-		runBenchmark(new GparsBatchInsertBenchmark(true), true)
+		runBenchmark(new GparsDaoBenchmark(false), true)
+		runBenchmark(new GparsDaoBenchmark(true), true)
 
 
 		//real benchmarks starts here
 		println "--- Running Benchmarks ---"
 
-		runBenchmark(new GparsBatchInsertBenchmark(false))
-		runBenchmark(new GparsBatchInsertBenchmark(true))
-		runBenchmark(new GparsBatchInsertWithoutDaoBenchmark(true, true))
-		runBenchmark(new GparsBatchInsertWithoutDaoBenchmark(false, true))
+		runBenchmark(new GparsDaoBenchmark(false))
+		runBenchmark(new GparsDaoBenchmark(true))
+		runBenchmark(new GparsBaselineBenchmark(true, true))
+		runBenchmark(new GparsBaselineBenchmark(false, true))
 
-		runBenchmark(new GparsBatchInsertWithoutDaoBenchmark(true, false)) //with databinding, no validation
-		runBenchmark(new GparsBatchInsertWithoutDaoBenchmark(false, false)) //no data binding, no validation
+		runBenchmark(new GparsBaselineBenchmark(true, false)) //with databinding, no validation
+		runBenchmark(new GparsBaselineBenchmark(false, false)) //no data binding, no validation
 
 		runBenchmark(new GparsThreadPerTransactionBenchmark(false))
 		runBenchmark(new GparsThreadPerTransactionBenchmark(true))
 
-		runBenchmark(new BatchInsertWithDataFlawQueueBenchmark(true))
-		runBenchmark(new BatchInsertWithDataFlawQueueBenchmark(false))
+		runBenchmark(new BatchInsertWithDataFlowQueueBenchmark(true))
+		runBenchmark(new BatchInsertWithDataFlowQueueBenchmark(false))
 
 		runBenchmark(new SimpleBatchInsertBenchmark(false))
 		runBenchmark(new SimpleBatchInsertBenchmark(true))
@@ -76,7 +76,7 @@ class LoaderService {
 		runBenchmark(new OneBigTransactionBenchmark(false))
 		runBenchmark(new OneBigTransactionBenchmark(true))
 
-		runBenchmark(new DataFlawQueueWithScrollableQueryBenchmark())
+		runBenchmark(new DataFlowQueueWithScrollableQueryBenchmark())
 
 		System.exit(0)
 	}
@@ -110,8 +110,8 @@ class LoaderService {
 
 	@CompileStatic(TypeCheckingMode.SKIP)
 	void runBenchmark(AbstractBenchmark benchmark, boolean mute = false) {
-		if(benchmark instanceof GparsBenchmark) benchmark.poolSize = POOL_SIZE
-		if(benchmark instanceof BatchInsertBenchmark) benchmark.batchSize = BATCH_SIZE
+		if(benchmark.hasProperty("poolSize")) benchmark.poolSize = POOL_SIZE
+		if(benchmark.hasProperty("batchSize")) benchmark.batchSize = BATCH_SIZE
 		autowire(benchmark)
 		benchmark.run()
 

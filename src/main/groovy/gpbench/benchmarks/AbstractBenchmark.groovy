@@ -7,6 +7,7 @@ import groovy.transform.CompileStatic
  */
 @CompileStatic
 abstract class AbstractBenchmark {
+
 	BigDecimal timeTaken
 
 	void setup() {}

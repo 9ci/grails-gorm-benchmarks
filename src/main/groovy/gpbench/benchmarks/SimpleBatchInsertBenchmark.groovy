@@ -10,7 +10,7 @@ import groovy.transform.CompileStatic
  * Runs batch inserts but without gpars.
  */
 @CompileStatic
-class SimpleBatchInsertBenchmark extends BaseBatchInsertBenchmark implements BatchInsertBenchmark {
+class SimpleBatchInsertBenchmark extends BaseBatchInsertBenchmark {
 
 	SimpleBatchInsertBenchmark(boolean databinding) {
 		super(databinding)

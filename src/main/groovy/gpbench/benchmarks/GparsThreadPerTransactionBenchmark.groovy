@@ -11,7 +11,7 @@ import groovyx.gpars.GParsPool
  * Runs inserts in parallel using gparse with one thread per transaction.
  */
 @CompileStatic
-class GparsThreadPerTransactionBenchmark extends BaseBenchmark implements GparsBenchmark {
+class GparsThreadPerTransactionBenchmark extends BaseBenchmark {
 
 	GparsThreadPerTransactionBenchmark(boolean databinding) {
 		super(databinding)

@@ -2,18 +2,14 @@ package gpbench.benchmarks
 
 import gpbench.CityIdGen
 import gpbench.CityDao
-import grails.plugin.dao.DaoUtil
 import grails.transaction.Transactional
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
-import groovy.transform.TypeCheckingMode
-import groovyx.gpars.GParsPool
 
 /**
  * Runs batch inserts in parallel using gparse.
  */
 @CompileStatic
-class BatchInsertIdGen extends GparsBatchInsertBenchmark {
+class BatchInsertIdGen extends GparsDaoBenchmark {
 
 	boolean validate = true
 	String bindingMethod //= 'grails'
@@ -25,7 +21,7 @@ class BatchInsertIdGen extends GparsBatchInsertBenchmark {
 	@Override
 	def execute() {
 		assert CityIdGen.count() == 0
-		insert(cities, cityDao)
+		insertGpars(cities, cityDao)
 		assert CityIdGen.count() == 115000
 	}
 
