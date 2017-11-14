@@ -1,15 +1,13 @@
 package gpbench
+
 //@AuditStamp
 //@CompileStatic
-class City{
+class CityBaseline {
 	String name
 	String shortCode
 
 	BigDecimal latitude
 	BigDecimal longitude
-
-	//Region region
-	//Country country
 
 	static belongsTo = [region:Region, country:Country]
 

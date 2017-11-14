@@ -31,30 +31,8 @@ class GparsDaoBenchmark extends BaseBatchInsertBenchmark  {
 		assert City.count() == 115000
 	}
 
-	@CompileDynamic
-	void insertGpars(List<List<Map>> batchList, CityDao dao) {
-		GParsPool.withPool(poolSize) {
-			batchList.eachParallel { List<Map> batch ->
-				insertBatch(batch, dao)
-			}
-		}
-	}
-
-	@Transactional
-	void insertBatch(List<Map> batch, CityDao dao) {
-		for (Map record : batch) {
-			insertRow(record, dao)
-		}
-		DaoUtil.flushAndClear()
-	}
-
-	//@Transactional
-	void insertRow(Map row, CityDao dao) {
-		dao.insert(row, [validate:validate, bindingMethod:bindingMethod ])
-	}
-
 	@Override
 	String getDescription() {
-		return "GparsBatchInsert: bindingMethod=${bindingMethod} validate=${validate}"
+		return "GparsDaoBenchmark: bindingMethod=${bindingMethod} validate=${validate}"
 	}
 }

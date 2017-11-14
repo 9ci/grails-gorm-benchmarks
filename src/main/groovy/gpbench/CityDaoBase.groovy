@@ -27,6 +27,7 @@ class CityDaoBase<T extends BaseCity & GormEntity & WebDataBinding> extends Gorm
 	}
 
 	@NotTransactional
+	//@CompileDynamic
 	T bindWithCopyDomain(Map row) {
 		Region r = Region.load(row['region']['id'] as Long)
 		Country country = Country.load(row['country']['id'] as Long)
@@ -39,6 +40,7 @@ class CityDaoBase<T extends BaseCity & GormEntity & WebDataBinding> extends Gorm
 	}
 
 	@NotTransactional
+	//@CompileDynamic
 	T bindWithSetters(Map row) {
 		Region r = Region.load(row['region']['id'] as Long)
 		Country country = Country.load(row['country']['id'] as Long)
