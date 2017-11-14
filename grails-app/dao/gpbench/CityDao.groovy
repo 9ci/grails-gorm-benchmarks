@@ -14,7 +14,7 @@ import groovy.transform.TypeCheckingMode
 @Transactional
 @GrailsCompileStatic
 class CityDao extends CityDaoBase<City> {
-	Class domainClass = City
+	//Class domainClass = City
 
 	CityDao() {
 		super(City)

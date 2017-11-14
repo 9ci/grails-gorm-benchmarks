@@ -12,13 +12,13 @@ import groovy.transform.TypeCheckingMode
 import gpbench.*
 
 @Transactional
-@GrailsCompileStatic
+//@GrailsCompileStatic
 class CityDaoBase<T> extends GormDaoSupport<T> {
-	private Class<T> thisDomainClass
+
 
 	CityDaoBase(Class<T> clazz) {
 		super(clazz)
-		thisDomainClass = clazz
+		//thisDomainClass = clazz
 	}
 
 	@NotTransactional
