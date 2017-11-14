@@ -5,10 +5,10 @@ import grails.transaction.Transactional
 
 @Transactional
 @GrailsCompileStatic
-class CityDao extends CityDaoBase<City> {
+class CityIdGenDao extends CityDaoBase<CityIdGen> {
 	//Class domainClass = City
 
-	CityDao() {
-		super(City)
+	CityIdGenDao() {
+		super(CityIdGen)
 	}
 }

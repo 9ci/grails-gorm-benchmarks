@@ -2,6 +2,7 @@ package gpbench.benchmarks
 
 import gpbench.CityIdGen
 import gpbench.CityDao
+import gpbench.CityIdGenDao
 import grails.transaction.Transactional
 import groovy.transform.CompileStatic
 
@@ -11,8 +12,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class BatchInsertIdGen extends GparsDaoBenchmark {
 
-	boolean validate = true
-	String bindingMethod //= 'grails'
+	CityIdGenDao cityIdGenDao
 
 	BatchInsertIdGen(boolean databinding = true, boolean validate = true, String bindingMethod = 'grails') {
 		super(databinding, validate, bindingMethod)
@@ -27,7 +27,7 @@ class BatchInsertIdGen extends GparsDaoBenchmark {
 
 	@Transactional
 	void insertRow(Map row, CityDao dao) {
-		dao.insert(row, [validate:validate, bindingMethod:bindingMethod ])
+		cityIdGenDao.insert(row, [validate:validate, bindingMethod:bindingMethod ])
 	}
 
 	@Override

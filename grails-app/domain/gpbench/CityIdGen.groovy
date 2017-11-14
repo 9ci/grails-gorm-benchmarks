@@ -1,16 +1,6 @@
 package gpbench
 
-import gorm.AuditStamp
-import groovy.transform.CompileStatic
-
-
-class CityIdGen {
-
-	String name
-	String shortCode
-
-	BigDecimal latitude
-	BigDecimal longitude
+class CityIdGen implements BaseCity {
 
 	static belongsTo = [region:Region, country:Country]
 

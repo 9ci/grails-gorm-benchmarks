@@ -1,9 +1,5 @@
 package gpbench
 
-import gorm.AuditStamp
-import groovy.transform.CompileStatic
-
-
 class CityIdGenAssigned {
 	//injected bean for ids.
 	transient idGenerator

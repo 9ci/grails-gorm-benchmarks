@@ -80,6 +80,10 @@ class LoaderSimpleService {
 		runBenchmark(new GparsBaselineBenchmark(true, false))
 		runBenchmark(new GparsBaselineBenchmark(false, false))
 
+		println "\n- With BatchIdGenerator"
+		runBenchmark(new BatchInsertIdGen())
+
+
 		println "\n- External groovy script"
 		runBenchmark(new GparsScriptEngineBenchmark())
 

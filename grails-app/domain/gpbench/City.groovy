@@ -1,9 +1,4 @@
 package gpbench
-
-import gorm.AuditStamp
-import groovy.transform.CompileStatic
-
-
 //@AuditStamp
 //@CompileStatic
 class City implements BaseCity {
