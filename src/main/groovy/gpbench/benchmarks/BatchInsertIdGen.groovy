@@ -1,7 +1,7 @@
 package gpbench.benchmarks
 
-import gpbench.CityIdGen
 import gpbench.CityDao
+import gpbench.CityIdGen
 import gpbench.CityIdGenDao
 import grails.transaction.Transactional
 import groovy.transform.CompileStatic
@@ -16,6 +16,12 @@ class BatchInsertIdGen extends GparsDaoBenchmark {
 
 	BatchInsertIdGen(boolean databinding = true, boolean validate = true, String bindingMethod = 'grails') {
 		super(databinding, validate, bindingMethod)
+	}
+
+	@Override
+	void cleanup() {
+		super.cleanup()
+		jdbcTemplate.execute("DELETE FROM city_id_gen")
 	}
 
 	@Override
