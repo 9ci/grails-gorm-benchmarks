@@ -15,7 +15,7 @@ import gpbench.*
 import org.grails.datastore.gorm.GormEntity
 
 @Transactional
-@GrailsCompileStatic
+@CompileStatic
 class CityDaoBase<T extends BaseCity & GormEntity & WebDataBinding> extends GormDaoSupport<T> {
 
 
@@ -66,7 +66,7 @@ class CityDaoBase<T extends BaseCity & GormEntity & WebDataBinding> extends Gorm
 		T entity
 		if(args.bindingMethod == 'grails'){
 			entity = domainClass.newInstance()
-			entity.properties = row
+			bindGrails(entity, row)
 		}
 		else if(args.bindingMethod == 'copy'){
 			entity = bindWithCopyDomain(row)
@@ -85,6 +85,11 @@ class CityDaoBase<T extends BaseCity & GormEntity & WebDataBinding> extends Gorm
 	@CompileDynamic
 	def callBinderMethod(method, row){
 		"${method}"(row)
+	}
+
+	@CompileDynamic
+	void bindGrails(entity, row){
+		entity.properties = row
 	}
 
 

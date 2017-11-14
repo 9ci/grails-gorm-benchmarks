@@ -48,7 +48,7 @@ class GparsBatchInsertBenchmark extends BaseBatchInsertBenchmark implements Gpar
 		DaoUtil.flushAndClear()
 	}
 
-	@Transactional
+	//@Transactional
 	void insertRow(Map row, CityDao dao) {
 		dao.insert(row, [validate:validate, bindingMethod:bindingMethod ])
 	}
