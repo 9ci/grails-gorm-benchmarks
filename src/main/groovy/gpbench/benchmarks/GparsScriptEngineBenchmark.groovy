@@ -3,7 +3,9 @@ package gpbench.benchmarks
 import gpbench.City
 import gpbench.CityDao
 import grails.core.GrailsApplication
+import grails.plugin.dao.DaoUtil
 import grails.transaction.Transactional
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 /**
@@ -31,9 +33,13 @@ class GparsScriptEngineBenchmark extends GparsBaselineBenchmark {
 	}
 
 	@Transactional
-	void insertRow(Map row) {
-		Binding binding = new Binding([record:row])
-		scriptEngine.run("insert-city.groovy", binding)
+	@CompileDynamic
+	void insertBatch(List<Map> batch) {
+		def scriptinsert = scriptEngine.run("insert-city.groovy", new Binding())//new Binding([batch:batch])
+		for (Map record : batch) {
+			scriptinsert.insertRow(record)
+		}
+		DaoUtil.flushAndClear()
 	}
 
 	//@Transactional

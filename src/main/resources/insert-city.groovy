@@ -1,6 +1,13 @@
 
 import gpbench.City
 
-City city = new City()
-city.properties = record
-city.save(failOnError:true)
+class Loader {
+    String insertRow(Map row) {
+        City city = new City()
+        city.properties = row
+        city.save(failOnError:true)
+    }
+}
+
+new Loader()
+
