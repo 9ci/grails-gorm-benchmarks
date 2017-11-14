@@ -4,32 +4,30 @@ import gorm.AuditStamp
 import groovy.transform.CompileStatic
 
 
-@AuditStamp
+//@AuditStamp
 //@CompileStatic
-class City {
+class City extends BaseCity {
 	//transient loaderService
 
-	String name
-	String shortCode
+	// String name
+	// String shortCode
 
-	BigDecimal latitude
-	BigDecimal longitude
+	// BigDecimal latitude
+	// BigDecimal longitude
 
-	static belongsTo = [region:Region, country:Country]
+	// static belongsTo = [region:Region, country:Country]
 
 	static mapping = {
-		if(System.getProperty('idgenerator.enabled', 'false') == "true") {
-			id column: 'id', generator:'gorm.tools.idgen.SpringIdGenerator'
-		}
+		table 'city'
 		cache true
 	}
 
-	static constraints = {
-		name blank: false, nullable: false
-		shortCode blank: false, nullable: false
-		latitude nullable: false, scale: 4, max:90.00
-		longitude nullable: false, scale: 4, max:380.00
-	}
+	// static constraints = {
+	// 	name blank: false, nullable: false
+	// 	shortCode blank: false, nullable: false
+	// 	latitude nullable: false, scale: 4, max:90.00
+	// 	longitude nullable: false, scale: 4, max:380.00
+	// }
 
-	String toString() { name }
+	// String toString() { name }
 }

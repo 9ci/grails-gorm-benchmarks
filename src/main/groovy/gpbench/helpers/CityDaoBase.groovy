@@ -2,18 +2,21 @@ package gpbench.helpers
 
 import gorm.tools.GormUtils
 import grails.compiler.GrailsCompileStatic
+import grails.plugin.dao.DaoDomainTrait
 import grails.plugin.dao.DaoMessage
 import grails.plugin.dao.GormDaoSupport
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
+import grails.web.databinding.WebDataBinding
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import gpbench.*
+import org.grails.datastore.gorm.GormEntity
 
 @Transactional
-//@GrailsCompileStatic
-class CityDaoBase<T> extends GormDaoSupport<T> {
+@GrailsCompileStatic
+class CityDaoBase<T extends BaseCity> extends GormDaoSupport<T> {
 
 
 	CityDaoBase(Class<T> clazz) {
@@ -62,7 +65,7 @@ class CityDaoBase<T> extends GormDaoSupport<T> {
 	T insert(Map row, Map args) {
 		T entity
 		if(args.bindingMethod == 'grails'){
-			entity = T.newInstance()
+			entity = domainClass.newInstance()
 			entity.properties = row
 		}
 		else if(args.bindingMethod == 'copy'){
