@@ -18,6 +18,7 @@ abstract class BaseCity {
 	static belongsTo = [region:Region, country:Country]
 
 	static mapping = {
+		table 'city'
 		cache true
 	}
 
