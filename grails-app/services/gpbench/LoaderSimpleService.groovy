@@ -80,6 +80,9 @@ class LoaderSimpleService {
 		runBenchmark(new GparsBaselineBenchmark(true, false))
 		runBenchmark(new GparsBaselineBenchmark(false, false))
 
+		println "\n- External groovy script"
+		runBenchmark(new GparsScriptEngineBenchmark())
+
 		println "\n- Gorm Tools DataFlawQueue"
 		runBenchmark(new BatchInsertWithDataFlowQueueBenchmark(true))
 

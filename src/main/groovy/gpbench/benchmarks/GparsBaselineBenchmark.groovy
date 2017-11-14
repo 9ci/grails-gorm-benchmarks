@@ -19,7 +19,6 @@ class GparsBaselineBenchmark extends GparsDaoBenchmark {
 	def execute() {
 		assert City.count() == 0
 		insertGpars(cities, cityDao)
-		//cityDao.insertGpars(cities, [validate:validate, bindingMethod:bindingMethod ])
 		assert City.count() == 115000
 	}
 
