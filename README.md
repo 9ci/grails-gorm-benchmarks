@@ -6,15 +6,15 @@ Summary
 --------
 The application runs large batch inserts (115K records) in different ways. The goal is to decide the optimum way to run large batch inserts with Gorm.
 
-questions we want a good benchmark to constantly measure and answer
+The goal is to have good benchmarks to measure and answer following questions.
 
-- fastest way to persist/insert gorm
-- show advantages of using multi-core (shown)
-- does binding slow it down (yes), why, can it be optimized, best alternative ….
-- does valiation slow it down (yes), why …. can it be optimized
-- does auditstamp slow it down (yes), can it be optimized
-- do daos slow it down ……
-- does differerent id generateord such as BatchIdGenerator slow it down or speed it up
+- Fastest way to persist/insert large batches using gorm.
+- Show advantages of using multi-core.
+- Does binding slow it down, why, can it be optimized, best alternative
+- Does valiation slow it down, why, can it be optimized
+- Does Auditstamp slow it down, can it be optimized
+- Does Daos slow it down
+- Do custom Id generator slow it down, or improve speed
 - does @compileStatic speed things up, where does it matter? does it help to have it on the domains?
 
 How to run the benchmarks
@@ -143,7 +143,7 @@ As per Gpars performance tips [here](http://www.gpars.org/1.0.0/guide/guide/tips
 
 Questions answered by above conclusion.
 ----
-**Fastest way to persist/insert gorm**
+**Fastest way to persist/insert large batches using gorm**
 Gpars batch insert without data binding and validation.
 
 **Does binding slow it down, why, can it be optimized, best alternative**
