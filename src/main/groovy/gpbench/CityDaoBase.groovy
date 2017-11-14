@@ -76,8 +76,8 @@ class CityDaoBase<T extends BaseCity & GormEntity & WebDataBinding> extends Gorm
 		} else {
 			entity = (T) callBinderMethod(args.bindingMethod, row)
 		}
-		if (fireEvents) super.beforeInsertSave(entity, row)
-		super.save(entity, [validate: args.validate?:false ])
+		if (fireEvents) super.beforeInsertSave((GormEntity)entity, row)
+		super.save((GormEntity)entity, [validate: args.validate?:false ])
 		//DaoMessage.created(entity) slows it down by about 15-20%
 		return entity //[ok: true, entity: entity, message: DaoMessage.created(entity)]
 	}
