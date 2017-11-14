@@ -60,6 +60,8 @@ dependencies {
     compile("org.grails.plugins:dao:3.1.1-SNAPSHOT") { changing = true}
     compile 'org.grails.plugins:csv:1.0'
 
+    compile "io.reactivex.rxjava2:rxjava:2.1.6"
+
     compile "org.grails.plugins:audit-trail:3.0.6"
 
     compile "org.springframework:spring-test:4.3.7.RELEASE"
