@@ -1,9 +1,10 @@
 package gpbench
 
 class BootStrap {
-    LoaderService loaderService
+
+    LoaderSimpleService LoaderSimpleService
 
     def init = { servletContext ->
-        loaderService.runBenchMarks()
+        LoaderSimpleService.runBenchMarks()
     }
 }

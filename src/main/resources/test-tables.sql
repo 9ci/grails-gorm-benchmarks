@@ -8,10 +8,3 @@ CREATE TABLE IF NOT EXISTS city_tmp
   "country.id" BIGINT NOT NULL,
   "region.id" BIGINT NOT NULL
 );
-
-
-create table IF NOT EXISTS NewObjectId
-(
-    KeyName varchar(255) not null primary key,
-    NextId bigint not null
-);

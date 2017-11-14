@@ -30,7 +30,7 @@ abstract class BaseBatchInsertBenchmark extends AbstractBenchmark implements Bat
 		cities = recordsLoader.read("City100k").collate(batchSize)
 	}
 
-	@Transactional
+	//@Transactional
 	void cleanup() {
 		jdbcTemplate.execute("DELETE FROM city")
 	}

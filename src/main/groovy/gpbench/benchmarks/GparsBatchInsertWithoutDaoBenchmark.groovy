@@ -4,6 +4,7 @@ import gpbench.City
 import gpbench.CityDao
 import grails.plugin.dao.DaoUtil
 import grails.transaction.Transactional
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 
@@ -11,36 +12,25 @@ import groovy.transform.TypeCheckingMode
  * Runs batch inserts in parallel without using dao.
  */
 
-@CompileStatic
+//@CompileStatic
 class GparsBatchInsertWithoutDaoBenchmark extends GparsBatchInsertBenchmark {
 
-	boolean validate
-
-	GparsBatchInsertWithoutDaoBenchmark(boolean databinding, boolean validate) {
-		super(databinding)
-		this.validate = validate
+	GparsBatchInsertWithoutDaoBenchmark(boolean databinding = true, boolean validate = true) {
+		super(databinding,validate)
 	}
 
-	@Transactional
-	@CompileStatic(TypeCheckingMode.SKIP)
-	void insertBatch(List<Map> batch, CityDao dao) {
-		for (Map record : batch) {
-			try {
-				if (useDatabinding) {
-					City city = new City()
-					city.properties = record
-					city.save(validate)
-				}
-				else {
-					City city = dao.bind(record)
-					city.save(validate)
-				}
-			}catch (Exception e) {
-				e.printStackTrace()
-			}
-		}
 
-		DaoUtil.flushAndClear()
+	@Transactional
+	void insertRow(Map row, CityDao dao) {
+		if (useDatabinding) {
+			City city = new City()
+			city.properties = row
+			city.save(failOnError:true, validate:validate)
+		}
+		else {
+			City city = dao.bindWithSetters(row)
+			city.save(failOnError:true, validate:validate)
+		}
 	}
 
 	@Override

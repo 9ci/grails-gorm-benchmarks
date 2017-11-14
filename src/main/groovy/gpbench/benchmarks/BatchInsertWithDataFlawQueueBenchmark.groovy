@@ -58,7 +58,7 @@ class BatchInsertWithDataFlawQueueBenchmark extends BaseBatchInsertBenchmark imp
 		for (Map record : batch) {
 			try {
 				if (useDatabinding) dao.insert(record)
-				else dao.insertWithSetter(record)
+				else dao.insert(record, [validate:true, bindingMethod:"copy" ])
 			}catch (Exception e) {
 				e.printStackTrace()
 			}
@@ -69,6 +69,6 @@ class BatchInsertWithDataFlawQueueBenchmark extends BaseBatchInsertBenchmark imp
 
 	@Override
 	String getDescription() {
-		return "GparsBatchInsert with dataflow queue: databinding=${useDatabinding}"
+		return "BatchInsertWithDataFlowQueueBenchmark: databinding=${useDatabinding}"
 	}
 }

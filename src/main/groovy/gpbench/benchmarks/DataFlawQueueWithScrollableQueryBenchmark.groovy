@@ -33,6 +33,7 @@ class DataFlawQueueWithScrollableQueryBenchmark extends AbstractBenchmark implem
 	CsvReader csvReader
 
 	void setup() {
+		Long start = System.currentTimeMillis()
 		//create temp table to hold data and insert records in.
 		benchmarkHelper.executeSqlScript("test-tables.sql")
 		Long count = jdbcTemplate.queryForObject("select count(*) FROM city_tmp", Long)
@@ -45,7 +46,8 @@ class DataFlawQueueWithScrollableQueryBenchmark extends AbstractBenchmark implem
 			List params = [m.name, m.latitude as Float, m.longitude as Float, m.shortCode, m['country.id'] as Long, m['region.id'] as Long]
 			sql.execute query, params
 		}
-
+		Long end = System.currentTimeMillis()
+		println "${((end - start) / 1000)}s to load city templ table"
 	}
 
 	@Override
