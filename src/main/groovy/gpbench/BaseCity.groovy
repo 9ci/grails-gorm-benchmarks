@@ -15,10 +15,12 @@ abstract class BaseCity {
 	BigDecimal latitude
 	BigDecimal longitude
 
+	Region region
+	Country country
+
 	static belongsTo = [region:Region, country:Country]
 
 	static mapping = {
-		table 'city'
 		cache true
 	}
 

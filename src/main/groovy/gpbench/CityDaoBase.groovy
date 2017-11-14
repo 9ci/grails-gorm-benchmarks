@@ -1,4 +1,4 @@
-package gpbench.helpers
+package gpbench
 
 import gorm.tools.GormUtils
 import grails.compiler.GrailsCompileStatic
@@ -16,7 +16,7 @@ import org.grails.datastore.gorm.GormEntity
 
 @Transactional
 @GrailsCompileStatic
-class CityDaoBase<T extends BaseCity> extends GormDaoSupport<T> {
+class CityDaoBase<T extends BaseCity & GormEntity & WebDataBinding> extends GormDaoSupport<T> {
 
 
 	CityDaoBase(Class<T> clazz) {
@@ -57,7 +57,7 @@ class CityDaoBase<T extends BaseCity> extends GormDaoSupport<T> {
 
 	T insertWithSetter(Map row) {
 		T c = bindWithSetters(row)
-		c.persist()
+		((DaoDomainTrait)c).persist()
 		return c
 	}
 

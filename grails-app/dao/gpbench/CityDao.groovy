@@ -1,7 +1,6 @@
 package gpbench
 
 import gorm.tools.GormUtils
-import gpbench.helpers.CityDaoBase
 import grails.compiler.GrailsCompileStatic
 import grails.plugin.dao.DaoMessage
 import grails.plugin.dao.GormDaoSupport
