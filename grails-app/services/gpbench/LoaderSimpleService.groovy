@@ -48,10 +48,11 @@ class LoaderSimpleService {
 			//run benchmarks without displaying numbers to warmup jvm so we get consitent results
 			//showing that doing this will drop results below on averge about 10%
 			println "- Warmming up JVM"
-			//runBenchmark(new GparsBatchInsertBenchmark(false), true)
-			//runBenchmark(new GparsBatchInsertBenchmark(), true)
 			runBenchmark(new GparsBaselineBenchmark(), true)
-			//runBenchmark(new BatchInsertWithDataFlawQueueBenchmark(true), true)
+			runBenchmark(new BatchInsertWithDataFlowQueueBenchmark(true), true)
+			runBenchmark(new GparsDaoBenchmark(), true)
+			runBenchmark(new GparsDaoIdGenBenchmark(), true)
+			//runBenchmark(new GparsDaoBenchmark(), true)
 		}
 
 		//real benchmarks starts here
@@ -64,34 +65,43 @@ class LoaderSimpleService {
 			//runBenchmark(new OneBigTransactionBenchmark(true))
 		}
 
-		runMultiThreads("Pass 1")
-		runMultiThreads("Pass 2")
+		runMultiCoreBinding("Pass 1")
+		runMultiCoreBinding("Pass 2")
 
 		//runBenchmark(new DataFlawQueueWithScrollableQueryBenchmark())
 
 		System.exit(0)
 	}
 
+	void runMultiCoreBinding(String msg) {
+		println "********* $msg multi-core binding "
+
+		println "\n- Grails Binding Compare"
+		runBenchmark(new GparsBaselineBenchmark())
+		runBenchmark(new BatchInsertWithDataFlowQueueBenchmark(true))
+		runBenchmark(new GparsDaoBenchmark())
+		runBenchmark(new GparsScriptEngineBenchmark())
+		runBenchmark(new GparsDaoIdGenBenchmark())
+
+	}
+
 	void runMultiThreads(String msg){
 		println "********* $msg multi-threaded "
+
+		println "\n- Grails Binding Compare"
+		runBenchmark(new GparsBaselineBenchmark())
+		runBenchmark(new BatchInsertWithDataFlowQueueBenchmark(true))
+		runBenchmark(new GparsDaoBenchmark())
+		runBenchmark(new GparsDaoIdGenBenchmark())
+
+
 		println "- Grails Baseline"
 		runBenchmark(new GparsBaselineBenchmark())
 		runBenchmark(new GparsBaselineBenchmark(false, true))
 		runBenchmark(new GparsBaselineBenchmark(true, false))
 		runBenchmark(new GparsBaselineBenchmark(false, false))
 
-		println "\n- With BatchIdGenerator"
-		runBenchmark(new BatchInsertIdGen())
-
-
-		println "\n- External groovy script"
-		runBenchmark(new GparsScriptEngineBenchmark())
-
-		println "\n- Gorm Tools DataFlawQueue"
-		runBenchmark(new BatchInsertWithDataFlowQueueBenchmark(true))
-
-		println "\n- Gorm Tools Dao Baseline"
-		runBenchmark(new GparsDaoBenchmark())
+		println "\n- Dao Copy Props instead of databinding"
 		runBenchmark(new GparsDaoBenchmark(false,true,"copy"))
 		runBenchmark(new GparsDaoBenchmark(true,false))
 		runBenchmark(new GparsDaoBenchmark(false,false,"copy"))
@@ -100,20 +110,13 @@ class LoaderSimpleService {
 		runBenchmark(new GparsDaoBenchmark(false,true,"bindWithSetters"))
 		runBenchmark(new GparsDaoBenchmark(false,true,"bindWithCopyDomain"))
 
-		println "\n   -dao with static binding method calls"
+		println "\n   -dao with static setter method calls"
 		runBenchmark(new GparsDaoBenchmark(false,true,"setter"))
 		runBenchmark(new GparsDaoBenchmark(false,true,"copy"))
-		runBenchmark(new GparsDaoBenchmark(false,true,"bindWithSetters"))
-		runBenchmark(new GparsDaoBenchmark(false,true,"bindWithCopyDomain"))
-		runBenchmark(new GparsDaoBenchmark(false,true,"setter"))
-		runBenchmark(new GparsDaoBenchmark(false,true,"copy"))
-		runBenchmark(new GparsDaoBenchmark(false,true,"bindWithSetters"))
-		runBenchmark(new GparsDaoBenchmark(false,true,"bindWithCopyDomain"))
-		runBenchmark(new GparsDaoBenchmark(false,true,"setter"))
-		runBenchmark(new GparsDaoBenchmark(false,true,"copy"))
-		runBenchmark(new GparsDaoBenchmark(false,true,"bindWithSetters"))
-		runBenchmark(new GparsDaoBenchmark(false,true,"bindWithCopyDomain"))
 
+		println "\n- Gorm Tools Dao idGenerator"
+		runBenchmark(new GparsDaoIdGenBenchmark())
+		runBenchmark(new GparsDaoIdGenBenchmark(true,true,"copy"))
 	}
 
 	void prepareBaseData() {
