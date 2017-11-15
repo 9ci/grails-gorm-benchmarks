@@ -15,8 +15,10 @@ class BootStrap {
     }
 
     void mockAuthentication() {
+
         GrailsUser grailsUser = new GrailsUser("test", "test", true,
                 true, false, true, AuthorityUtils.createAuthorityList('ROLE_ADMIN'), 1)
+        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
         SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(grailsUser, "test", AuthorityUtils.createAuthorityList('ROLE_ADMIN'))
     }
 }
