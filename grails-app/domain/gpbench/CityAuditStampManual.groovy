@@ -33,14 +33,14 @@ class CityAuditStampManual {
 
 		dateCreated nullable:true,display:false,editable:false,bindable:false
 		lastUpdated nullable:true,display:false,editable:false,bindable:false
-		dateCreatedUser nullable:true,display:false,editable:false,bindable:false
-		lastUpdatedUser nullable:true,display:false,editable:false,bindable:false
+		dateCreatedUser nullable:false,display:false,editable:false,bindable:false
+		lastUpdatedUser nullable:false,display:false,editable:false,bindable:false
 	}
 
 	String toString() { name }
 
 	def beforeValidate(){
-		lastUpdated = springSecurityService.principal.id
+		lastUpdatedUser = springSecurityService.principal.id
 		dateCreatedUser = springSecurityService.principal.id
 	}
 
@@ -49,7 +49,7 @@ class CityAuditStampManual {
 	}
 
 	def beforeUpdate() {
-		lastUpdated = springSecurityService.principal.id
+		lastUpdatedUser = springSecurityService.principal.id
 	}
 
 }
