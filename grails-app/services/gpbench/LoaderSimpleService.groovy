@@ -75,15 +75,19 @@ class LoaderSimpleService {
 		println "\n********* $msg multi-core binding "
 		println "\n- Grails Binding Compare"
 		runBenchmark(new GparsBaselineBenchmark(CityBaseline))
-		runBenchmark(new GparsDaoBenchmark(CityDynamic))
 		runBenchmark(new GparsBaselineBenchmark(CityModelTrait))
-		runBenchmark(new GparsDaoBenchmark(City))
-		runBenchmark(new BatchInsertWithDataFlowQueueBenchmark())
-		runBenchmark(new GparsScriptEngineBenchmark(City))
 		runBenchmark(new GparsBaselineBenchmark(CityIdGen))
 		runBenchmark(new GparsBaselineBenchmark(CityIdGenAssigned))
-		runBenchmark(new RxJavaBenchmark(CityBaseline))
+
 		runBenchmark(new GparsBaselineBenchmark(CityAuditTrail))
+
+		runBenchmark(new GparsDaoBenchmark(City))
+		runBenchmark(new GparsDaoBenchmark(CityDynamic))
+
+		runBenchmark(new BatchInsertWithDataFlowQueueBenchmark())
+		runBenchmark(new GparsScriptEngineBenchmark(City))
+		runBenchmark(new RxJavaBenchmark(CityBaseline))
+		runBenchmark(new RxJavaBenchmark(CityBaseline))
 
 	}
 

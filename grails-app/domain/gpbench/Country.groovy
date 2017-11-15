@@ -1,11 +1,6 @@
 package gpbench
 
-import gorm.AuditStamp
-
-@AuditStamp
 class Country {
-	transient loaderService
-
 	String name
 	String capital
 	String fips104
