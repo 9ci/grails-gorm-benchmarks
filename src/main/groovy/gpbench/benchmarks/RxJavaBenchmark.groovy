@@ -1,16 +1,12 @@
 package gpbench.benchmarks
 
-import gpbench.City
 import gpbench.CityBaseline
-import grails.core.GrailsApplication
 import grails.plugin.dao.DaoUtil
 import grails.transaction.Transactional
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
-import org.reactivestreams.Subscriber
-import org.reactivestreams.Subscription
 
 /**
  * Calls external script for each row. The script does the insert.

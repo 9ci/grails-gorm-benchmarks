@@ -1,11 +1,6 @@
 package gpbench.benchmarks
 
-import gpbench.City
-import gpbench.CityDao
-import gpbench.GparsLoadService
 import grails.core.GrailsApplication
-import grails.plugin.dao.DaoUtil
-import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
