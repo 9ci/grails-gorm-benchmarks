@@ -3,7 +3,7 @@ package gpbench
 import gorm.AuditStamp
 
 @AuditStamp
-class CityAuditTrail { //implements CityModel{
+class CityAuditTrail {
 	String name
 	String shortCode
 

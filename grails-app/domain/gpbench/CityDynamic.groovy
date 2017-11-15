@@ -1,7 +1,5 @@
 package gpbench
 
-//@AuditStamp
-//@CompileStatic
 class CityDynamic{
 	String name
 	String shortCode

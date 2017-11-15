@@ -78,8 +78,8 @@ class LoaderSimpleService {
 		runBenchmark(new GparsBaselineBenchmark(CityModelTrait))
 		runBenchmark(new GparsBaselineBenchmark(CityIdGen))
 		runBenchmark(new GparsBaselineBenchmark(CityIdGenAssigned))
-
 		runBenchmark(new GparsBaselineBenchmark(CityAuditTrail))
+		runBenchmark(new GparsBaselineBenchmark(CityAuditStampFields))
 
 		runBenchmark(new GparsDaoBenchmark(City))
 		runBenchmark(new GparsDaoBenchmark(CityDynamic))
@@ -96,8 +96,12 @@ class LoaderSimpleService {
 
 		println "\n- GormUtils.copyDomain insead of grails databinding "
 		runBenchmark(new GparsBaselineBenchmark(CityBaseline,"bindWithCopy"))
-		runBenchmark(new GparsDaoBenchmark(CityDynamic,"bindWithCopyDomain"))
 		runBenchmark(new GparsBaselineBenchmark(CityModelTrait,"bindWithCopy"))
+		runBenchmark(new GparsBaselineBenchmark(CityAuditTrail,"bindWithCopy"))
+		runBenchmark(new GparsBaselineBenchmark(CityAuditStampFields,"bindWithCopy"))
+
+		runBenchmark(new GparsDaoBenchmark(CityDynamic,"bindWithCopyDomain"))
+
 		runBenchmark(new BatchInsertWithDataFlowQueueBenchmark("copy"))
 		runBenchmark(new GparsDaoBenchmark(City, "copy"))
 		runBenchmark(new GparsScriptEngineBenchmark(City, "copy"))

@@ -1,7 +1,5 @@
 package gpbench
 
-//@AuditStamp
-//@CompileStatic
 class CityModelTrait implements CityModel{
 
 	static belongsTo = [Region, Country]
