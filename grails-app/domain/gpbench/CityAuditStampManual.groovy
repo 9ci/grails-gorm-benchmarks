@@ -1,9 +1,10 @@
 package gpbench
 
 
-class CityAuditStampFields {
+class CityAuditStampManual {
 
 	transient auditTrailHelper
+	transient disableAuditTrailStamp = true
 
 	String name
 	String shortCode
@@ -15,8 +16,9 @@ class CityAuditStampFields {
 
 	Long createdBy
 	Date createdDate
+
 	Long editedBy
-	Long editedDate
+	Date editedDate
 
 	static mapping = {
 		cache true
@@ -38,5 +40,21 @@ class CityAuditStampFields {
 	}
 
 	String toString() { name }
+
+	def beforeValidate(){
+		initFields()
+	}
+
+	def beforeInsert() {
+		initFields()
+	}
+
+	void initFields() {
+		auditTrailHelper.setDateField(this, 'createdDate')
+		auditTrailHelper.setDateField(this, 'editedDate')
+
+		auditTrailHelper.setUserField(this, 'createdBy')
+		auditTrailHelper.setDateField(this, 'editedBy')
+	}
 
 }

@@ -79,7 +79,8 @@ class LoaderSimpleService {
 		runBenchmark(new GparsBaselineBenchmark(CityIdGen))
 		runBenchmark(new GparsBaselineBenchmark(CityIdGenAssigned))
 		runBenchmark(new GparsBaselineBenchmark(CityAuditTrail))
-		runBenchmark(new GparsBaselineBenchmark(CityAuditStampFields))
+		runBenchmark(new GparsBaselineBenchmark(CityAuditStampManual))
+		runBenchmark(new GparsBaselineBenchmark(CityDateStamp))
 
 		runBenchmark(new GparsDaoBenchmark(City))
 		runBenchmark(new GparsDaoBenchmark(CityDynamic))
@@ -98,7 +99,8 @@ class LoaderSimpleService {
 		runBenchmark(new GparsBaselineBenchmark(CityBaseline,"bindWithCopy"))
 		runBenchmark(new GparsBaselineBenchmark(CityModelTrait,"bindWithCopy"))
 		runBenchmark(new GparsBaselineBenchmark(CityAuditTrail,"bindWithCopy"))
-		runBenchmark(new GparsBaselineBenchmark(CityAuditStampFields,"bindWithCopy"))
+		runBenchmark(new GparsBaselineBenchmark(CityAuditStampManual,"bindWithCopy"))
+		runBenchmark(new GparsBaselineBenchmark(CityDateStamp,"bindWithCopy"))
 
 		runBenchmark(new GparsDaoBenchmark(CityDynamic,"bindWithCopyDomain"))
 
@@ -120,6 +122,7 @@ class LoaderSimpleService {
 		println "\n   -dao with static setter method calls"
 		runBenchmark(new GparsDaoBenchmark(City,"setter"))
 		runBenchmark(new GparsDaoBenchmark(City,"copy"))
+		new City().attached
 
 	}
 
