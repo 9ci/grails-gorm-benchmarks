@@ -3,8 +3,7 @@ package gpbench
 
 class CityAuditStampManual {
 
-	transient auditTrailHelper
-	transient disableAuditTrailStamp = true
+	transient springSecurityService
 
 	String name
 	String shortCode
@@ -14,11 +13,10 @@ class CityAuditStampManual {
 
 	static belongsTo = [region:Region, country:Country]
 
-	Long createdBy
-	Date createdDate
-
-	Long editedBy
-	Date editedDate
+	Date dateCreated
+	Date lastUpdated
+	Long dateCreatedUser
+	Long lastUpdatedUser
 
 	static mapping = {
 		cache true
@@ -33,28 +31,25 @@ class CityAuditStampManual {
 
 		country nullable: false
 
-		createdBy nullable:true,display:false,editable:false,bindable:false
-		createdDate nullable:true,display:false,editable:false,bindable:false
-		editedBy nullable:true,display:false,editable:false,bindable:false
-		editedDate nullable:true,display:false,editable:false,bindable:false
+		dateCreated nullable:true,display:false,editable:false,bindable:false
+		lastUpdated nullable:true,display:false,editable:false,bindable:false
+		dateCreatedUser nullable:true,display:false,editable:false,bindable:false
+		lastUpdatedUser nullable:true,display:false,editable:false,bindable:false
 	}
 
 	String toString() { name }
 
 	def beforeValidate(){
-		initFields()
+		lastUpdated = springSecurityService.principal.id
+		dateCreatedUser = springSecurityService.principal.id
 	}
 
 	def beforeInsert() {
-		initFields()
+		dateCreatedUser = springSecurityService.principal.id
 	}
 
-	void initFields() {
-		auditTrailHelper.setDateField(this, 'createdDate')
-		auditTrailHelper.setDateField(this, 'editedDate')
-
-		auditTrailHelper.setUserField(this, 'createdBy')
-		auditTrailHelper.setUserField(this, 'editedBy')
+	def beforeUpdate() {
+		lastUpdated = springSecurityService.principal.id
 	}
 
 }

@@ -47,8 +47,9 @@ class LoaderSimpleService {
 			//run benchmarks without displaying numbers to warmup jvm so we get consitent results
 			//showing that doing this will drop results below on averge about 10%
 			println "- Warmming up JVM"
-			runBenchmark(new GparsBaselineBenchmark(CityAuditTrail))
+			//runBenchmark(new GparsBaselineBenchmark(CityAuditTrail))
 			runBenchmark(new GparsBaselineBenchmark(CityBaseline))
+			runBenchmark(new GparsBaselineBenchmark(City))
 			runBenchmark(new GparsDaoBenchmark(CityDynamic))
 		}
 
@@ -75,12 +76,12 @@ class LoaderSimpleService {
 		println "\n********* $msg multi-core binding "
 		println "\n- Grails Binding Compare"
 		runBenchmark(new GparsBaselineBenchmark(CityBaseline))
-		runBenchmark(new GparsBaselineBenchmark(CityModelTrait))
-		runBenchmark(new GparsBaselineBenchmark(CityIdGen))
-		runBenchmark(new GparsBaselineBenchmark(CityIdGenAssigned))
+		runBenchmark(new GparsBaselineBenchmark(CityDateStamp))
 		runBenchmark(new GparsBaselineBenchmark(CityAuditTrail))
 		runBenchmark(new GparsBaselineBenchmark(CityAuditStampManual))
-		runBenchmark(new GparsBaselineBenchmark(CityDateStamp))
+		runBenchmark(new GparsBaselineBenchmark(CityIdGen))
+		runBenchmark(new GparsBaselineBenchmark(CityIdGenAssigned))
+		runBenchmark(new GparsBaselineBenchmark(CityModelTrait))
 
 		runBenchmark(new GparsDaoBenchmark(City))
 		runBenchmark(new GparsDaoBenchmark(CityDynamic))

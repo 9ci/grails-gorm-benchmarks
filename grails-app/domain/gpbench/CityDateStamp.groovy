@@ -9,6 +9,8 @@ class CityDateStamp {
 
 	Date dateCreated
 	Date lastUpdated
+	Long dateCreatedUser
+	Long lastUpdatedUser
 
 	static belongsTo = [region:Region, country:Country]
 
@@ -26,6 +28,8 @@ class CityDateStamp {
 
 		dateCreated nullable:true,display:false,editable:false,bindable:false
 		lastUpdated nullable:true,display:false,editable:false,bindable:false
+		dateCreatedUser nullable:true,display:false,editable:false,bindable:false
+		lastUpdatedUser nullable:true,display:false,editable:false,bindable:false
 	}
 
 	String toString() { name }
