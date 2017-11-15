@@ -84,6 +84,7 @@ class LoaderSimpleService {
 		runBenchmark(new BatchInsertWithDataFlowQueueBenchmark())
 		runBenchmark(new GparsScriptEngineBenchmark())
 		runBenchmark(new GparsDaoIdGenBenchmark())
+		runBenchmark(new RxJavaBenchmark())
 
 	}
 
