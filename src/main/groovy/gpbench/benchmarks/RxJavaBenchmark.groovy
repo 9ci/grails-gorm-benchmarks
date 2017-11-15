@@ -14,8 +14,8 @@ import io.reactivex.schedulers.Schedulers
 @CompileStatic
 class RxJavaBenchmark extends GparsBaselineBenchmark {
 
-	RxJavaBenchmark() {
-		super(CityBaseline)
+	RxJavaBenchmark(Class domain) {
+		super(domain)
 	}
 
 	@Override

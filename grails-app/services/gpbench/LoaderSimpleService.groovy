@@ -90,7 +90,7 @@ class LoaderSimpleService {
 		runBenchmark(new GparsScriptEngineBenchmark(City))
 		runBenchmark(new GparsBaselineBenchmark(CityIdGen))
 		runBenchmark(new GparsBaselineBenchmark(CityIdGenAssigned))
-		runBenchmark(new RxJavaBenchmark())
+		runBenchmark(new RxJavaBenchmark(CityBaseline))
 
 	}
 
