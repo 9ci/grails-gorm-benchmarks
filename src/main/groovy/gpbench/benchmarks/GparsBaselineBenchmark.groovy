@@ -3,6 +3,7 @@ package gpbench.benchmarks
 import gorm.tools.GormUtils
 import gpbench.CityBaseline
 import gpbench.Country
+import gpbench.GparsLoadService
 import gpbench.Region
 import grails.plugin.dao.DaoUtil
 import grails.transaction.NotTransactional
@@ -16,45 +17,25 @@ import groovyx.gpars.GParsPool
  */
 
 @CompileStatic
-class GparsBaselineBenchmark extends GparsDaoBenchmark {
+class GparsBaselineBenchmark extends BaseBatchInsertBenchmark {
 
-	boolean validate = true
-	String bindingMethod //= 'grails'
-
-	GparsBaselineBenchmark(boolean databinding = true, boolean validate = true, String bindingMethod = 'grails') {
-		super(databinding)
-		this.validate = validate
-		this.bindingMethod = bindingMethod
+	GparsBaselineBenchmark(String bindingMethod = 'grails', boolean validate = true) {
+		super(bindingMethod,validate)
 	}
 
 	@Override
 	def execute() {
 		assert CityBaseline.count() == 0
-		insertGpars(cities)
-		//cityDao.insertGpars(cities, [validate:validate, bindingMethod:bindingMethod ])
+		//insertGpars(cities)
+		def args = [poolSize:poolSize, validate:validate, bindingMethod:bindingMethod ]
+		gparsLoadService.insertGpars(cities, args){ Map row, Map zargs ->
+			insertRow(row)
+		}
 		assert CityBaseline.count() == 115000
 	}
 
-	@CompileDynamic
-	void insertGpars(List<List<Map>> batchList) {
-		GParsPool.withPool(poolSize) {
-			batchList.eachParallel { List<Map> batch ->
-				insertBatch(batch)
-			}
-		}
-	}
-
-	@Transactional
-	void insertBatch(List<Map> batch) {
-		for (Map record : batch) {
-			insertRow(record)
-		}
-		DaoUtil.flushAndClear()
-	}
-
-	//@Transactional
 	void insertRow(Map row) {
-		if (useDatabinding) {
+		if (bindingMethod == 'grails') {
 			CityBaseline city = new CityBaseline(row)
 			city.save(failOnError:true, validate:validate)
 		}
@@ -85,8 +66,4 @@ class GparsBaselineBenchmark extends GparsDaoBenchmark {
 		jdbcTemplate.execute("DELETE FROM city_baseline")
 	}
 
-	@Override
-	String getDescription() {
-		return "GparsBaselineBenchmark: databinding=${useDatabinding}, validation:${validate}"
-	}
 }

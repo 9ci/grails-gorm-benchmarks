@@ -13,21 +13,14 @@ import groovy.transform.CompileStatic
 class GparsDaoIdGenBenchmark extends GparsDaoBenchmark {
 
 	CityIdGenDao cityIdGenDao
-
-	GparsDaoIdGenBenchmark(boolean databinding = true, boolean validate = true, String bindingMethod = 'grails') {
-		super(databinding, validate, bindingMethod)
+	GparsDaoIdGenBenchmark(String bindingMethod = 'grails', boolean validate = true) {
+		super(bindingMethod,validate)
 	}
-
 	@Override
 	def execute() {
 		assert CityIdGen.count() == 0
 		cityIdGenDao.insertGpars(cities, [poolSize:poolSize, validate:validate, bindingMethod:bindingMethod ])
 		assert CityIdGen.count() == 115000
-	}
-
-	@Override
-	String getDescription() {
-		return "GparsDaoIdGenBenchmark: bindingMethod=${bindingMethod} validate=${validate}"
 	}
 
 	//@Transactional

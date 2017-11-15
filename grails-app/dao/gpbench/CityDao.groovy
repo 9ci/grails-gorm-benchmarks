@@ -57,6 +57,8 @@ class CityDao extends GormDaoSupport<City> {
 
 	//See at the bottom why we need this doXX methods
 	City insert(Map row, Map args) {
+//		CityPropBinders cbinder = new CityPropBinders(City)
+//		City entity = cbinder.insert(row, args)
 		City entity
 		if(args.bindingMethod == 'grails'){
 			entity = domainClass.newInstance()

@@ -30,12 +30,19 @@ class CsvReader extends RecordsLoader {
 		CSVMapReader reader = new CSVMapReader(new InputStreamReader(resource.inputStream))
 		reader.each { Map m ->
 			//need to convert to grails parameter map, so that it can be binded
+			castNum( m)
 			m = toGrailsParamsMap(m)
 			results.add(m)
 		}
 
 		return results
 
+	}
+
+	void castNum(Map m){
+		['latitude',"longitude"].each{key->
+			if(m[key]) m[key] = m[key] as BigDecimal
+		}
 	}
 
 	@CompileDynamic

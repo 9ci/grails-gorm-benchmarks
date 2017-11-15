@@ -50,7 +50,7 @@ class DataFlowQueueWithScrollableQueryBenchmark extends AbstractBenchmark {
 			sql.execute query, params
 		}
 		Long end = System.currentTimeMillis()
-		println "${((end - start) / 1000)}s to load city templ table"
+		println "${((end - start) / 1000)}s to load city temp table"
 	}
 
 	@Override

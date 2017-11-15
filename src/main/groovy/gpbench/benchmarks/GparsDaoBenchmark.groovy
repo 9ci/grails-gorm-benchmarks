@@ -15,13 +15,8 @@ import groovyx.gpars.GParsPool
 @CompileStatic
 class GparsDaoBenchmark extends BaseBatchInsertBenchmark  {
 
-	boolean validate = true
-	String bindingMethod //= 'grails'
-
-	GparsDaoBenchmark(boolean databinding = true, boolean validate = true, String bindingMethod = 'grails') {
-		super(databinding)
-		this.validate = validate
-		this.bindingMethod = bindingMethod
+	GparsDaoBenchmark(String bindingMethod = 'grails', boolean validate = true) {
+		super(bindingMethod,validate)
 	}
 
 	@Override
@@ -31,8 +26,4 @@ class GparsDaoBenchmark extends BaseBatchInsertBenchmark  {
 		assert City.count() == 115000
 	}
 
-	@Override
-	String getDescription() {
-		return "GparsDaoBenchmark: bindingMethod=${bindingMethod} validate=${validate}"
-	}
 }

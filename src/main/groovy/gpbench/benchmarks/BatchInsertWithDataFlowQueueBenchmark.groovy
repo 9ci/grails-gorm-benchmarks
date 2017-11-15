@@ -17,8 +17,10 @@ import static groovyx.gpars.dataflow.Dataflow.operator
 @CompileStatic
 class BatchInsertWithDataFlowQueueBenchmark extends BaseBatchInsertBenchmark {
 
-	BatchInsertWithDataFlowQueueBenchmark(boolean databinding) {
-		super(databinding)
+	BatchInsertWithDataFlowQueueBenchmark(boolean databinding) { super(databinding) }
+
+	BatchInsertWithDataFlowQueueBenchmark(String bindingMethod = 'grails', boolean validate = true) {
+		super(bindingMethod,validate)
 	}
 
 	@Override
@@ -58,7 +60,7 @@ class BatchInsertWithDataFlowQueueBenchmark extends BaseBatchInsertBenchmark {
 		for (Map record : batch) {
 			try {
 				if (useDatabinding) dao.insert(record)
-				else dao.insert(record, [validate:true, bindingMethod:"copy" ])
+				else dao.insert(record, [validate:true, bindingMethod:bindingMethod])
 			}catch (Exception e) {
 				e.printStackTrace()
 			}
@@ -67,8 +69,4 @@ class BatchInsertWithDataFlowQueueBenchmark extends BaseBatchInsertBenchmark {
 		DaoUtil.flushAndClear()
 	}
 
-	@Override
-	String getDescription() {
-		return "BatchInsertWithDataFlowQueueBenchmark: databinding=${useDatabinding}"
-	}
 }

@@ -1,17 +1,17 @@
 package gpbench
 //@AuditStamp
 //@CompileStatic
-class City{
+class City { //implements CityModel{
 	String name
 	String shortCode
 
 	BigDecimal latitude
 	BigDecimal longitude
 
-	//Region region
-	//Country country
+	Region region
+	Country country
 
-	static belongsTo = [region:Region, country:Country]
+	static belongsTo = [Region, Country]
 
 	static mapping = {
 		//id column: 'id', generator:'gorm.tools.idgen.SpringIdGenerator'

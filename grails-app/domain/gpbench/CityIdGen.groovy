@@ -1,6 +1,6 @@
 package gpbench
 
-class CityIdGen implements BaseCity {
+class CityIdGen implements CityModel {
 	String name
 	String shortCode
 
