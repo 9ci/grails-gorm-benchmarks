@@ -1,14 +1,11 @@
 package gpbench.benchmarks
 
 import gpbench.City
-import gpbench.CityDao
 import gpbench.GparsLoadService
 import gpbench.helpers.CsvReader
 import gpbench.helpers.JsonReader
 import gpbench.helpers.RecordsLoader
-import grails.transaction.Transactional
 import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
 import org.springframework.jdbc.core.JdbcTemplate
 
 //@CompileStatic

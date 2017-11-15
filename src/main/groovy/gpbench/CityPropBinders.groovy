@@ -1,20 +1,10 @@
 package gpbench
 
 import gorm.tools.GormUtils
-import grails.compiler.GrailsCompileStatic
 import grails.plugin.dao.DaoDomainTrait
-import grails.plugin.dao.DaoMessage
-import grails.plugin.dao.DaoUtil
-import grails.plugin.dao.GormDaoSupport
 import grails.transaction.NotTransactional
-import grails.transaction.Transactional
-import grails.web.databinding.WebDataBinding
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
-import groovy.transform.TypeCheckingMode
-import gpbench.*
-import groovyx.gpars.GParsPool
-import org.grails.datastore.gorm.GormEntity
 
 @CompileStatic
 class CityPropBinders<T extends CityModel>{

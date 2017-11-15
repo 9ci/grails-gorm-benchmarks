@@ -1,20 +1,9 @@
 package gpbench.benchmarks
 
 import gorm.tools.GormUtils
-import gpbench.CityBaseline
-import gpbench.CityModel
 import gpbench.Country
-import gpbench.GparsLoadService
 import gpbench.Region
-import grails.compiler.GrailsCompileStatic
-import grails.plugin.dao.DaoUtil
-import grails.transaction.NotTransactional
-import grails.transaction.Transactional
-import grails.web.databinding.WebDataBinding
 import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
-import groovyx.gpars.GParsPool
-import org.grails.datastore.gorm.GormEntity
 
 /**
  * Baseline benchmark with grails out of the box

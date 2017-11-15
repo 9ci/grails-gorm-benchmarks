@@ -1,7 +1,4 @@
-
 import gpbench.City
-import gpbench.CityDao
-import grails.compiler.GrailsCompileStatic
 
 //import groovy.transform.CompileStatic
 

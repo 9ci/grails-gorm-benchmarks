@@ -2,7 +2,6 @@ package gpbench.helpers
 
 import grails.core.GrailsApplication
 import groovy.transform.CompileStatic
-import org.hibernate.SessionFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
 import org.springframework.jdbc.core.JdbcTemplate
