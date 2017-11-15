@@ -1,16 +1,18 @@
 package gpbench.benchmarks
 
+import gpbench.City
 import gpbench.CityDao
 import gpbench.GparsLoadService
 import gpbench.helpers.CsvReader
 import gpbench.helpers.JsonReader
 import gpbench.helpers.RecordsLoader
 import grails.transaction.Transactional
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.springframework.jdbc.core.JdbcTemplate
 
-@CompileStatic
-abstract class BaseBatchInsertBenchmark extends AbstractBenchmark {
+//@CompileStatic
+abstract class BaseBatchInsertBenchmark<T> extends AbstractBenchmark {
 	int poolSize
 	int batchSize
 
@@ -20,7 +22,7 @@ abstract class BaseBatchInsertBenchmark extends AbstractBenchmark {
 	CsvReader csvReader
 	JsonReader jsonReader
 
-	CityDao cityDao
+	Class<T> domainClass = City
 
 	boolean useDatabinding = true //use default grails databinding
 	boolean validate = true
@@ -33,26 +35,28 @@ abstract class BaseBatchInsertBenchmark extends AbstractBenchmark {
 		if(useDatabinding) bindingMethod = 'copy'
 	}
 
-	BaseBatchInsertBenchmark(String bindingMethod = 'grails', boolean validate = true) {
+	BaseBatchInsertBenchmark(Class<T> clazz, String bindingMethod = 'grails', boolean validate = true) {
 		if(bindingMethod != 'grails') useDatabinding = false
 		this.validate = validate
 		this.bindingMethod = bindingMethod
+		domainClass = clazz
 	}
 
 	void setup() {
+		assert domainClass.count() == 0
 		RecordsLoader recordsLoader = useDatabinding ? csvReader : jsonReader
 		cities = recordsLoader.read("City100k").collate(batchSize)
 	}
 
-	//@Transactional
+	@CompileDynamic
 	void cleanup() {
-		jdbcTemplate.execute("DELETE FROM city")
+		assert domainClass.count() == 115000
+		domainClass.executeUpdate("delete from ${domainClass.getSimpleName()}".toString())
 	}
 
 	@Override
 	String getDescription() {
-		String validateDesc = validate ? "": ", validation:${validate}"
-		return "${this.getClass().simpleName} [ bindingMethod:${bindingMethod} ${validateDesc}]"
+		String validateDesc = validate ? "": ", validation: ${validate}"
+		return "${this.getClass().simpleName}<${domainClass.simpleName}> [ bindingMethod: ${bindingMethod} ${validateDesc}]"
 	}
-
 }

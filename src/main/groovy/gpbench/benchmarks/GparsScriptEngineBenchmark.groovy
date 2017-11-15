@@ -13,13 +13,12 @@ import groovy.transform.CompileStatic
  * Calls external script for each row. The script does the insert.
  */
 @CompileStatic
-class GparsScriptEngineBenchmark extends GparsBaselineBenchmark {
+class GparsScriptEngineBenchmark<T> extends GparsBaselineBenchmark<T> {
 	GroovyScriptEngine scriptEngine
 	GrailsApplication grailsApplication
-	GparsLoadService gparsLoadService
 
-	GparsScriptEngineBenchmark(String bindingMethod = 'grails', boolean validate = true) {
-		super(bindingMethod,validate)
+	GparsScriptEngineBenchmark(Class<T> clazz, String bindingMethod = 'grails', boolean validate = true) {
+		super(clazz,bindingMethod,validate)
 	}
 
 	void setup() {
@@ -30,22 +29,13 @@ class GparsScriptEngineBenchmark extends GparsBaselineBenchmark {
 	@Override
 	@CompileDynamic
 	def execute() {
-		assert City.count() == 0
-
 		def scriptinsert = scriptEngine.run("insert-city.groovy",
-			new Binding([bindingMethod:bindingMethod, dao:cityDao]))//new Binding([batch:batch])
+			new Binding([bindingMethod:bindingMethod]))//new Binding([batch:batch])
 
 		def args = [poolSize:poolSize]
 		gparsLoadService.insertGpars(cities, args){ row, zargs ->
 			scriptinsert.insertRow(row)
 		}
-		assert City.count() == 115000
-	}
-
-
-	//@Transactional
-	void cleanup() {
-		jdbcTemplate.execute("DELETE FROM city")
 	}
 
 }

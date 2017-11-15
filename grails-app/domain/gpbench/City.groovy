@@ -1,4 +1,5 @@
 package gpbench
+
 //@AuditStamp
 //@CompileStatic
 class City { //implements CityModel{

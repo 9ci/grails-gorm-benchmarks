@@ -12,6 +12,8 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class SimpleBatchInsertBenchmark extends BaseBatchInsertBenchmark {
 
+	CityDao cityDao
+
 	SimpleBatchInsertBenchmark(boolean databinding) {
 		super(databinding)
 	}

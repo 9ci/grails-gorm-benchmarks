@@ -17,17 +17,16 @@ import static groovyx.gpars.dataflow.Dataflow.operator
 @CompileStatic
 class BatchInsertWithDataFlowQueueBenchmark extends BaseBatchInsertBenchmark {
 
+	CityDao cityDao
 	BatchInsertWithDataFlowQueueBenchmark(boolean databinding) { super(databinding) }
 
 	BatchInsertWithDataFlowQueueBenchmark(String bindingMethod = 'grails', boolean validate = true) {
-		super(bindingMethod,validate)
+		super(City, bindingMethod,validate)
 	}
 
 	@Override
 	def execute() {
-		assert City.count() == 0
 		insert(cities, cityDao)
-		assert City.count() == 115000
 	}
 
 	@CompileStatic(TypeCheckingMode.SKIP)

@@ -10,7 +10,7 @@ class CityIdGen implements CityModel {
 	Region region
 	Country country
 
-	static belongsTo = [region:Region, country:Country]
+	static belongsTo = [Region, Country]
 
 	static mapping = {
 		id column: 'id', generator:'gorm.tools.idgen.SpringIdGenerator'
@@ -22,6 +22,8 @@ class CityIdGen implements CityModel {
 		shortCode blank: false, nullable: false
 		latitude nullable: false, scale: 4, max:90.00
 		longitude nullable: false, scale: 4, max:380.00
+		region nullable: false
+		country nullable: false
 	}
 
 	String toString() { name }

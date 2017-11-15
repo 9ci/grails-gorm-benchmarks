@@ -48,10 +48,14 @@ class LoaderSimpleService {
 			//run benchmarks without displaying numbers to warmup jvm so we get consitent results
 			//showing that doing this will drop results below on averge about 10%
 			println "- Warmming up JVM"
-			runBenchmark(new GparsBaselineBenchmark())
-			runBenchmark(new GparsDaoDynamicBenchmark())
-			runBenchmark(new GparsDaoBenchmark())
-			runBenchmark(new GparsDaoIdGenBenchmark())
+			runBenchmark(new GparsBaselineBenchmark(CityBaseline))
+			runBenchmark(new GparsDaoBenchmark(CityDynamic))
+			//runBenchmark(new GparsDaoBenchmark(CityDynamic))
+			//runBenchmark(new GparsDaoBenchmark(City))
+			runBenchmark(new GparsScriptEngineBenchmark(City))
+
+			//runBenchmark(new GparsBaselineBenchmark(CityModelTrait))
+			//runBenchmark(new GparsDaoBenchmark(CityIdGen))
 			//runBenchmark(new GparsDaoBenchmark(), true)
 		}
 
@@ -77,13 +81,14 @@ class LoaderSimpleService {
 	void runMultiCoreBinding(String msg) {
 		println "\n********* $msg multi-core binding "
 		println "\n- Grails Binding Compare"
-		runBenchmark(new GparsBaselineBenchmark())
-		runBenchmark(new GparsDaoDynamicBenchmark())
-		runBenchmark(new GparsModelTraitBenchmark())
-		runBenchmark(new GparsDaoBenchmark())
+		runBenchmark(new GparsBaselineBenchmark(CityBaseline))
+		runBenchmark(new GparsDaoBenchmark(CityDynamic))
+		runBenchmark(new GparsBaselineBenchmark(CityModelTrait))
+		runBenchmark(new GparsDaoBenchmark(City))
 		runBenchmark(new BatchInsertWithDataFlowQueueBenchmark())
-		runBenchmark(new GparsScriptEngineBenchmark())
-		runBenchmark(new GparsDaoIdGenBenchmark())
+		runBenchmark(new GparsScriptEngineBenchmark(City))
+		runBenchmark(new GparsBaselineBenchmark(CityIdGen))
+		runBenchmark(new GparsBaselineBenchmark(CityIdGenAssigned))
 		runBenchmark(new RxJavaBenchmark())
 
 	}
@@ -92,26 +97,27 @@ class LoaderSimpleService {
 		println "********* $msg multi-core no grails binding "
 
 		println "\n- GormUtils.copyDomain insead of grails databinding "
-		runBenchmark(new GparsBaselineBenchmark("bindWithCopy"))
-		runBenchmark(new GparsDaoDynamicBenchmark("bindWithCopyDomain"))
-		runBenchmark(new GparsModelTraitBenchmark("bindWithCopy"))
+		runBenchmark(new GparsBaselineBenchmark(CityBaseline,"bindWithCopy"))
+		runBenchmark(new GparsDaoBenchmark(CityDynamic,"bindWithCopyDomain"))
+		runBenchmark(new GparsBaselineBenchmark(CityModelTrait,"bindWithCopy"))
 		runBenchmark(new BatchInsertWithDataFlowQueueBenchmark("copy"))
-		runBenchmark(new GparsDaoBenchmark("copy"))
-		runBenchmark(new GparsScriptEngineBenchmark("copy"))
-		runBenchmark(new GparsDaoIdGenBenchmark("copy"))
+		runBenchmark(new GparsDaoBenchmark(City, "copy"))
+		runBenchmark(new GparsScriptEngineBenchmark(City, "copy"))
+		runBenchmark(new GparsDaoBenchmark(CityIdGen, "copy"))
+		runBenchmark(new GparsBaselineBenchmark(CityIdGenAssigned,"copy"))
 
 	}
 
 	void runMultiThreads(String msg){
 		println "********* $msg multi-threaded "
 
-		println "\n   -dao with dynamic binding method calls"
-		runBenchmark(new GparsDaoBenchmark("bindWithSetters"))
-		runBenchmark(new GparsDaoBenchmark("bindWithCopyDomain"))
+		println "\n - not much difference static and dynamic method calls"
+		runBenchmark(new GparsDaoBenchmark(City,"bindWithSetters"))
+		runBenchmark(new GparsDaoBenchmark(City,"bindWithCopyDomain"))
 
 		println "\n   -dao with static setter method calls"
-		runBenchmark(new GparsDaoBenchmark("setter"))
-		runBenchmark(new GparsDaoBenchmark("copy"))
+		runBenchmark(new GparsDaoBenchmark(City,"setter"))
+		runBenchmark(new GparsDaoBenchmark(City,"copy"))
 
 	}
 

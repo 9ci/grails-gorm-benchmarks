@@ -88,23 +88,6 @@ class CityDao extends GormDaoSupport<City> {
 		entity.properties = row
 	}
 
-	@NotTransactional
-	@CompileDynamic
-	void insertGpars(List<List<Map>> batchList, Map args) {
-		GParsPool.withPool(args.poolSize) {
-			batchList.eachParallel { List<Map> batch ->
-				insertBatch(batch, args)
-			}
-		}
-	}
-
-	void insertBatch(List<Map> batch, Map args) {
-		for (Map record : batch) {
-			insertRow(record, args)
-		}
-		DaoUtil.flushAndClear()
-	}
-
 	void insertRow(Map row, Map args) {
 		insert(row, args)
 	}

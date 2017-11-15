@@ -12,18 +12,19 @@ import groovyx.gpars.GParsPool
 /**
  * Runs batch inserts in parallel using gparse.
  */
-@CompileStatic
-class GparsDaoBenchmark extends BaseBatchInsertBenchmark  {
+//@CompileStatic
+class GparsDaoBenchmark<T> extends BaseBatchInsertBenchmark<T>  {
 
-	GparsDaoBenchmark(String bindingMethod = 'grails', boolean validate = true) {
-		super(bindingMethod,validate)
+	GparsDaoBenchmark(Class<T> clazz, String bindingMethod = 'grails', boolean validate = true) {
+		super(clazz, bindingMethod,validate)
 	}
 
 	@Override
 	def execute() {
-		assert City.count() == 0
-		cityDao.insertGpars(cities, [poolSize:poolSize, validate:validate, bindingMethod:bindingMethod ])
-		assert City.count() == 115000
+		def args = [poolSize:poolSize, validate:validate, bindingMethod:bindingMethod ]
+		gparsLoadService.insertGpars(cities, args){ row, zargs ->
+			domainClass.dao.insert(row, zargs)
+		}
 	}
 
 }

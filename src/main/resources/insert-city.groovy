@@ -5,10 +5,9 @@ import grails.compiler.GrailsCompileStatic
 
 //import groovy.transform.CompileStatic
 
-@GrailsCompileStatic
+//@GrailsCompileStatic
 class Loader {
     String bindingMethod
-    CityDao dao
 
     String insertRow(Map row) {
         if (bindingMethod == 'grails'){
@@ -17,11 +16,11 @@ class Loader {
             city.persist()
         }
         else {
-            dao.insert(row, [validate:true, bindingMethod:bindingMethod])
+            City.dao.insert(row, [validate:true, bindingMethod:bindingMethod])
         }
 
     }
 }
 
-new Loader(bindingMethod: bindingMethod, dao: dao)
+new Loader(bindingMethod: bindingMethod)
 

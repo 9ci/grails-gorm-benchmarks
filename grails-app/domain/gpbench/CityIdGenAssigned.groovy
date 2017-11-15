@@ -14,6 +14,7 @@ class CityIdGenAssigned {
 
 	static mapping = {
 		id generator:'assigned'
+		table 'CityIdGenAssigned'
 		cache true
 	}
 
@@ -22,6 +23,8 @@ class CityIdGenAssigned {
 		shortCode blank: false, nullable: false
 		latitude nullable: false, scale: 4, max:90.00
 		longitude nullable: false, scale: 4, max:380.00
+		region nullable: false
+		country nullable: false
 	}
 
 	def beforeInsert() {
