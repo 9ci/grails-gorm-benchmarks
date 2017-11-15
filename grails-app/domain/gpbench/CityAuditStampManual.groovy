@@ -54,7 +54,7 @@ class CityAuditStampManual {
 		auditTrailHelper.setDateField(this, 'editedDate')
 
 		auditTrailHelper.setUserField(this, 'createdBy')
-		auditTrailHelper.setDateField(this, 'editedBy')
+		auditTrailHelper.setUserField(this, 'editedBy')
 	}
 
 }
