@@ -20,15 +20,12 @@ class RxJavaBenchmark extends GparsBaselineBenchmark {
 
 	@Override
 	def execute() {
-		assert CityBaseline.count() == 0
 		Flowable<List<Map>> stream = Flowable.fromIterable(cities)
 		stream.parallel().runOn(Schedulers.computation()).map({ List<Map> batch ->
 			//println "${batch.size()} Thread : " + Thread.currentThread().name
 			insertBatch(batch)
 			return true
 		}).sequential().blockingForEach({  })
-
-		assert CityBaseline.count() == 115000
 	}
 
 	@Transactional
