@@ -15,7 +15,7 @@ import io.reactivex.schedulers.Schedulers
 class RxJavaBenchmark extends GparsBaselineBenchmark {
 
 	RxJavaBenchmark() {
-		super()
+		super(CityBaseline)
 	}
 
 	@Override
@@ -35,26 +35,10 @@ class RxJavaBenchmark extends GparsBaselineBenchmark {
 	@CompileStatic(TypeCheckingMode.SKIP)
 	void insertBatch(List<Map> batch) {
 		for(Map row : batch) {
-			CityBaseline city = new CityBaseline()
-			city.properties = row
-			city.save(failOnError:true)
+			insertRow(row)
 		}
 
 		DaoUtil.flushAndClear()
 	}
 
-	@Transactional
-	void insertRow(Map row) {
-		cityDao.insert(row)
-	}
-
-	//@Transactional
-	void cleanup() {
-		jdbcTemplate.execute("DELETE FROM city")
-	}
-
-	@Override
-	String getDescription() {
-		return "RxJava: databinding=${useDatabinding}, validation:${validate}"
-	}
 }
