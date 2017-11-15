@@ -51,13 +51,6 @@ class LoaderSimpleService {
 			runBenchmark(new GparsBaselineBenchmark(CityAuditTrail))
 			runBenchmark(new GparsBaselineBenchmark(CityBaseline))
 			runBenchmark(new GparsDaoBenchmark(CityDynamic))
-			//runBenchmark(new GparsDaoBenchmark(CityDynamic))
-			//runBenchmark(new GparsDaoBenchmark(City))
-			runBenchmark(new GparsScriptEngineBenchmark(City))
-
-			//runBenchmark(new GparsBaselineBenchmark(CityModelTrait))
-			//runBenchmark(new GparsDaoBenchmark(CityIdGen))
-			//runBenchmark(new GparsDaoBenchmark(), true)
 		}
 
 		//real benchmarks starts here
@@ -91,6 +84,7 @@ class LoaderSimpleService {
 		runBenchmark(new GparsBaselineBenchmark(CityIdGen))
 		runBenchmark(new GparsBaselineBenchmark(CityIdGenAssigned))
 		runBenchmark(new RxJavaBenchmark(CityBaseline))
+		runBenchmark(new GparsBaselineBenchmark(CityAuditTrail))
 
 	}
 
