@@ -37,7 +37,6 @@ class LoaderSimpleService {
 		println "Available processors: " + Runtime.getRuntime().availableProcessors()
 		println "Gpars pool size: " + POOL_SIZE
 		println "Autowire enabled: " + System.getProperty("autowire.enabled", "true")
-		println "IdGenerator enabled: " + System.getProperty("idgenerator.enabled", "false")
 
 
 		//load base country and city data which is used by all benchmarks

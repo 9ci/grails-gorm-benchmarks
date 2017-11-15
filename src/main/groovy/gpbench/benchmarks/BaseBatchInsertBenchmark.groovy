@@ -5,6 +5,7 @@ import gpbench.GparsLoadService
 import gpbench.helpers.CsvReader
 import gpbench.helpers.JsonReader
 import gpbench.helpers.RecordsLoader
+import grails.plugin.springsecurity.SpringSecurityService
 import groovy.transform.CompileDynamic
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -18,6 +19,8 @@ abstract class BaseBatchInsertBenchmark<T> extends AbstractBenchmark {
 
 	CsvReader csvReader
 	JsonReader jsonReader
+
+	SpringSecurityService springSecurityService
 
 	Class<T> domainClass = City
 
@@ -40,7 +43,10 @@ abstract class BaseBatchInsertBenchmark<T> extends AbstractBenchmark {
 	}
 
 	void setup() {
+		assert springSecurityService.principal.id != null
+		assert springSecurityService.principal.id == 1
 		assert domainClass.count() == 0
+
 		RecordsLoader recordsLoader = useDatabinding ? csvReader : jsonReader
 		cities = recordsLoader.read("City100k").collate(batchSize)
 	}
