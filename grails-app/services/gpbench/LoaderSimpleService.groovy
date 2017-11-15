@@ -48,6 +48,7 @@ class LoaderSimpleService {
 			//run benchmarks without displaying numbers to warmup jvm so we get consitent results
 			//showing that doing this will drop results below on averge about 10%
 			println "- Warmming up JVM"
+			runBenchmark(new GparsBaselineBenchmark(CityAuditTrail))
 			runBenchmark(new GparsBaselineBenchmark(CityBaseline))
 			runBenchmark(new GparsDaoBenchmark(CityDynamic))
 			//runBenchmark(new GparsDaoBenchmark(CityDynamic))
