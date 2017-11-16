@@ -3,7 +3,6 @@ package gpbench
  * Dao Baseline. This has a DAO and has been touched by the gorm-tools AST
  */
 class City {
-	//transient springSecurityService
 
 	String name
 	String shortCode
@@ -41,11 +40,4 @@ class City {
 
 	String toString() { name }
 
-	def beforeInsert() {
-		dateCreatedUser = SecUtil.userId
-	}
-
-	def beforeUpdate() {
-		lastUpdatedUser = SecUtil.userId
-	}
 }
