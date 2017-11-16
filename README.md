@@ -8,6 +8,9 @@
 - [Changing default pool size](#changing-default-pool-size)
 - [The Benchmarks](#the-benchmarks)
 - [Bench Mark Results and details](#bench-mark-results-and-details)
+- [Pass 1 multi-thread - standard grails binding baseline](#pass-1-multi-thread-standard-grails-binding-baseline)
+- [Pass 2 multi-thread](#pass-2-multi-thread)
+- [Pass 3 multi-thread - copy props](#pass-3-multi-thread-copy-props)
 	- [CPU Load during Gparse batch insert](#cpu-load-during-gparse-batch-insert)
 - [System specs](#system-specs)
 - [Conclusions](#conclusions)
@@ -96,6 +99,40 @@ Note: All of above benchmarks are run with and without data binding, and you wil
 | no dao                                    | 10.603 |
 | DataflowQueue (CED Way)                   | 12.356 |
 | Custom IdGenerator                        | 12.532 |
+
+<!-- BENCHMARKS -->
+```
+Loading 372,300 cities
+
+## Pass 1 multi-thread - standard grails binding baseline
+  - Baseline to measure against
+26.228s for GparsBaselineBenchmark<CityBaseline> [ bindingMethod: grails ]
+  - using copy instead of binding, >20% faster
+21.467s for GparsBaselineBenchmark<CityBaseline> [ bindingMethod: copy ]
+
+## Pass 2 multi-thread
+
+  - These should all run within 5% of baseline and each other
+27.281s for GparsBaselineBenchmark<CityAuditStampManual> [ bindingMethod: grails ]
+25.84s for GparsScriptEngineBenchmark<City> [ bindingMethod: grails ]
+26.951s for GparsDaoBenchmark<CityDynamic> [ bindingMethod: grails ]
+
+  - These run faster
+21.506s for GparsBaselineBenchmark<CityIdGen> [ bindingMethod: grails ]
+25.254s for RxJavaBenchmark<City> [ bindingMethod: grails ]
+
+  - These show performance issues
+33.658s for GparsDaoBenchmark<City> [ bindingMethod: grails ]
+29.543s for GparsBaselineBenchmark<CityAuditTrail> [ bindingMethod: grails ]
+31.9s for GparsBaselineBenchmark<CityModelTrait> [ bindingMethod: grails ]
+
+## Pass 3 multi-thread - copy props
+
+  - These should all run within 5% of baseline and each other
+17.717s for GparsBaselineBenchmark<CityAuditStampManual> [ bindingMethod: copy ]
+...
+```
+<!-- /BENCHMARKS -->
 
 ### CPU Load during Gparse batch insert
 
