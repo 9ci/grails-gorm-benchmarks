@@ -102,7 +102,11 @@ Note: All of above benchmarks are run with and without data binding, and you wil
 
 <!-- BENCHMARKS -->
 ```
-Loading 372,300 cities
+Gpars pool size: 9
+Autowire enabled: false
+- Warming up JVM with initial pass
+*****************
+- Running Benchmarks loading 372,300 records each run
 
 ## Pass 1 multi-thread - standard grails binding baseline
   - Baseline to measure against
