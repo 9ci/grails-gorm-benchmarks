@@ -4,7 +4,7 @@ import gpbench.CityDao
 import gpbench.helpers.CsvReader
 import gpbench.helpers.JsonReader
 import gpbench.helpers.RecordsLoader
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import org.springframework.jdbc.core.JdbcTemplate
 

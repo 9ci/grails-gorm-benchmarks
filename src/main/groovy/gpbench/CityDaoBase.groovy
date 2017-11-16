@@ -4,8 +4,8 @@ import gorm.tools.GormUtils
 import grails.plugin.dao.DaoDomainTrait
 import grails.plugin.dao.DaoUtil
 import grails.plugin.dao.GormDaoSupport
-import grails.transaction.NotTransactional
-import grails.transaction.Transactional
+import grails.gorm.transactions.NotTransactional
+import grails.gorm.transactions.Transactional
 import grails.web.databinding.WebDataBinding
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic

@@ -2,7 +2,7 @@ package gpbench.benchmarks
 
 import gpbench.City
 import gpbench.CityDao
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import groovyx.gpars.GParsPool

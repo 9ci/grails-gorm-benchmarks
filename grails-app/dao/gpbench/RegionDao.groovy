@@ -3,8 +3,8 @@ package gpbench
 import gorm.tools.GormUtils
 import grails.compiler.GrailsCompileStatic
 import grails.plugin.dao.GormDaoSupport
-import grails.transaction.NotTransactional
-import grails.transaction.Transactional
+import grails.gorm.transactions.NotTransactional
+import grails.gorm.transactions.Transactional
 
 @Transactional
 @GrailsCompileStatic

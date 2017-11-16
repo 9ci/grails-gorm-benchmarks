@@ -7,7 +7,7 @@ import gpbench.CityDao
 import gpbench.helpers.BenchmarkHelper
 import gpbench.helpers.CsvReader
 import grails.plugin.dao.DaoUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.sql.Sql
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode

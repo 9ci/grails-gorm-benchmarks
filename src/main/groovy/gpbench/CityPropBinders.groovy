@@ -2,7 +2,7 @@ package gpbench
 
 import gorm.tools.GormUtils
 import grails.plugin.dao.DaoDomainTrait
-import grails.transaction.NotTransactional
+import grails.gorm.transactions.NotTransactional
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 

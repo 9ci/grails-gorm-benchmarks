@@ -97,7 +97,6 @@ class LoaderSimpleService {
 		runBenchmark(new GparsBaselineBenchmark(CityAuditStampManual,bindingMethod,validation))
 		runBenchmark(new GparsScriptEngineBenchmark(City,bindingMethod, validation))
 		runBenchmark(new GparsDaoBenchmark(CityDynamic,bindingMethod, validation))
-		runBenchmark(new BatchInsertWithDataFlowQueueBenchmark(bindingMethod, validation))
 
 		logMessage "\n  - These run faster"
 		runBenchmark(new GparsBaselineBenchmark(CityIdGen,bindingMethod, validation))
@@ -111,6 +110,7 @@ class LoaderSimpleService {
 
 	void runMultiThreadsOther(String msg){
 		println "\n$msg"
+        runBenchmark(new BatchInsertWithDataFlowQueueBenchmark('copy'))
 
 		logMessage "  - using copy instead of binding and no validation, <10% faster"
 		runBenchmark(new GparsBaselineBenchmark(CityBaseline, 'copy', false))

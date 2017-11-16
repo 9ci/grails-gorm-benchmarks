@@ -1,7 +1,7 @@
 package gpbench
 
 import grails.plugin.dao.DaoUtil
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovyx.gpars.GParsPool
 
 //@CompileStatic

@@ -1,7 +1,7 @@
 package gpbench
 
 class CityDynamic{
-	transient springSecurityService
+	//transient springSecurityService
 
 	String name
 	String shortCode
