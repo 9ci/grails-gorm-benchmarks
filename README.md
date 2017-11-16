@@ -1,9 +1,24 @@
+# GORM : batch importing large datasets and a performance benchmarking app
 
-GORM : batch importing large datasets and a performance benchmarking app
-===================================
 
-Summary
---------
+<!-- TOC depthFrom:2 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
+
+- [Intro](#intro)
+- [How to run the benchmarks](#how-to-run-the-benchmarks)
+- [Changing default pool size](#changing-default-pool-size)
+- [The Benchmarks](#the-benchmarks)
+- [Bench Mark Results and details](#bench-mark-results-and-details)
+	- [CPU Load during Gparse batch insert](#cpu-load-during-gparse-batch-insert)
+- [System specs](#system-specs)
+- [Conclusions](#conclusions)
+	- [Optimum setting for Gpars pool size.](#optimum-setting-for-gpars-pool-size)
+	- [Questions answered by above conclusion.](#questions-answered-by-above-conclusion)
+- [References and reading](#references-and-reading)
+
+<!-- /TOC -->
+
+## Intro
+
 The application runs large batch inserts (115K records) in different ways. The goal is to decide the optimum way to run large batch inserts with Gorm.
 
 The goal is to have good benchmarks to measure and answer following questions.
@@ -17,20 +32,20 @@ The goal is to have good benchmarks to measure and answer following questions.
 - Do custom Id generator slow it down, or improve speed
 - does @compileStatic speed things up, where does it matter? does it help to have it on the domains?
 
-How to run the benchmarks
--------
+## How to run the benchmarks
+
 - There is a script ```run-benchmarks.sh``` which will run the benchmarks
 - Run ```./run-benchmarks.sh```
 - See the script for more details.
 
 
-Changing default pool size
-----
+## Changing default pool size
+
 By default benchmarks uses default gpars pool size which is (availableProcessors + 1) which can be modified by passing system property ```gpars.poolsize=xx```
 Example: ```java -Dgpars.poolsize=5 -jar grails-gpars-batch-load-benchmark-0.1.war```
 
-The Bemchmarks
--------
+## The Benchmarks
+
 - GparsBatchInsertBenchmark - Runs the batches in parallel, each batch with the same size as jdbc batch size (50).
 - GparsBatchInsertWithoutDaoBenchmark - Same as above, but without using dao for inserting records.
 - GparsBatchInsertWithoutValidation - Runs the batches with gpars but with grails domain validation tunred off during save using ```domain.save(false)```
@@ -44,8 +59,7 @@ The Bemchmarks
 Note: All of above benchmarks are run with and without data binding, and you will see the results for both.
 
 
-My Bench Mark Results and details
--------
+## Bench Mark Results and details
 
 * 115k CSV records on a MacBook pro 2.5 GHz Intel Core i7. 2048 mb ram was given to the VM and these were run using ```java -jar grails-gpars-batch-load-benchmark-0.1.war```
 * All of these have jdbc.batch_size = 50 and use the principals from #2 above and flush/clear every 50 rows
@@ -62,54 +76,53 @@ My Bench Mark Results and details
 
 **Results for Gparse batched with different pool sizes**
 
-| Pool size                             |  2 threads | 3 threads | 4 threads | 5 threads | 6 threads | 7 threads | 8 threads | 9 threads | 10 threads | 11 threads | 12 threads |
-|---------------------------------------|------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|------------|------------|------------|
-| With data binding    | 24.522     | 22.473    | 16.063    | 17.363    | 16.698    | 14.53     | 12.32     | 12.012    | 12.145     | 14.785     | 14.081     |
-| Without data binding | 12.302     | 12.593    | 9.52      | 8.586     | 8.509     | 7.46      | 6.842     | 6.27      | 6.696      | 6.896      | 7.074      |
-| No validation                    | 15.335     | 17.588    | 9.906     | 10.3      | 10.724    | 9.489     | 7.993     | 8.112     | 8.203      | 9.069      | 9.032      |
-| No validation & No data binding    | 10.619     | 9.311     | 7.088     | 7.59      | 7.997     | 8.088     | 6.558     | 5.896     | 5.683      | 6.223      | 6.594      |
+|            Pool size            | 2 threads | 3 threads | 4 threads | 5 threads | 6 threads | 7 threads | 8 threads | 9 threads | 10 threads | 11 threads | 12 threads |
+| ------------------------------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- | ---------- | ---------- | ---------- |
+| With data binding               | 24.522    | 22.473    | 16.063    | 17.363    | 16.698    | 14.53     | 12.32     | 12.012    | 12.145     | 14.785     | 14.081     |
+| Without data binding            | 12.302    | 12.593    | 9.52      | 8.586     | 8.509     | 7.46      | 6.842     | 6.27      | 6.696      | 6.896      | 7.074      |
+| No validation                   | 15.335    | 17.588    | 9.906     | 10.3      | 10.724    | 9.489     | 7.993     | 8.112     | 8.203      | 9.069      | 9.032      |
+| No validation & No data binding | 10.619    | 9.311     | 7.088     | 7.59      | 7.997     | 8.088     | 6.558     | 5.896     | 5.683      | 6.223      | 6.594      |
 
 
-| Gpars Benchs      | time |
-|-------------------|------|
-|with databinding   | 12.32  |
-|no binding         | 6.842 |
-|No autowire        | 12.969 |
-|no validation      | 7.993 |
-|no binding, no autowire,  no validation | 6.221 |
-|grails date stamp fields | 14.726 |
-|audit-trail stamp fields (user and dates)| 21.728 |
-|no dao            | 10.603 |
-|DataflowQueue (CED Way) | 12.356 |
-|Custom IdGenerator | 12.532 |
+|               Gpars Benchs                |  time  |
+| ----------------------------------------- | ------ |
+| with databinding                          | 12.32  |
+| no binding                                | 6.842  |
+| No autowire                               | 12.969 |
+| no validation                             | 7.993  |
+| no binding, no autowire,  no validation   | 6.221  |
+| grails date stamp fields                  | 14.726 |
+| audit-trail stamp fields (user and dates) | 21.728 |
+| no dao                                    | 10.603 |
+| DataflowQueue (CED Way)                   | 12.356 |
+| Custom IdGenerator                        | 12.532 |
 
-CPU Load during Gparse batch insert
---------
+### CPU Load during Gparse batch insert
+
 It can be seen that cpu load goes highest during Gparse batch insert
-  
+
 ![Image of Yaktocat](./cupload.png)
 
 
-**Note:** 
+**Note:**
 - All Numbers are in Seconds.
 - Domain autowiring, validation and databinding are enabled, unless explicitly specified.
 - One service is injected in each of the domains.
 - H2 In memory database is used.
 
-System specs
-------------
+## System specs
+
 - Macbook Pro Intel(R) Core(TM) i7-4870HQ CPU @ 2.50GHz
 - Gparse pool size of 9
 - GRAILS_OPTS="-Xmx2048M -server -XX:+UseParallelGC"
 
 
-Conclusions
--------
+## Conclusions
 
 The key conclusions Are as below
 
 1. Gparse with batch insert is the optimum way to do large batch inserts.
-2. Gparse batch insert along with data binding and validation disabled has best performance. 
+2. Gparse batch insert along with data binding and validation disabled has best performance.
 3. Inserting each record in seperate transaction has worst performance
 4. Grails databinding almost doubles the time required for inserts.
 5. use small transaction batches and keep them the same size as the jdbc.batch_size. DO NOT (auto)commit on every insert
@@ -121,28 +134,28 @@ The key conclusions Are as below
 11. Dao does not have any major noticable effect on performance.
 12. Disabling validation has slight performance benifits but not significant (see below for details)
 13. Using custom [idgenerator](https://yakworks.github.io/gorm-tools/id-generation/) does not have any noticable effect  
-14. From above table, it can be seen that 
+14. From above table, it can be seen that
    Going from 2 cores to 4 improves numbers significantly
    Going from 4 cores to 8 numbers improves slowly
    from pool size 9 onward, performance starts degrading   
 
 
-Optimum setting for Gpars pool size.
-----
+### Optimum setting for Gpars pool size.
+
 It is observed that 9 core gave the best results for [i7-4870HQ](https://ark.intel.com/products/83504) which has four physical cores.
 But the system shows the OS and Java total of 8 cores and uses Hyper threading.
 
-Gparse will utilize and benefit if it is given 8 cores even if there are just four physical cores and four virtual cores. 
+Gparse will utilize and benefit if it is given 8 cores even if there are just four physical cores and four virtual cores.
 
 The default Gpars pool size is Runtime.getRuntime().availableProcessors() + 1 see ()here](https://github.com/vaclav/GPars/blob/master/src/main/groovy/groovyx/gpars/util/PoolUtils.java#L43)
-And this indeed gives better performance. 
+And this indeed gives better performance.
 
 As per Gpars performance tips [here](http://www.gpars.org/1.0.0/guide/guide/tips.html)
 > In many scenarios changing the pool size from the default value may give you performance benefits. Especially if your tasks perform IO operations, like file or database access, networking and such, increasing the number of threads in the pool is likely to help performance.
 
 
-Questions answered by above conclusion.
-----
+### Questions answered by above conclusion.
+
 **Fastest way to persist/insert large batches using gorm**
 Gpars batch insert without data binding and validation.
 
@@ -154,26 +167,25 @@ Gpars batch insert without data binding and validation.
 
 **Does valiation slow it down, why, can it be optimized**
 - Yes, it has slight performance impact
-- That is because Grails validation (GrailsDomainClassValidator) has to iterate over each constrained property of domain class 
-  and invoke validators on it for every instance. 
+- That is because Grails validation (GrailsDomainClassValidator) has to iterate over each constrained property of domain class
+  and invoke validators on it for every instance.
 
 **Does Auditstamp slow it down, can it be optimized**
 - Yes
-- Thats because audit trail plugin hooks into validation and gets called every time when the domain is validated. 
+- Thats because audit trail plugin hooks into validation and gets called every time when the domain is validated.
   It does some reflection to check for properties/value and checks in hibernate persistence context if the instance is being inserted or being updated. All this makes it little slower.
 - Need to try what can be done in audit trail plugin to improve performance.   
 
-**Do daos slow it down** 
+**Do daos slow it down**
 - No, very very little effect some thing around 1 to 1.5 seconds for 115K records.
- 
-**Do custom Id generator slow it down** 
+
+**Do custom Id generator slow it down**
 - No
- 
-**Do using Dataflow queue/operator make it faster** 
-- No, it has no noticeable effect 
- 
-More background and reading
----------------
+
+**Do using Dataflow queue/operator make it faster**
+- No, it has no noticeable effect
+
+## References and reading
 
 Here are a 2 links you should read that will give you some background information on processing large bulk data batches.
 read up through 13.2
