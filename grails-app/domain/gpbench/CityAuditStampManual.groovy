@@ -1,9 +1,5 @@
 package gpbench
 
-import grails.plugin.springsecurity.SpringSecurityUtils
-import grails.util.Holders
-
-
 class CityAuditStampManual {
 	//transient springSecurityService
 
@@ -30,10 +26,6 @@ class CityAuditStampManual {
 
 	String toString() { name }
 
-//	def beforeValidate(){
-//		lastUpdatedUser = lastUpdatedUser?: springSecurityService.principal.id
-//		dateCreatedUser = dateCreatedUser?: springSecurityService.principal.id
-//	}
 
 	def beforeInsert() {
 		dateCreatedUser = SecUtil.userId

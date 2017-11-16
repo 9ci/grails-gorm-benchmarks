@@ -11,10 +11,12 @@ class CityIdGen {
 	Region region
 	Country country
 
-	Date dateCreated
-	Date lastUpdated
-	Long dateCreatedUser
-	Long lastUpdatedUser
+    Date dateCreated
+    Date lastUpdated
+
+    //these don't do anything and are just here to equalize the number of fields
+    Long dateCreatedUser
+    Long lastUpdatedUser
 
 	static belongsTo = [Region, Country]
 

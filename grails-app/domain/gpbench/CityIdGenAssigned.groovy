@@ -10,7 +10,17 @@ class CityIdGenAssigned {
 	BigDecimal latitude
 	BigDecimal longitude
 
-	static belongsTo = [region:Region, country:Country]
+    Region region
+    Country country
+
+    Date dateCreated
+    Date lastUpdated
+
+    //these don't do anything and are just here to equalize the number of fields
+    Long dateCreatedUser
+    Long lastUpdatedUser
+
+    static belongsTo = [region:Region, country:Country]
 
 	static mapping = {
 		id generator:'assigned'
@@ -19,12 +29,7 @@ class CityIdGenAssigned {
 	}
 
 	static constraints = {
-		name blank: false, nullable: false
-		shortCode blank: false, nullable: false
-		latitude nullable: false, scale: 4, max:90.00
-		longitude nullable: false, scale: 4, max:380.00
-		region nullable: false
-		country nullable: false
+		importFrom(CityBaseline)
 	}
 
 	def beforeInsert() {

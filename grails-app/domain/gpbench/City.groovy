@@ -1,4 +1,5 @@
 package gpbench
+
 /**
  * Dao Baseline. This has a DAO and has been touched by the gorm-tools AST
  */
@@ -25,17 +26,7 @@ class City {
 	}
 
 	static constraints = {
-		name blank: false, nullable: false
-		shortCode blank: false, nullable: false
-		latitude nullable: false, scale: 4, max:90.00
-		longitude nullable: false, scale: 4, max:380.00
-		region nullable: false
-		country nullable: false
-
-		dateCreated nullable:true,display:false,editable:false,bindable:false
-		lastUpdated nullable:true,display:false,editable:false,bindable:false
-		dateCreatedUser nullable:true,display:false,editable:false,bindable:false
-		lastUpdatedUser nullable:true,display:false,editable:false,bindable:false
+        importFrom(CityBaseline)
 	}
 
 	String toString() { name }
