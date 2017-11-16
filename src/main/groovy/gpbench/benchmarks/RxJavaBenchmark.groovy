@@ -12,10 +12,10 @@ import io.reactivex.schedulers.Schedulers
  * Calls external script for each row. The script does the insert.
  */
 @CompileStatic
-class RxJavaBenchmark extends GparsBaselineBenchmark {
+class RxJavaBenchmark<T> extends GparsBaselineBenchmark<T> {
 
-	RxJavaBenchmark(Class domain) {
-		super(domain)
+	RxJavaBenchmark(Class<T> clazz, String bindingMethod = 'grails', boolean validate = true) {
+		super(clazz, bindingMethod,validate)
 	}
 
 	@Override

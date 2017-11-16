@@ -56,8 +56,10 @@ class CityDao extends GormDaoSupport<City> {
 //		City entity = cbinder.insert(row, args)
 		City entity
 		if(args.bindingMethod == 'grails'){
-			entity = domainClass.newInstance()
-			bindGrails(entity, row)
+			//entity = domainClass.newInstance()
+			//bindGrails(entity, row)
+			//uses stock dao insert
+			return (City) super.insert(row).entity
 		}
 		else if(args.bindingMethod == 'copy'){
 			entity = bindWithCopyDomain(row)

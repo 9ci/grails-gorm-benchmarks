@@ -1,12 +1,14 @@
 package gpbench
 
+import grails.plugin.springsecurity.SpringSecurityService
 import groovy.transform.CompileStatic
+
+import javax.persistence.Transient
 
 //@AuditStamp
 //@CompileStatic
-@CompileStatic
+//@CompileStatic
 trait CityModel {
-	//transient loaderService
 
 	String name
 	String shortCode
@@ -16,5 +18,10 @@ trait CityModel {
 
 	Region region
 	Country country
+
+	Date dateCreated
+	Date lastUpdated
+	Long dateCreatedUser
+	Long lastUpdatedUser
 
 }

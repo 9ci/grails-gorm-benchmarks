@@ -25,6 +25,7 @@ class GparsBaselineBenchmark<T> extends BaseBatchInsertBenchmark<T> {
 	}
 
 	void insertRow(Map row) {
+
 		if (bindingMethod == 'grails') {
 			T city = domainClass.newInstance()
 			city.properties = row

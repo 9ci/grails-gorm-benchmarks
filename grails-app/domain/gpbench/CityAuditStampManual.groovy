@@ -1,9 +1,11 @@
 package gpbench
 
+import grails.plugin.springsecurity.SpringSecurityUtils
+import grails.util.Holders
+
 
 class CityAuditStampManual {
-
-	transient springSecurityService
+	//transient springSecurityService
 
 	String name
 	String shortCode
@@ -23,33 +25,22 @@ class CityAuditStampManual {
 	}
 
 	static constraints = {
-		name blank: false, nullable: false
-		shortCode blank: false, nullable: false
-		latitude nullable: false, scale: 4, max:90.00
-		longitude nullable: false, scale: 4, max:380.00
-		region nullable: false
-
-		country nullable: false
-
-		dateCreated nullable:true,display:false,editable:false,bindable:false
-		lastUpdated nullable:true,display:false,editable:false,bindable:false
-		dateCreatedUser nullable:false,display:false,editable:false,bindable:false
-		lastUpdatedUser nullable:false,display:false,editable:false,bindable:false
+		importFrom(City)
 	}
 
 	String toString() { name }
 
-	def beforeValidate(){
-		lastUpdatedUser = springSecurityService.principal.id
-		dateCreatedUser = springSecurityService.principal.id
-	}
+//	def beforeValidate(){
+//		lastUpdatedUser = lastUpdatedUser?: springSecurityService.principal.id
+//		dateCreatedUser = dateCreatedUser?: springSecurityService.principal.id
+//	}
 
 	def beforeInsert() {
-		dateCreatedUser = springSecurityService.principal.id
+		dateCreatedUser = SecUtil.userId
 	}
 
 	def beforeUpdate() {
-		lastUpdatedUser = springSecurityService.principal.id
+		lastUpdatedUser = SecUtil.userId
 	}
 
 }

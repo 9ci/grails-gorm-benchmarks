@@ -1,6 +1,7 @@
 package gpbench
 
-class CityIdGen implements CityModel {
+class CityIdGen {
+
 	String name
 	String shortCode
 
@@ -10,6 +11,11 @@ class CityIdGen implements CityModel {
 	Region region
 	Country country
 
+	Date dateCreated
+	Date lastUpdated
+	Long dateCreatedUser
+	Long lastUpdatedUser
+
 	static belongsTo = [Region, Country]
 
 	static mapping = {
@@ -18,13 +24,10 @@ class CityIdGen implements CityModel {
 	}
 
 	static constraints = {
-		name blank: false, nullable: false
-		shortCode blank: false, nullable: false
-		latitude nullable: false, scale: 4, max:90.00
-		longitude nullable: false, scale: 4, max:380.00
-		region nullable: false
-		country nullable: false
+		importFrom(City)
 	}
 
 	String toString() { name }
+
+
 }

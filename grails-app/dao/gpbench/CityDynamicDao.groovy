@@ -40,7 +40,11 @@ class CityDynamicDao extends GormDaoSupport<CityDynamic> {
 		if(args.bindingMethod == 'grails'){
 			entity = domainClass.newInstance()
 			entity.properties = row
-		} else {
+		}
+		else if(args.bindingMethod == 'copy'){
+			entity = bindWithCopyDomain(row)
+		}
+		else {
 			entity = "${args.bindingMethod}"(row)
 		}
 		if (fireEvents) super.beforeInsertSave(entity, row)

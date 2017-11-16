@@ -1,5 +1,9 @@
 package gpbench
 
+/**
+ * Baseline stock grails domain. no DAO or anything else should be attached to this.
+ * only Grails AST should have touched this.
+ */
 class CityBaseline {
 	String name
 	String shortCode
@@ -7,9 +11,9 @@ class CityBaseline {
 	BigDecimal latitude
 	BigDecimal longitude
 
+	Date dateCreated
+	Date lastUpdated
 	//these don't do anything and are just here to equalize the number of fields
-	Date dateCreatedx
-	Date lastUpdatedx
 	Long dateCreatedUser
 	Long lastUpdatedUser
 
@@ -27,8 +31,8 @@ class CityBaseline {
 		region nullable: false
 		country nullable: false
 
-		dateCreatedx nullable:true,display:false,editable:false,bindable:false
-		lastUpdatedx nullable:true,display:false,editable:false,bindable:false
+		dateCreated nullable:true,display:false,editable:false,bindable:false
+		lastUpdated nullable:true,display:false,editable:false,bindable:false
 		dateCreatedUser nullable:true,display:false,editable:false,bindable:false
 		lastUpdatedUser nullable:true,display:false,editable:false,bindable:false
 	}

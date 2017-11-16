@@ -15,8 +15,11 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 class LoaderSimpleService {
 	static transactional = false
 
-	private static int POOL_SIZE = 9
-	private static int BATCH_SIZE = 50 //this should match the hibernate.jdbc.batch_size in datasources
+	static int POOL_SIZE = 9
+	static int BATCH_SIZE = 50 //this should match the hibernate.jdbc.batch_size in datasources
+
+	int loadIterations
+	boolean muteConsole = false
 
 	RegionDao regionDao
 	CountryDao countryDao
@@ -25,10 +28,11 @@ class LoaderSimpleService {
 	CsvReader csvReader
 	BenchmarkHelper benchmarkHelper
 
-	@CompileStatic
+	//@CompileStatic
 	void runBenchMarks() {
 		//use default poolsize, it can be updated by passing system property -Dgpars.poolsize=xx
 		POOL_SIZE = PoolUtils.retrieveDefaultPoolSize()
+		loadIterations = System.getProperty("load.iterations", "10").toInteger()
 
 		println "--- Environment info ---"
 		println "Max memory: " + (Runtime.getRuntime().maxMemory() / 1024 )+ " KB"
@@ -36,7 +40,7 @@ class LoaderSimpleService {
 		println "Free memory: " + (Runtime.getRuntime().freeMemory() / 1024 ) + " KB"
 		println "Available processors: " + Runtime.getRuntime().availableProcessors()
 		println "Gpars pool size: " + POOL_SIZE
-		println "Autowire enabled: " + System.getProperty("autowire.enabled", "true")
+		println "Autowire enabled: " + grailsApplication.config.grails.gorm.autowire
 
 
 		//load base country and city data which is used by all benchmarks
@@ -46,12 +50,16 @@ class LoaderSimpleService {
 		if(System.getProperty("warmup", "true").toBoolean()){
 			//run benchmarks without displaying numbers to warmup jvm so we get consitent results
 			//showing that doing this will drop results below on averge about 10%
-			println "- Warmming up JVM"
-			//runBenchmark(new GparsBaselineBenchmark(CityAuditTrail))
-			runBenchmark(new GparsBaselineBenchmark(CityBaseline))
-			runBenchmark(new GparsBaselineBenchmark(City))
-			runBenchmark(new GparsDaoBenchmark(CityDynamic))
+			println "- Warming up JVM with initial pass"
+			muteConsole = true
+			loadIterations = 1
+
+			runMultiCoreGrailsBaseline("")
+			runMultiCore("", 'grails')
+
+			loadIterations = System.getProperty("load.iterations", "10").toInteger()
 		}
+		muteConsole = false
 
 		//real benchmarks starts here
 		println "\n- Running Benchmarks"
@@ -63,68 +71,71 @@ class LoaderSimpleService {
 			//runBenchmark(new OneBigTransactionBenchmark(true))
 		}
 
-		runMultiCoreBinding("Pass 1")
-		runMultiCoreCopyDomain("Pass 2")
-		runMultiThreads("Pass 3")
+		runMultiCoreGrailsBaseline("## Pass 1 multi-thread - standard grails binding baseline")
+		runMultiCore("## Pass 2 multi-thread", 'grails')
+		runMultiCore("## Pass 3 multi-thread - copy props", 'copy')
+		//runMultiCore("## Pass 3 multi-thread - copy props no validation", 'copy', false)
+		//runMultiCore("Pass 3 multi-thread - standard grails binding with GrailsParameterMap", 'grails')
+		runMultiThreadsOther("## Pass 4 sanity checks")
 
 		//runBenchmark(new DataFlawQueueWithScrollableQueryBenchmark())
 
 		System.exit(0)
 	}
 
-	void runMultiCoreBinding(String msg) {
-		println "\n********* $msg multi-core binding "
-		println "\n- Grails Binding Compare"
+	void runMultiCoreGrailsBaseline(String msg) {
+		logMessage "\n$msg"
+		logMessage "  - Baseline to measure against"
 		runBenchmark(new GparsBaselineBenchmark(CityBaseline))
-		runBenchmark(new GparsBaselineBenchmark(CityDateStamp))
-		runBenchmark(new GparsBaselineBenchmark(CityAuditTrail))
-		runBenchmark(new GparsBaselineBenchmark(CityAuditStampManual))
-		runBenchmark(new GparsBaselineBenchmark(CityIdGen))
+		logMessage "  - using copy instead of binding, >20% faster"
+		runBenchmark(new GparsBaselineBenchmark(CityBaseline,'copy'))
+	}
+
+	void runMultiCore(String msg, String bindingMethod = 'grails', boolean validation = true) {
+		logMessage "\n$msg"
+		logMessage "\n  - These should all run within 5% of baseline and each other"
+		runBenchmark(new GparsBaselineBenchmark(CityAuditStampManual,bindingMethod,validation))
+		runBenchmark(new GparsScriptEngineBenchmark(City,bindingMethod, validation))
+		runBenchmark(new GparsDaoBenchmark(CityDynamic,bindingMethod, validation))
+		runBenchmark(new BatchInsertWithDataFlowQueueBenchmark(bindingMethod, validation))
+
+		logMessage "\n  - These run faster"
+		runBenchmark(new GparsBaselineBenchmark(CityIdGen,bindingMethod, validation))
+		runBenchmark(new RxJavaBenchmark(City, bindingMethod, validation))
+
+		logMessage "\n  - These show performance issues"
+		runBenchmark(new GparsDaoBenchmark(City,bindingMethod, validation))
+		runBenchmark(new GparsBaselineBenchmark(CityAuditTrail, bindingMethod, validation))
+		runBenchmark(new GparsBaselineBenchmark(CityModelTrait, bindingMethod, validation))
+	}
+
+	void runMultiThreadsOther(String msg){
+		println "\n$msg"
+
+		logMessage "  - using copy instead of binding and no validation, <10% faster"
+		runBenchmark(new GparsBaselineBenchmark(CityBaseline, 'copy', false))
+
+		println "\n - assign id inside domain with beforeValidate"
 		runBenchmark(new GparsBaselineBenchmark(CityIdGenAssigned))
-		runBenchmark(new GparsBaselineBenchmark(CityModelTrait))
 
-		runBenchmark(new GparsDaoBenchmark(City))
-		runBenchmark(new GparsDaoBenchmark(CityDynamic))
+		println "\n  - not much difference between static and dynamic method calls"
+		runBenchmark(new GparsDaoBenchmark(City,"setter"))
+		runBenchmark(new GparsDaoBenchmark(City,"copy"))
 
-		runBenchmark(new BatchInsertWithDataFlowQueueBenchmark())
-		runBenchmark(new GparsScriptEngineBenchmark(City))
-		runBenchmark(new RxJavaBenchmark(CityBaseline))
-		runBenchmark(new RxJavaBenchmark(CityBaseline))
-
-	}
-
-	void runMultiCoreCopyDomain(String msg) {
-		println "********* $msg multi-core no grails binding "
-
-		println "\n- GormUtils.copyDomain insead of grails databinding "
-		runBenchmark(new GparsBaselineBenchmark(CityBaseline,"bindWithCopy"))
-		runBenchmark(new GparsBaselineBenchmark(CityModelTrait,"bindWithCopy"))
-		runBenchmark(new GparsBaselineBenchmark(CityAuditTrail,"bindWithCopy"))
-		runBenchmark(new GparsBaselineBenchmark(CityAuditStampManual,"bindWithCopy"))
-		runBenchmark(new GparsBaselineBenchmark(CityDateStamp,"bindWithCopy"))
-
-		runBenchmark(new GparsDaoBenchmark(CityDynamic,"bindWithCopyDomain"))
-
-		runBenchmark(new BatchInsertWithDataFlowQueueBenchmark("copy"))
-		runBenchmark(new GparsDaoBenchmark(City, "copy"))
-		runBenchmark(new GparsScriptEngineBenchmark(City, "copy"))
-		runBenchmark(new GparsDaoBenchmark(CityIdGen, "copy"))
-		runBenchmark(new GparsBaselineBenchmark(CityIdGenAssigned,"copy"))
-
-	}
-
-	void runMultiThreads(String msg){
-		println "********* $msg multi-threaded "
-
-		println "\n - not much difference static and dynamic method calls"
 		runBenchmark(new GparsDaoBenchmark(City,"bindWithSetters"))
 		runBenchmark(new GparsDaoBenchmark(City,"bindWithCopyDomain"))
 
-		println "\n   -dao with static setter method calls"
-		runBenchmark(new GparsDaoBenchmark(City,"setter"))
-		runBenchmark(new GparsDaoBenchmark(City,"copy"))
 		new City().attached
 
+	}
+
+	@CompileStatic(TypeCheckingMode.SKIP)
+	void logMessage(String msg) {
+		if(!muteConsole) {
+			println msg
+		} else{
+			System.out.print("*")
+		}
 	}
 
 	void prepareBaseData() {
@@ -158,11 +169,14 @@ class LoaderSimpleService {
 	void runBenchmark(AbstractBenchmark benchmark, boolean mute = false) {
 		if(benchmark.hasProperty("poolSize")) benchmark.poolSize = POOL_SIZE
 		if(benchmark.hasProperty("batchSize")) benchmark.batchSize = BATCH_SIZE
+		if(benchmark.hasProperty("repeatedCityTimes")) benchmark.repeatedCityTimes = loadIterations
+
 		autowire(benchmark)
 		benchmark.run()
-
-		if(!mute) println "${benchmark.timeTaken}s for $benchmark.description"
+		logMessage "${benchmark.timeTaken}s for $benchmark.description"
+		//if(!MUTE_CONSOLE) println "${benchmark.timeTaken}s for $benchmark.description"
 	}
+
 
 	@CompileStatic
 	void autowire(def bean) {

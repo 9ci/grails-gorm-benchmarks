@@ -1,27 +1,40 @@
 package gpbench
 
 class CityDynamic{
+	transient springSecurityService
+
 	String name
 	String shortCode
 
 	BigDecimal latitude
 	BigDecimal longitude
 
-	static belongsTo = [region:Region, country:Country]
+	Region region
+	Country country
+
+	Date dateCreated
+	Date lastUpdated
+	Long dateCreatedUser
+	Long lastUpdatedUser
+
+	static belongsTo = [Region, Country]
 
 	static mapping = {
 		cache true
 	}
 
 	static constraints = {
-		name blank: false, nullable: false
-		shortCode blank: false, nullable: false
-		latitude nullable: false, scale: 4, max:90.00
-		longitude nullable: false, scale: 4, max:380.00
-		region nullable: false
-		country nullable: false
+		importFrom(City)
 	}
 
 	String toString() { name }
+
+	def beforeInsert() {
+		dateCreatedUser = SecUtil.userId
+	}
+
+	def beforeUpdate() {
+		lastUpdatedUser = SecUtil.userId
+	}
 
 }
