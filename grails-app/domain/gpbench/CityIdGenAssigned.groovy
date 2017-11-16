@@ -12,7 +12,6 @@ class CityIdGenAssigned {
 
     Region region
     Country country
-
     Date dateCreated
     Date lastUpdated
 

@@ -31,4 +31,12 @@ class City {
 
 	String toString() { name }
 
+    def beforeInsert() {
+        dateCreatedUser = SecUtil.userId
+    }
+
+    def beforeUpdate() {
+        lastUpdatedUser = SecUtil.userId
+    }
+
 }
