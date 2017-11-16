@@ -59,26 +59,21 @@ class LoaderSimpleService {
 
 			loadIterations = System.getProperty("load.iterations", "10").toInteger()
 		}
+
 		muteConsole = false
 
 		//real benchmarks starts here
-		println "\n- Running Benchmarks"
+		println "\n- Running Benchmarks, loading ${ loadIterations * 37230} records each run"
 
 		if(System.getProperty("runSingleThreaded", "false").toBoolean()){
 			println "-- single threaded - no gpars"
 			runBenchmark(new SimpleBatchInsertBenchmark(true))
-			//runBenchmark(new CommitEachSaveBenchmark(true))
-			//runBenchmark(new OneBigTransactionBenchmark(true))
 		}
 
 		runMultiCoreGrailsBaseline("## Pass 1 multi-thread - standard grails binding baseline")
 		runMultiCore("## Pass 2 multi-thread", 'grails')
 		runMultiCore("## Pass 3 multi-thread - copy props", 'copy')
-		//runMultiCore("## Pass 3 multi-thread - copy props no validation", 'copy', false)
-		//runMultiCore("Pass 3 multi-thread - standard grails binding with GrailsParameterMap", 'grails')
 		runMultiThreadsOther("## Pass 4 sanity checks")
-
-		//runBenchmark(new DataFlawQueueWithScrollableQueryBenchmark())
 
 		System.exit(0)
 	}

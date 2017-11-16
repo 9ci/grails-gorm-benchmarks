@@ -2,22 +2,18 @@ package gpbench.benchmarks
 
 import gpbench.City
 import gpbench.GparsLoadService
-import gpbench.helpers.CsvReader
 import gpbench.helpers.JsonReader
 import gpbench.helpers.RecordsLoader
 import grails.plugin.springsecurity.SpringSecurityService
 import groovy.transform.CompileDynamic
-import org.springframework.jdbc.core.JdbcTemplate
 
 //@CompileStatic
 abstract class BaseBatchInsertBenchmark<T> extends AbstractBenchmark {
 	int poolSize
 	int batchSize
 
-	JdbcTemplate jdbcTemplate
 	GparsLoadService gparsLoadService
 
-	CsvReader csvReader
 	JsonReader jsonReader
 
 	SpringSecurityService springSecurityService

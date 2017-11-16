@@ -1,8 +1,7 @@
 package gpbench.benchmarks
 
-import gpbench.CityBaseline
-import grails.plugin.dao.DaoUtil
 import grails.gorm.transactions.Transactional
+import grails.plugin.dao.DaoUtil
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import io.reactivex.Flowable

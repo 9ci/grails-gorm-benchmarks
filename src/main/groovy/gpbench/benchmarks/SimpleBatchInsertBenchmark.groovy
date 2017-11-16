@@ -2,8 +2,8 @@ package gpbench.benchmarks
 
 import gpbench.City
 import gpbench.CityDao
-import grails.plugin.dao.DaoUtil
 import grails.gorm.transactions.Transactional
+import grails.plugin.dao.DaoUtil
 import groovy.transform.CompileStatic
 
 /**
