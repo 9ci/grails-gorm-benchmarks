@@ -50,15 +50,9 @@ class CityDao extends GormDaoSupport<City> {
 		return c
 	}
 
-	//See at the bottom why we need this doXX methods
 	City insert(Map row, Map args) {
-//		CityPropBinders cbinder = new CityPropBinders(City)
-//		City entity = cbinder.insert(row, args)
 		City entity
 		if(args.bindingMethod == 'grails'){
-			//entity = domainClass.newInstance()
-			//bindGrails(entity, row)
-			//uses stock dao insert
 			return (City) super.insert(row).entity
 		}
 		else if(args.bindingMethod == 'copy'){
@@ -72,7 +66,7 @@ class CityDao extends GormDaoSupport<City> {
 		if (fireEvents) super.beforeInsertSave((GormEntity)entity, row)
 		super.save((GormEntity)entity, [validate: args.validate?:false ])
 		//DaoMessage.created(entity) slows it down by about 15-20%
-		return entity //[ok: true, entity: entity, message: DaoMessage.created(entity)]
+		return entity
 	}
 
 	@CompileDynamic
@@ -80,12 +74,4 @@ class CityDao extends GormDaoSupport<City> {
 		"${method}"(row)
 	}
 
-	@CompileDynamic
-	void bindGrails(entity, row){
-		entity.properties = row
-	}
-
-	void insertRow(Map row, Map args) {
-		insert(row, args)
-	}
 }

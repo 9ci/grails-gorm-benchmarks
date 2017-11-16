@@ -25,7 +25,7 @@ class CityAuditStampManual {
 	}
 
 	static constraints = {
-		importFrom(City)
+		importFrom(CityBaseline)
 	}
 
 	String toString() { name }

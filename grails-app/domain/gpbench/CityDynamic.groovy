@@ -24,7 +24,7 @@ class CityDynamic{
 	}
 
 	static constraints = {
-		importFrom(City)
+		importFrom(CityBaseline)
 	}
 
 	String toString() { name }

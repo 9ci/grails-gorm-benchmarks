@@ -1,7 +1,4 @@
 package gpbench
-
-import grails.util.Holders
-
 /**
  * Dao Baseline. This has a DAO and has been touched by the gorm-tools AST
  */
@@ -25,7 +22,6 @@ class City {
 	static belongsTo = [Region, Country]
 
 	static mapping = {
-		//id column: 'id', generator:'gorm.tools.idgen.SpringIdGenerator'
 		cache true
 	}
 
@@ -44,11 +40,6 @@ class City {
 	}
 
 	String toString() { name }
-//
-//	def beforeValidate(){
-//		lastUpdatedUser = lastUpdatedUser?: springSecurityService.principal.id
-//		dateCreatedUser = dateCreatedUser?: springSecurityService.principal.id
-//	}
 
 	def beforeInsert() {
 		dateCreatedUser = SecUtil.userId

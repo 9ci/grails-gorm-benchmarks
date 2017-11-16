@@ -13,7 +13,8 @@ class CityBaseline {
 
 	Date dateCreated
 	Date lastUpdated
-	//these don't do anything and are just here to equalize the number of fields
+
+    //these don't do anything and are just here to equalize the number of fields
 	Long dateCreatedUser
 	Long lastUpdatedUser
 
