@@ -16,7 +16,7 @@ grails {
     }
 }
 
-grails.gorm.autowire = Boolean.valueOf(System.getProperty("autowire.enabled", "true"))
+grails.gorm.autowire = Boolean.valueOf(System.getProperty("autowire.enabled", "false"))
 
 grails {
     gorm.default.mapping = {
