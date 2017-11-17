@@ -75,6 +75,7 @@ class LoaderSimpleService {
 //        warmUpAndRun("# Gpars - standard grails binding with baseline",
 //            'runMultiCoreGrailsBaseline', 'grails')
 
+        //runBenchmark(new GparsBaselineBenchmark(CityAuditTrail, "grails"))
         warmUpAndRun("# Gpars - standard grails binding with baseline",
             "runMultiCoreBaselineCompare", 'grails')
 
@@ -94,6 +95,11 @@ class LoaderSimpleService {
             "runMultiCoreFaster", 'copy')
 
 		runMultiThreadsOther("## Misc sanity checks")
+
+        runBenchmark(new DatabindingBenchmark(CityBaseline), true)
+        runBenchmark(new DatabindingBenchmark(CityBaseline), true)
+        runBenchmark(new DatabindingBenchmark(CityModelTrait), true)
+        runBenchmark(new DatabindingBenchmark(CityModelTrait), true)
 
 		System.exit(0)
 	}
