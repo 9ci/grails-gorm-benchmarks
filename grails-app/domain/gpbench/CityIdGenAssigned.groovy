@@ -1,5 +1,7 @@
 package gpbench
 
+import grails.util.Holders
+
 class CityIdGenAssigned {
 	//injected bean for ids.
 	transient idGenerator
@@ -43,7 +45,7 @@ class CityIdGenAssigned {
 	 * uses the injected idGenerator to get and assign an id to this instance
 	 */
 	Long generateId(){
-	    id = idGenerator.getNextId('CityIdGenAssigned.id')
+	    id = Holders.applicationContext.idGenerator.getNextId('CityIdGenAssigned.id')
 	}
 
 	String toString() { name }

@@ -102,39 +102,67 @@ Note: All of above benchmarks are run with and without data binding, and you wil
 
 <!-- BENCHMARKS -->
 ```
-Gpars pool size: 9
-Autowire enabled: false
-- Warming up JVM with initial pass
-*****************
-- Running Benchmarks loading 372,300 records each run
+- Running Benchmarks, loading 372300 records each run
+Warm up cycle ********
 
-## Pass 1 multi-thread - standard grails binding baseline
-  - Baseline to measure against
-26.228s for GparsBaselineBenchmark<CityBaseline> [ bindingMethod: grails ]
-  - using copy instead of binding, >20% faster
-21.467s for GparsBaselineBenchmark<CityBaseline> [ bindingMethod: copy ]
-
-## Pass 2 multi-thread
+# Gpars - standard grails binding with baseline
+  - Grails Basic Baseline to measure against
+26.866s for GparsBaselineBenchmark<CityBaseline> [ bindingMethod: grails ]
 
   - These should all run within 5% of baseline and each other
-27.281s for GparsBaselineBenchmark<CityAuditStampManual> [ bindingMethod: grails ]
-25.84s for GparsScriptEngineBenchmark<City> [ bindingMethod: grails ]
-26.951s for GparsDaoBenchmark<CityDynamic> [ bindingMethod: grails ]
+25.634s for GparsBaselineBenchmark<CityAuditStampManual> [ bindingMethod: grails ]
+27.245s for GparsDaoBenchmark<City> [ bindingMethod: grails ]
+27.778s for GparsScriptEngineBenchmark<City> [ bindingMethod: grails ]
+25.511s for GparsDaoBenchmark<CityDynamic> [ bindingMethod: grails ]
+Warm up cycle ****
 
-  - These run faster
-21.506s for GparsBaselineBenchmark<CityIdGen> [ bindingMethod: grails ]
-25.254s for RxJavaBenchmark<City> [ bindingMethod: grails ]
-
+  - Performance problems - standard grails binding with baseline
   - These show performance issues
-33.658s for GparsDaoBenchmark<City> [ bindingMethod: grails ]
-29.543s for GparsBaselineBenchmark<CityAuditTrail> [ bindingMethod: grails ]
-31.9s for GparsBaselineBenchmark<CityModelTrait> [ bindingMethod: grails ]
+29.554s for GparsBaselineBenchmark<CityAuditTrail> [ bindingMethod: grails ]
+33.875s for GparsBaselineBenchmark<CityModelTrait> [ bindingMethod: grails ]
+Warm up cycle ****
 
-## Pass 3 multi-thread - copy props
+  - Faster Options - standard grails binding
+  - These run faster
+21.392s for GparsBaselineBenchmark<CityIdGen> [ bindingMethod: grails ]
+24.261s for RxJavaBenchmark<City> [ bindingMethod: grails ]
+Warm up cycle ********
+
+# Gpars - copy to fields, no grails databinding
+  - Grails Basic Baseline to measure against
+17.926s for GparsBaselineBenchmark<CityBaseline> [ bindingMethod: copy ]
 
   - These should all run within 5% of baseline and each other
-17.717s for GparsBaselineBenchmark<CityAuditStampManual> [ bindingMethod: copy ]
-...
+17.617s for GparsBaselineBenchmark<CityAuditStampManual> [ bindingMethod: copy ]
+18.463s for GparsDaoBenchmark<City> [ bindingMethod: copy ]
+17.982s for GparsScriptEngineBenchmark<City> [ bindingMethod: copy ]
+18.311s for GparsDaoBenchmark<CityDynamic> [ bindingMethod: copy ]
+Warm up cycle ****
+
+  - Performance problems - standard grails binding with baseline
+  - These show performance issues
+20.566s for GparsBaselineBenchmark<CityAuditTrail> [ bindingMethod: copy ]
+18.631s for GparsBaselineBenchmark<CityModelTrait> [ bindingMethod: copy ]
+Warm up cycle ****
+
+  - Faster Options - copy to fields, no grails databinding
+  - These run faster
+13.753s for GparsBaselineBenchmark<CityIdGen> [ bindingMethod: copy ]
+17.131s for RxJavaBenchmark<City> [ bindingMethod: copy ]
+
+## Misc sanity checks
+17.97s for BatchInsertWithDataFlowQueueBenchmark<City> [ bindingMethod: copy ]
+  - using copy instead of binding and no validation, <10% faster
+19.377s for GparsBaselineBenchmark<CityBaseline> [ bindingMethod: copy , validation: false]
+
+ - assign id inside domain with beforeValidate
+25.183s for GparsBaselineBenchmark<CityIdGenAssigned> [ bindingMethod: grails ]
+
+  - not much difference between static and dynamic method calls
+17.17s for GparsDaoBenchmark<City> [ bindingMethod: setter ]
+17.913s for GparsDaoBenchmark<City> [ bindingMethod: copy ]
+17.71s for GparsDaoBenchmark<City> [ bindingMethod: bindWithSetters ]
+19.076s for GparsDaoBenchmark<City> [ bindingMethod: bindWithCopyDomain ]
 ```
 <!-- /BENCHMARKS -->
 

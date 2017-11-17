@@ -18,7 +18,7 @@ class LoaderSimpleService {
 	static int POOL_SIZE = 9
 	static int BATCH_SIZE = 50 //this should match the hibernate.jdbc.batch_size in datasources
 
-	int loadIterations
+	int loadIterations = System.getProperty("load.iterations", "10").toInteger()
 	boolean muteConsole = false
 
 	RegionDao regionDao
@@ -47,18 +47,19 @@ class LoaderSimpleService {
 		benchmarkHelper.truncateTables()
 		prepareBaseData()
 
-		if(System.getProperty("warmup", "true").toBoolean()){
-			//run benchmarks without displaying numbers to warmup jvm so we get consitent results
-			//showing that doing this will drop results below on averge about 10%
-			println "- Warming up JVM with initial pass"
-			muteConsole = true
-			loadIterations = 1
-
-			runMultiCoreGrailsBaseline("")
-			runMultiCore("", 'grails')
-
-			loadIterations = System.getProperty("load.iterations", "10").toInteger()
-		}
+//		if(System.getProperty("warmup", "true").toBoolean()){
+//			//run benchmarks without displaying numbers to warmup jvm so we get consitent results
+//			//showing that doing this will drop results below on averge about 10%
+//			println "- Warming up JVM with initial pass"
+//			muteConsole = true
+//			loadIterations = 1
+//
+//			//runMultiCoreGrailsBaseline("")
+//			runMultiCore("", 'grails')
+//            //runMultiCore("", 'copy')
+//
+//			loadIterations = System.getProperty("load.iterations", "10").toInteger()
+//		}
 
 		muteConsole = false
 
@@ -70,38 +71,84 @@ class LoaderSimpleService {
 			runBenchmark(new SimpleBatchInsertBenchmark(true))
 		}
 
-		runMultiCoreGrailsBaseline("## Pass 1 multi-thread - standard grails binding baseline")
-		runMultiCore("## Pass 2 multi-thread", 'grails')
-		runMultiCore("## Pass 3 multi-thread - copy props", 'copy')
-		runMultiThreadsOther("## Pass 4 sanity checks")
+		//runMultiCoreGrailsBaseline("## Pass 1 multi-thread - standard grails binding baseline")
+//        warmUpAndRun("# Gpars - standard grails binding with baseline",
+//            'runMultiCoreGrailsBaseline', 'grails')
+
+        warmUpAndRun("# Gpars - standard grails binding with baseline",
+            "runMultiCoreBaselineCompare", 'grails')
+
+        warmUpAndRun("  - Performance problems - standard grails binding with baseline",
+            "runMultiCoreSlower", 'grails')
+
+        warmUpAndRun("  - Faster Options - standard grails binding",
+            "runMultiCoreFaster", 'grails')
+
+        warmUpAndRun("# Gpars - copy to fields, no grails databinding",
+            "runMultiCoreBaselineCompare", 'copy')
+
+        warmUpAndRun("  - Performance problems - standard grails binding with baseline",
+            "runMultiCoreSlower", 'copy')
+
+        warmUpAndRun("  - Faster Options - copy to fields, no grails databinding",
+            "runMultiCoreFaster", 'copy')
+
+		runMultiThreadsOther("## Misc sanity checks")
 
 		System.exit(0)
 	}
 
-	void runMultiCoreGrailsBaseline(String msg) {
-		logMessage "\n$msg"
-		logMessage "  - Baseline to measure against"
-		runBenchmark(new GparsBaselineBenchmark(CityBaseline))
-		logMessage "  - using copy instead of binding, >20% faster"
-		runBenchmark(new GparsBaselineBenchmark(CityBaseline,'copy'))
-	}
+    void warmUp(String runMethod, String bindingMethod){
+        System.out.print("Warm up cycle ")
+        muteConsole = true
+        def oldLoadIterations = loadIterations
+        loadIterations = 1
+        //runMultiCoreGrailsBaseline("")
+        "$runMethod"("", bindingMethod)
+        //runMultiCore("", 'copy')
+        loadIterations = oldLoadIterations
+        muteConsole = false
+        println ""
+    }
 
-	void runMultiCore(String msg, String bindingMethod = 'grails', boolean validation = true) {
-		logMessage "\n$msg"
-		logMessage "\n  - These should all run within 5% of baseline and each other"
-		runBenchmark(new GparsBaselineBenchmark(CityAuditStampManual,bindingMethod,validation))
-		runBenchmark(new GparsScriptEngineBenchmark(City,bindingMethod, validation))
-		runBenchmark(new GparsDaoBenchmark(CityDynamic,bindingMethod, validation))
+    void warmUpAndRun(String msg, String runMethod, String bindingMethod = 'grails'){
+        warmUp(runMethod, bindingMethod)
+        "$runMethod"(msg, bindingMethod)
+    }
 
-		logMessage "\n  - These run faster"
+    void runMultiCoreGrailsBaseline(String msg, String bindingMethod = 'grails', boolean validation = true) {
+        logMessage "\n$msg"
+        logMessage "  - Grails Basic Baseline to measure against"
+        runBenchmark(new GparsBaselineBenchmark(CityBaseline,bindingMethod,validation))
+    }
+
+    void runMultiCoreBaselineCompare(String msg, String bindingMethod = 'grails', boolean validation = true) {
+        logMessage "\n$msg"
+        logMessage "  - Grails Basic Baseline to measure against"
+        runBenchmark(new GparsBaselineBenchmark(CityBaseline,bindingMethod,validation))
+
+        logMessage "\n  - These should all run within 5% of baseline and each other"
+        runBenchmark(new GparsBaselineBenchmark(CityAuditStampManual,bindingMethod,validation))
+        //runBenchmark(new GparsBaselineBenchmark(CityAuditStampAutowire,bindingMethod,validation))
+        //runBenchmark(new GparsBaselineBenchmark(CityAuditTrail, bindingMethod, validation))
+        runBenchmark(new GparsDaoBenchmark(City,bindingMethod, validation))
+        runBenchmark(new GparsScriptEngineBenchmark(City,bindingMethod, validation))
+        runBenchmark(new GparsDaoBenchmark(CityDynamic,bindingMethod, validation))
+    }
+
+	void runMultiCoreFaster(String msg, String bindingMethod = 'grails', boolean validation = true) {
+		logMessage "\n$msg"
+		logMessage "  - These run faster"
 		runBenchmark(new GparsBaselineBenchmark(CityIdGen,bindingMethod, validation))
 		runBenchmark(new RxJavaBenchmark(City, bindingMethod, validation))
-
-		logMessage "\n  - These show performance issues"
-		runBenchmark(new GparsDaoBenchmark(City,bindingMethod, validation))
-		runBenchmark(new GparsBaselineBenchmark(CityAuditTrail, bindingMethod, validation))
-		runBenchmark(new GparsBaselineBenchmark(CityModelTrait, bindingMethod, validation))
 	}
+
+    void runMultiCoreSlower(String msg, String bindingMethod = 'grails', boolean validation = true) {
+        logMessage "\n$msg"
+        logMessage "  - These show performance issues"
+        runBenchmark(new GparsBaselineBenchmark(CityAuditTrail, bindingMethod, validation))
+        runBenchmark(new GparsBaselineBenchmark(CityModelTrait, bindingMethod, validation))
+    }
 
 	void runMultiThreadsOther(String msg){
 		println "\n$msg"
