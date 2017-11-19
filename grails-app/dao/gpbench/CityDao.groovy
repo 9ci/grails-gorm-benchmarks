@@ -17,12 +17,12 @@ class CityDao extends GormDaoSupport<City> {
 	@NotTransactional
 	//@CompileDynamic
 	City bindWithCopyDomain(Map row) {
-		Region r = Region.load(row['region']['id'] as Long)
-		Country country = Country.load(row['country']['id'] as Long)
+		//Region r = Region.load(row['region']['id'] as Long)
+		//Country country = Country.load(row['country']['id'] as Long)
 		City c = new City()
-		GormUtils.copyDomain(c, row)
-		c.region = r
-		c.country = country
+		GormUtils.bindFast(c, row)
+		//c.region = r
+		//c.country = country
 		return c
 	}
 

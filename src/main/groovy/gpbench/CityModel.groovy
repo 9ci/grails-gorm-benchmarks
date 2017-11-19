@@ -1,5 +1,8 @@
 package gpbench
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 trait CityModel {
 
 	String name
@@ -10,6 +13,8 @@ trait CityModel {
 
 	Region region
 	Country country
+    String state
+    String countryName
 
 	Date dateCreated
 	Date lastUpdated

@@ -1,6 +1,9 @@
 package gpbench
 
+import grails.compiler.GrailsCompileStatic
 
+
+@GrailsCompileStatic
 class CityModelTrait implements CityModel{
 
 	static belongsTo = [Region, Country]
@@ -10,7 +13,7 @@ class CityModelTrait implements CityModel{
 	}
 
 	static constraints = {
-		importFrom(CityBaseline)
+		importFrom(CityBaselineDynamic)
 	}
 
 	String toString() { name }

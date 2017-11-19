@@ -15,7 +15,7 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 class LoaderSimpleService {
 	static transactional = false
 
-	static int POOL_SIZE = 9
+	static int POOL_SIZE = PoolUtils.retrieveDefaultPoolSize()
 	static int BATCH_SIZE = 50 //this should match the hibernate.jdbc.batch_size in datasources
 
 	int loadIterations = System.getProperty("load.iterations", "10").toInteger()
@@ -31,8 +31,8 @@ class LoaderSimpleService {
 	//@CompileStatic
 	void runBenchMarks() {
 		//use default poolsize, it can be updated by passing system property -Dgpars.poolsize=xx
-		POOL_SIZE = PoolUtils.retrieveDefaultPoolSize()
-		loadIterations = System.getProperty("load.iterations", "10").toInteger()
+		//POOL_SIZE = PoolUtils.retrieveDefaultPoolSize()
+		//loadIterations = System.getProperty("load.iterations", "10").toInteger()
 
 		println "--- Environment info ---"
 		println "Max memory: " + (Runtime.getRuntime().maxMemory() / 1024 )+ " KB"
@@ -72,34 +72,22 @@ class LoaderSimpleService {
 		}
 
 		//runMultiCoreGrailsBaseline("## Pass 1 multi-thread - standard grails binding baseline")
-//        warmUpAndRun("# Gpars - standard grails binding with baseline",
-//            'runMultiCoreGrailsBaseline', 'grails')
+        //warmUpAndRun("# Gpars - standard grails binding with baseline",
+        //    'runMultiCoreGrailsBaseline', 'grails')
 
-        //runBenchmark(new GparsBaselineBenchmark(CityAuditTrail, "grails"))
-        warmUpAndRun("# Gpars - standard grails binding with baseline",
+        warmUpAndRun("# Gpars - Assign Properties, no grails databinding",
+            "runMultiCoreBaselineCompare", 'copy')
+
+        warmUpAndRun("# Gpars - standard grails binding with baseline Slower",
             "runMultiCoreBaselineCompare", 'grails')
+
+        warmUpAndRun("  - Performance (NO?) problems - standard grails binding with baseline",
+            "runMultiCoreSlower", 'copy')
 
         warmUpAndRun("  - Performance problems - standard grails binding with baseline",
             "runMultiCoreSlower", 'grails')
 
-        warmUpAndRun("  - Faster Options - standard grails binding",
-            "runMultiCoreFaster", 'grails')
-
-        warmUpAndRun("# Gpars - copy to fields, no grails databinding",
-            "runMultiCoreBaselineCompare", 'copy')
-
-        warmUpAndRun("  - Performance problems - standard grails binding with baseline",
-            "runMultiCoreSlower", 'copy')
-
-        warmUpAndRun("  - Faster Options - copy to fields, no grails databinding",
-            "runMultiCoreFaster", 'copy')
-
 		runMultiThreadsOther("## Misc sanity checks")
-
-        runBenchmark(new DatabindingBenchmark(CityBaseline), true)
-        runBenchmark(new DatabindingBenchmark(CityBaseline), true)
-        runBenchmark(new DatabindingBenchmark(CityModelTrait), true)
-        runBenchmark(new DatabindingBenchmark(CityModelTrait), true)
 
 		System.exit(0)
 	}
@@ -119,41 +107,41 @@ class LoaderSimpleService {
 
     void warmUpAndRun(String msg, String runMethod, String bindingMethod = 'grails'){
         warmUp(runMethod, bindingMethod)
+        //warmUp(runMethod, bindingMethod)
         "$runMethod"(msg, bindingMethod)
     }
 
-    void runMultiCoreGrailsBaseline(String msg, String bindingMethod = 'grails', boolean validation = true) {
-        logMessage "\n$msg"
-        logMessage "  - Grails Basic Baseline to measure against"
-        runBenchmark(new GparsBaselineBenchmark(CityBaseline,bindingMethod,validation))
-    }
+//    void runMultiCoreGrailsBaseline(String msg, String bindingMethod = 'grails', boolean validation = true) {
+//        logMessage "\n$msg"
+//        logMessage "  - Grails Basic Baseline to measure against"
+//        runBenchmark(new GparsBaselineBenchmark(CityBaseline,bindingMethod,validation))
+//    }
 
     void runMultiCoreBaselineCompare(String msg, String bindingMethod = 'grails', boolean validation = true) {
         logMessage "\n$msg"
         logMessage "  - Grails Basic Baseline to measure against"
+        //runBenchmark(new GparsBaselineBenchmark(CityIdGen,bindingMethod, validation))
+        runBenchmark(new GparsBaselineBenchmark(CityBaselineDynamic,bindingMethod,validation))
         runBenchmark(new GparsBaselineBenchmark(CityBaseline,bindingMethod,validation))
 
-        logMessage "\n  - These should all run within 5% of baseline and each other"
-        runBenchmark(new GparsBaselineBenchmark(CityAuditStampManual,bindingMethod,validation))
-        //runBenchmark(new GparsBaselineBenchmark(CityAuditStampAutowire,bindingMethod,validation))
-        //runBenchmark(new GparsBaselineBenchmark(CityAuditTrail, bindingMethod, validation))
-        runBenchmark(new GparsDaoBenchmark(City,bindingMethod, validation))
-        runBenchmark(new GparsScriptEngineBenchmark(City,bindingMethod, validation))
-        runBenchmark(new GparsDaoBenchmark(CityDynamic,bindingMethod, validation))
-    }
+        //runBenchmark(new GparsFatBenchmark(CityFatAssocDynamic,bindingMethod,validation))
+        //runBenchmark(new GparsFatBenchmark(CityFatAssoc,bindingMethod,validation))
 
-	void runMultiCoreFaster(String msg, String bindingMethod = 'grails', boolean validation = true) {
-		logMessage "\n$msg"
-		logMessage "  - These run faster"
-		runBenchmark(new GparsBaselineBenchmark(CityIdGen,bindingMethod, validation))
-		runBenchmark(new RxJavaBenchmark(City, bindingMethod, validation))
-	}
+        logMessage "\n  - These should all run within about 5% of baseline and each other"
+        //runBenchmark(new GparsBaselineBenchmark(CityAuditStampManual,bindingMethod,validation))
+        runBenchmark(new GparsBaselineBenchmark(CityAuditTrail, bindingMethod, validation))
+        //runBenchmark(new GparsBaselineBenchmark(CityAuditStampAutowire,bindingMethod,validation))
+        runBenchmark(new GparsDaoBenchmark(City,bindingMethod, validation))
+        runBenchmark(new RxJavaBenchmark(City, bindingMethod, validation))
+        runBenchmark(new GparsScriptEngineBenchmark(City,bindingMethod, validation))
+    }
 
     void runMultiCoreSlower(String msg, String bindingMethod = 'grails', boolean validation = true) {
         logMessage "\n$msg"
-        logMessage "  - These show performance issues"
-        runBenchmark(new GparsBaselineBenchmark(CityAuditTrail, bindingMethod, validation))
+        logMessage "  - Traits have big performance issues with databinding but may be fine with assignment"
         runBenchmark(new GparsBaselineBenchmark(CityModelTrait, bindingMethod, validation))
+        logMessage "  - Fully Dynamic should be slower than statically compiled counter parts"
+        runBenchmark(new GparsDaoBenchmark(CityDynamic,bindingMethod, validation))
     }
 
 	void runMultiThreadsOther(String msg){
@@ -161,7 +149,7 @@ class LoaderSimpleService {
         runBenchmark(new BatchInsertWithDataFlowQueueBenchmark('copy'))
 
 		logMessage "  - using copy instead of binding and no validation, <10% faster"
-		runBenchmark(new GparsBaselineBenchmark(CityBaseline, 'copy', false))
+		runBenchmark(new GparsBaselineBenchmark(CityBaselineDynamic, 'copy', false))
 
 		println "\n - assign id inside domain with beforeValidate"
 		runBenchmark(new GparsBaselineBenchmark(CityIdGenAssigned))

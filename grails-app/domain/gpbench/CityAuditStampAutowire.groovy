@@ -9,6 +9,9 @@ class CityAuditStampAutowire {
 	BigDecimal latitude
 	BigDecimal longitude
 
+    String state
+    String countryName
+
 	static belongsTo = [region:Region, country:Country]
 
 	Date dateCreated
@@ -22,7 +25,7 @@ class CityAuditStampAutowire {
 	}
 
 	static constraints = {
-		importFrom(CityBaseline)
+		importFrom(CityBaselineDynamic)
 	}
 
 	String toString() { name }

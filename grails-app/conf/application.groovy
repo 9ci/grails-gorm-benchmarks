@@ -16,10 +16,10 @@ grails {
     }
 }
 
-grails.gorm.autowire = Boolean.valueOf(System.getProperty("autowire.enabled", "false"))
+grails.gorm.autowire = false//Boolean.valueOf(System.getProperty("autowire.enabled", "false"))
 
 grails {
     gorm.default.mapping = {
-        //id generator:'gorm.tools.idgen.SpringIdGenerator'
+        id generator:'gorm.tools.idgen.SpringIdGenerator'
     }
 }

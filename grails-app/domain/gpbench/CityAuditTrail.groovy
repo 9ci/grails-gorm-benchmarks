@@ -1,8 +1,10 @@
 package gpbench
 
 import gorm.AuditStamp
+import grails.compiler.GrailsCompileStatic
 
 @AuditStamp
+@GrailsCompileStatic
 class CityAuditTrail {
 	String name
 	String shortCode
@@ -12,6 +14,9 @@ class CityAuditTrail {
 
 	Region region
 	Country country
+
+    String state
+    String countryName
 
 	static belongsTo = [Region, Country]
 
@@ -27,6 +32,8 @@ class CityAuditTrail {
 		longitude nullable: false, scale: 4, max:380.00
 		region nullable: false
 		country nullable: false
+        state nullable: true
+        countryName nullable: true
 	}
 
 	String toString() { name }

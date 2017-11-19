@@ -1,9 +1,13 @@
 package gpbench
 
+import grails.compiler.GrailsCompileStatic
+import groovy.transform.CompileStatic
+
 /**
  * Baseline stock grails domain. no DAO or anything else should be attached to this.
  * only Grails AST should have touched this.
  */
+@GrailsCompileStatic
 class CityBaseline {
 	String name
 	String shortCode
@@ -18,10 +22,15 @@ class CityBaseline {
 	Long dateCreatedUser
 	Long lastUpdatedUser
 
+    Region region
+    Country country
+    String state
+    String countryName
+
 	static belongsTo = [region:Region, country:Country]
 
 	static mapping = {
-		cache true
+		//cache true
 	}
 
 	static constraints = {
@@ -31,6 +40,8 @@ class CityBaseline {
 		longitude nullable: false, scale: 4, max:380.00
 		region nullable: false
 		country nullable: false
+        state nullable: true
+        countryName nullable: true
 
 		dateCreated nullable:true,display:false,editable:false,bindable:false
 		lastUpdated nullable:true,display:false,editable:false,bindable:false

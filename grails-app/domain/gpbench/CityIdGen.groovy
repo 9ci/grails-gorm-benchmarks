@@ -1,5 +1,8 @@
 package gpbench
 
+import grails.compiler.GrailsCompileStatic
+
+@GrailsCompileStatic  //FIXME not sure whats up here.
 class CityIdGen {
 
 	String name
@@ -10,6 +13,8 @@ class CityIdGen {
 
 	Region region
 	Country country
+    String state
+    String countryName
 
     Date dateCreated
     Date lastUpdated
@@ -21,12 +26,12 @@ class CityIdGen {
 	static belongsTo = [Region, Country]
 
 	static mapping = {
-		id column: 'id', generator:'gorm.tools.idgen.SpringIdGenerator'
+		id generator:'gorm.tools.idgen.SpringIdGenerator'
 		cache true
 	}
 
 	static constraints = {
-		importFrom(CityBaseline)
+		importFrom(CityBaselineDynamic)
 	}
 
 	String toString() { name }

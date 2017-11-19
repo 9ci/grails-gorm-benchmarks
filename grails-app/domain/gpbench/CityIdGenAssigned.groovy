@@ -1,10 +1,13 @@
 package gpbench
 
+import grails.compiler.GrailsCompileStatic
 import grails.util.Holders
+import groovy.transform.CompileDynamic
 
+@GrailsCompileStatic
 class CityIdGenAssigned {
 	//injected bean for ids.
-	transient idGenerator
+	//transient idGenerator
 
 	String name
 	String shortCode
@@ -30,7 +33,7 @@ class CityIdGenAssigned {
 	}
 
 	static constraints = {
-		importFrom(CityBaseline)
+		importFrom(CityBaselineDynamic)
 	}
 
 	def beforeInsert() {
@@ -44,6 +47,7 @@ class CityIdGenAssigned {
 	/**
 	 * uses the injected idGenerator to get and assign an id to this instance
 	 */
+    @CompileDynamic
 	Long generateId(){
 	    id = Holders.applicationContext.idGenerator.getNextId('CityIdGenAssigned.id')
 	}

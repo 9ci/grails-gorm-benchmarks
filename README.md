@@ -68,6 +68,11 @@ Note: All of above benchmarks are run with and without data binding, and you wil
 * All of these have jdbc.batch_size = 50 and use the principals from #2 above and flush/clear every 50 rows
 * The winner seems to be gpars and batched (smaller chunks) transactions
 
+Please note that Hibernate would disable insert batching at the JDBC level transparently if the primary key of the inserting table isGenerationType.Identity.
+https://stackoverflow.com/questions/12011343/how-do-you-enable-batch-inserts-in-hibernate
+https://vladmihalcea.com/2015/03/18/how-to-batch-insert-and-update-statements-with-hibernate/
+https://stackoverflow.com/questions/6687422/hibernate-batch-size-confusion
+
 
 **Results with Gparse pool size 8**
 

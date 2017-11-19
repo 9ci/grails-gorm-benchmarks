@@ -1,8 +1,11 @@
 package gpbench
 
+import grails.compiler.GrailsCompileStatic
+
 /**
  * Dao Baseline. This has a DAO and has been touched by the gorm-tools AST
  */
+@GrailsCompileStatic
 class City {
 
 	String name
@@ -13,6 +16,8 @@ class City {
 
 	Region region
 	Country country
+    String state
+    String countryName
 
 	Date dateCreated
 	Date lastUpdated

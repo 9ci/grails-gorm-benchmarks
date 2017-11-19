@@ -1,5 +1,8 @@
 package gpbench
 
+import grails.compiler.GrailsCompileStatic
+
+@GrailsCompileStatic
 class CityAuditStampManual {
 	//transient springSecurityService
 
@@ -8,6 +11,9 @@ class CityAuditStampManual {
 
 	BigDecimal latitude
 	BigDecimal longitude
+
+    String state
+    String countryName
 
 	static belongsTo = [region:Region, country:Country]
 
@@ -21,17 +27,7 @@ class CityAuditStampManual {
 	}
 
     static constraints = {
-        name blank: false, nullable: false
-        shortCode blank: false, nullable: false
-        latitude nullable: false, scale: 4, max:90.00
-        longitude nullable: false, scale: 4, max:380.00
-        region nullable: false
-        country nullable: false
-
-        dateCreated nullable:false,display:false,editable:false,bindable:false
-        lastUpdated nullable:false,display:false,editable:false,bindable:false
-        dateCreatedUser nullable:false,display:false,editable:false,bindable:false
-        lastUpdatedUser nullable:false,display:false,editable:false,bindable:false
+        importFrom(CityBaseline)
     }
 
 	String toString() { name }

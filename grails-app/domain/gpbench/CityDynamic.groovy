@@ -11,6 +11,8 @@ class CityDynamic{
 
 	Region region
 	Country country
+    String state
+    String countryName
 
 	Date dateCreated
 	Date lastUpdated
@@ -24,7 +26,7 @@ class CityDynamic{
 	}
 
 	static constraints = {
-		importFrom(CityBaseline)
+		importFrom(CityBaselineDynamic)
 	}
 
 	String toString() { name }
