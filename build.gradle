@@ -56,11 +56,10 @@ dependencies {
 
     runtime 'mysql:mysql-connector-java:5.1.5'
     compile("org.grails.plugins:dao:3.1.1-SNAPSHOT") { changing = true}
+    compile("org.grails.plugins:audit-trail:3.0.8-SNAPSHOT") { changing = true }
     compile 'org.grails.plugins:csv:1.0'
 
     compile "io.reactivex.rxjava2:rxjava:2.1.6"
-
-    compile "org.grails.plugins:audit-trail:3.0.8-SNAPSHOT"
 
     compile "org.springframework:spring-test:4.3.7.RELEASE"
     testCompile "org.grails:grails-plugin-testing"
@@ -83,3 +82,5 @@ bootRun {
 tasks.withType(org.springframework.boot.gradle.run.BootRunTask) {
     systemProperties = System.properties
 }
+
+war.archiveName = "benchmarks.war"
