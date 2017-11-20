@@ -17,6 +17,8 @@ grails {
 }
 
 grails.gorm.autowire = false//Boolean.valueOf(System.getProperty("autowire.enabled", "false"))
+hibernate.jdbc.batch_size = System.getProperty("jdbc.batchSize", "50").toInteger()
+
 
 grails {
     gorm.default.mapping = {

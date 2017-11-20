@@ -16,7 +16,9 @@ class BenchmarkRunnerService {
 	static transactional = false
 
 	static int POOL_SIZE = PoolUtils.retrieveDefaultPoolSize()
-	static int BATCH_SIZE = 50 //this should match the hibernate.jdbc.batch_size in datasources
+
+    //this should match the hibernate.jdbc.batch_size in datasources
+	static int BATCH_SIZE = System.getProperty("jdbc.batchSize", "50").toInteger()
 
 	int loadIterations = System.getProperty("load.iterations", "3").toInteger()
     int warmupCycles = 1
@@ -41,6 +43,7 @@ class BenchmarkRunnerService {
 		println "Free memory: " + (Runtime.getRuntime().freeMemory() / 1024 ) + " KB"
 		println "Available processors: " + Runtime.getRuntime().availableProcessors()
 		println "Gpars pool size: " + POOL_SIZE
+        println "JDBC batch size: " + grailsApplication.config.hibernate.jdbc.batch_size
 		println "Autowire enabled: " + grailsApplication.config.grails.gorm.autowire
 
 

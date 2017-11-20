@@ -247,13 +247,18 @@ Gpars batch insert without data binding and validation.
 - Need to try what can be done in audit trail plugin to improve performance.   
 
 **Do daos slow it down**
-- No, very very little effect some thing around 1 to 1.5 seconds for 115K records.
+- No, very very little effect, some thing around 1 to 1.5 seconds for 115K records.
 
-**Do custom Id generator slow it down**
-- No
+**Do custom Id generator slow it down, or improves speed**
+- The batch id generator provided by Dao plugin actually improves the performance.
 
 **Do using Dataflow queue/operator make it faster**
 - No, it has no noticeable effect
+
+**Does @compileStatic speed things up**
+- Yes, compile static improves the performance as method calls are not intercepted and does not go through the metaclass.
+- Putting CompileStatic on domain class improves the databinding speed.
+- It is recommended to use compile static on services, domain classes and other code as far as possible, unless the code need to use dynamic dispatch.
 
 ### Batching inserts and updates with hibernate
 JDBC API supports batching for DML operations, however by default Hibernate does not use JDBC batching support. Below are the settings which can be used to enable batching of insert/updates with hibernate.  
