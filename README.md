@@ -16,6 +16,7 @@
 - [Conclusions](#conclusions)
 	- [Optimum setting for Gpars pool size.](#optimum-setting-for-gpars-pool-size)
 	- [Questions answered by above conclusion.](#questions-answered-by-above-conclusion)
+- [Batching inserts and updates with hibernate](#batching-inserts-and-updates-with-hibernate)	
 - [References and reading](#references-and-reading)
 
 <!-- /TOC -->
@@ -208,35 +209,6 @@ The key conclusions Are as below
    Going from 4 cores to 8 numbers improves slowly
    from pool size 9 onward, performance starts degrading   
 
-### Batching inserts and updates with hibernate
-JDBC API supports batching for DML operations, however by default Hibernate does not use JDBC batching support. Below are the settings which can be used to enable batching of insert/updates with hibernate.  
-
-**hibernate.jdbc.batch_size**  
-This is the most important setting which tells hibernate to enable batching of statements and configures the batch size used by hibernate.
-
-**hibernate.order_inserts** and **hibernate.order_updates**  
-By default hibernate executes each statement in the same order it appears. However it affects the batching. Batching can target one table at a time.
-As soon as a DML statement for a different table is encountered, it ends the current batch. This can result in hibernate not being able to use batching effectively.
-The above two settings tells hibernate to order inserts and update statements respectively based on entity type.
- 
-**hibernate.jdbc.batch_versioned_data**
-This setting tells hibernate to enable batching for versioned entities and is required to enable batching of update statements.
-
-**Note** from hibernate
->Some JDBC drivers return incorrect row counts when a batch is executed. If your JDBC driver falls into this category this setting should be set to false. Otherwise, it is safe to enable this which will allow Hibernate to still batch the DML for versioned entities and still use the returned row counts for optimistic lock checks. Since 5.0, it defaults to true. Previously (versions 3.x and 4.x), it used to be false.
- 
-
-**Caveats**
-- Hibernate disables insert batching at the JDBC level transparently if you use an identity identifier generator.
-- Hibernate disables batch insert when using hibernate.cache.use_second_level_cache = true
-  
-**Reference**
-https://stackoverflow.com/questions/12011343/how-do-you-enable-batch-inserts-in-hibernate
-https://vladmihalcea.com/2015/03/18/how-to-batch-insert-and-update-statements-with-hibernate/
-https://stackoverflow.com/questions/6687422/hibernate-batch-size-confusion
-https://docs.jboss.org/hibernate/stable/orm/userguide/html_single/chapters/batch/Batching.html
-https://docs.jboss.org/hibernate/orm/3.6/reference/en-US/html/batch.html 
-
 
 ### Optimum setting for Gpars pool size.
 
@@ -282,6 +254,36 @@ Gpars batch insert without data binding and validation.
 
 **Do using Dataflow queue/operator make it faster**
 - No, it has no noticeable effect
+
+### Batching inserts and updates with hibernate
+JDBC API supports batching for DML operations, however by default Hibernate does not use JDBC batching support. Below are the settings which can be used to enable batching of insert/updates with hibernate.  
+
+**hibernate.jdbc.batch_size**  
+This is the most important setting which tells hibernate to enable batching of statements and configures the batch size used by hibernate.
+
+**hibernate.order_inserts** and **hibernate.order_updates**  
+By default hibernate executes each statement in the same order it appears. However it affects the batching. Batching can target one table at a time.
+As soon as a DML statement for a different table is encountered, it ends the current batch. This can result in hibernate not being able to use batching effectively.
+The above two settings tells hibernate to order inserts and update statements respectively based on entity type.
+ 
+**hibernate.jdbc.batch_versioned_data**
+This setting tells hibernate to enable batching for versioned entities and is required to enable batching of update statements.
+
+**Note** from hibernate
+>Some JDBC drivers return incorrect row counts when a batch is executed. If your JDBC driver falls into this category this setting should be set to false. Otherwise, it is safe to enable this which will allow Hibernate to still batch the DML for versioned entities and still use the returned row counts for optimistic lock checks. Since 5.0, it defaults to true. Previously (versions 3.x and 4.x), it used to be false.
+ 
+
+**Caveats**
+- Hibernate disables insert batching at the JDBC level transparently if you use an identity identifier generator.
+- Hibernate disables batch insert when using hibernate.cache.use_second_level_cache = true
+  
+**Reference**
+https://stackoverflow.com/questions/12011343/how-do-you-enable-batch-inserts-in-hibernate
+https://vladmihalcea.com/2015/03/18/how-to-batch-insert-and-update-statements-with-hibernate/
+https://stackoverflow.com/questions/6687422/hibernate-batch-size-confusion
+https://docs.jboss.org/hibernate/stable/orm/userguide/html_single/chapters/batch/Batching.html
+https://docs.jboss.org/hibernate/orm/3.6/reference/en-US/html/batch.html 
+
 
 ## References and reading
 
