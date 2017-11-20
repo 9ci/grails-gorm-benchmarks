@@ -32,9 +32,9 @@ repositories {
     }
 }
 
-//configurations.all {
-//    resolutionStrategy.cacheChangingModulesFor 1, 'seconds'
-//}
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 1, 'seconds'
+}
 
 dependencies {
     compile "org.springframework.boot:spring-boot-starter-logging"
