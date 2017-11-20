@@ -1,6 +1,7 @@
 package gpbench
 
 import gorm.tools.GormUtils
+import gpbench.model.CityModel
 import grails.plugin.dao.DaoDomainTrait
 import grails.gorm.transactions.NotTransactional
 import groovy.transform.CompileDynamic

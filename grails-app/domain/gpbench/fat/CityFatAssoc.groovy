@@ -1,57 +1,40 @@
-package gpbench
+package gpbench.fat
 
+import gpbench.Country
+import gpbench.Region
+import gpbench.model.CityTrait
+import gpbench.model.CityTrait2
+import gpbench.model.CityTrait2Constraints
+import gpbench.model.CityTrait3
+import gpbench.model.CityTrait3Constraints
+import gpbench.model.CityTraitConstraints
+import gpbench.model.CityTraitFat
+import gpbench.model.CityTraitFatConstraints
+import gpbench.model.DateUserStamp
+import gpbench.model.DateUserStampConstraints
 import grails.compiler.GrailsCompileStatic
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
+import groovy.transform.TypeChecked
+import groovy.transform.TypeCheckingMode
 import org.grails.datastore.gorm.GormEnhancer
 
 /**
- * Baseline stock grails domain. no DAO or anything else should be attached to this.
- * only Grails AST should have touched this.
+ *
  */
 @GrailsCompileStatic
-class CityFatAssoc {
-	String name
-	String shortCode
+class CityFatAssoc implements CityTraitFat, DateUserStamp{
 
-	BigDecimal latitude
-	BigDecimal longitude
+	static belongsTo = [region:Region, country:Country,
+                        region2:Region, country2:Country,
+                        region3:Region, country3:Country]
 
-    String state
-    String countryName
 
-	Date dateCreated
-	Date lastUpdated
-
-    //these don't do anything and are just here to equalize the number of fields
-	Long dateCreatedUser
-	Long lastUpdatedUser
-
-    String name2
-    String shortCode2
-    String state2
-    String countryName2
-
-    BigDecimal latitude2
-    BigDecimal longitude2
-
-    String name3
-    String shortCode3
-    String state3
-    String countryName3
-
-    BigDecimal latitude3
-    BigDecimal longitude3
-
-	static belongsTo = [region:Region, country:Country, region2:Region, country2:Country, region3:Region, country3:Country]
-
-	static mapping = {
-		cache true
-	}
-
+    //@CompileStatic(TypeCheckingMode.SKIP)
 	static constraints = {
-        importFrom(CityFatAssocDynamic)
+        importFrom(CityTraitFatConstraints)
+        importFrom DateUserStampConstraints
 	}
-
-	String toString() { name }
 
     void setPropsFast(Map row) {
         this.name = row['name']

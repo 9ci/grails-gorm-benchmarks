@@ -29,8 +29,8 @@ class GparsFatBenchmark<T> extends GparsBaselineBenchmark<T> {
             row.country2 = [id:row.country.id]
             row.country3 = [id:row.country.id]
 
-            row.state  = row.region.id
-            row.countryName  = row.country.id
+            //row.state  = row.region.id
+            //row.countryName  = row.country.id
             row.state2  = row.region.id
             row.countryName2  = row.country.id
             row.state3  = row.region.id

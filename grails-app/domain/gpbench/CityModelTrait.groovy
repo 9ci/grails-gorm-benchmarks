@@ -1,5 +1,6 @@
 package gpbench
 
+import gpbench.model.CityModel
 import grails.compiler.GrailsCompileStatic
 
 

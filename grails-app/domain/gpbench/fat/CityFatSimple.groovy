@@ -1,9 +1,9 @@
-package bugwork
+package gpbench.fat
 
 /**
- * Created by sudhir on 17/11/17.
+ * No Association, not constraints, etc..
  */
-class CityFat {
+class CityFatSimple {
     String name
     String shortCode
     String state

@@ -1,6 +1,8 @@
 package gpbench
 
 import gpbench.benchmarks.*
+import gpbench.fat.CityFatAssoc
+import gpbench.fat.CityFatAssocDynamic
 import gpbench.helpers.BenchmarkHelper
 import gpbench.helpers.CsvReader
 import grails.core.GrailsApplication
@@ -8,11 +10,12 @@ import grails.plugin.dao.DaoUtil
 import grails.plugin.dao.GormDaoSupport
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
-import groovyx.gpars.GParsPool
 import groovyx.gpars.util.PoolUtils
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 
 class BenchmarkRunnerService {
+
+    GparsLoadService gparsLoadService
 	static transactional = false
 
 	static int POOL_SIZE = PoolUtils.retrieveDefaultPoolSize()
@@ -33,37 +36,19 @@ class BenchmarkRunnerService {
 
 	//@CompileStatic
 	void runBenchMarks() {
-		//use default poolsize, it can be updated by passing system property -Dgpars.poolsize=xx
-		//POOL_SIZE = PoolUtils.retrieveDefaultPoolSize()
-		//loadIterations = System.getProperty("load.iterations", "10").toInteger()
-
 		println "--- Environment info ---"
-		println "Max memory: " + (Runtime.getRuntime().maxMemory() / 1024 )+ " KB"
-		println "Total Memory: " + (Runtime.getRuntime().totalMemory() / 1024 )+ " KB"
-		println "Free memory: " + (Runtime.getRuntime().freeMemory() / 1024 ) + " KB"
+		//println "Max memory: " + (Runtime.getRuntime().maxMemory() / 1024 )+ " KB"
+		//println "Total Memory: " + (Runtime.getRuntime().totalMemory() / 1024 )+ " KB"
+		//println "Free memory: " + (Runtime.getRuntime().freeMemory() / 1024 ) + " KB"
 		println "Available processors: " + Runtime.getRuntime().availableProcessors()
 		println "Gpars pool size: " + POOL_SIZE
-        println "JDBC batch size: " + grailsApplication.config.hibernate.jdbc.batch_size
+        println "batch size: " + grailsApplication.config.hibernate.jdbc.batch_size
 		println "Autowire enabled: " + grailsApplication.config.grails.gorm.autowire
 
 
 		//load base country and city data which is used by all benchmarks
 		benchmarkHelper.truncateTables()
 		prepareBaseData()
-
-//		if(System.getProperty("warmup", "true").toBoolean()){
-//			//run benchmarks without displaying numbers to warmup jvm so we get consitent results
-//			//showing that doing this will drop results below on averge about 10%
-//			println "- Warming up JVM with initial pass"
-//			muteConsole = true
-//			loadIterations = 1
-//
-//			//runMultiCoreGrailsBaseline("")
-//			runMultiCore("", 'grails')
-//            //runMultiCore("", 'copy')
-//
-//			loadIterations = System.getProperty("load.iterations", "10").toInteger()
-//		}
 
 		muteConsole = false
 
@@ -118,6 +103,7 @@ class BenchmarkRunnerService {
 
 
     void runMultiCoreBaselineCompare(String msg, String bindingMethod = 'grails') {
+        runBenchmark(new GparsFatBenchmark(CityFatAssoc,bindingMethod))
         logMessage "\n$msg"
         logMessage "  - Grails Basic Baseline to measure against"
         runBenchmark(new GparsBaselineBenchmark(CityBaselineDynamic,bindingMethod))
@@ -188,16 +174,19 @@ class BenchmarkRunnerService {
 
 	@CompileStatic(TypeCheckingMode.SKIP)
 	void insert(List<List<Map>> batchList, GormDaoSupport dao) {
-		GParsPool.withPool(POOL_SIZE) {
-			batchList.eachParallel { List<Map> batch ->
-				City.withTransaction {
-					batch.each { Map row ->
-						dao.insert(row)
-					}
-					DaoUtil.flushAndClear()
-				}
-			}
-		}
+        gparsLoadService.insertGpars(batchList, [poolSize:POOL_SIZE]){ Map row, args ->
+            dao.insert(row)
+        }
+//		GParsPool.withPool(POOL_SIZE) {
+//			batchList.eachParallel { List<Map> batch ->
+//				City.withTransaction {
+//					batch.each { Map row ->
+//						dao.insert(row)
+//					}
+//					DaoUtil.flushAndClear()
+//				}
+//			}
+//		}
 	}
 
 	@CompileStatic(TypeCheckingMode.SKIP)
@@ -205,6 +194,7 @@ class BenchmarkRunnerService {
 		if(benchmark.hasProperty("poolSize")) benchmark.poolSize = POOL_SIZE
 		if(benchmark.hasProperty("batchSize")) benchmark.batchSize = BATCH_SIZE
 		if(benchmark.hasProperty("repeatedCityTimes")) benchmark.repeatedCityTimes = loadIterations
+        if(benchmark.hasProperty("disableSave")) benchmark.disableSave = disableSave
 
 		autowire(benchmark)
 		benchmark.run()

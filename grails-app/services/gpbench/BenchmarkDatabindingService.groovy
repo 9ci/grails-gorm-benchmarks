@@ -2,10 +2,16 @@ package gpbench
 
 import bugwork.*
 import gorm.tools.GormUtils
+import gpbench.fat.CityFatSimple
+import gpbench.fat.CityFatAssoc
+import gpbench.fat.CityFatAssocDynamic
+import gpbench.fat.CityFatStatic
+import gpbench.fat.CityFatWithTraitStatic
 import gpbench.helpers.JsonReader
 import gpbench.helpers.RecordsLoader
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEnhancer
+import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
 import org.springframework.util.StopWatch
@@ -35,12 +41,11 @@ class BenchmarkDatabindingService {
         (1..2).each {
             if(!mute) println "\n - setters or property copy on associations with 20 fields"
             useStaticSettersInDomain(CityFatAssoc)
-            gormUtilsBindFast(CityFatAssoc)
-            daoCreateNewFast(CityFatAssoc)
             useSetPropsFastIterate(CityFatAssoc)
+            daoCreateNewFast(CityFatAssoc)
             useDynamicSettersFat(CityFatAssoc)
-            if(!mute) println " - Slower dynamic without @GrailsCompileStatic on domain"
-            gormUtilsBindFast(CityFatAssocDynamic)
+            if(!mute) println " - Dynamic is slower, ie without @GrailsCompileStatic on domain"
+            useSetPropsFastIterate(CityFatAssocDynamic)
             mute = false
         }
 
@@ -50,8 +55,8 @@ class BenchmarkDatabindingService {
             gormUtilsBindFast(CityFatStatic)
             useDynamicSettersFat(CityFatStatic)
             if(!mute) println " - without CompileStatic on domains it slows down"
-            gormUtilsBindFast(CityFat)
-            useDynamicSettersFat(CityFat)
+            gormUtilsBindFast(CityFatSimple)
+            useDynamicSettersFat(CityFatSimple)
             if(!mute) println "\n Using Traits with CompileStatic is fast using setters or copy (fast bind)"
             gormUtilsBindFast(CityFatWithTraitStatic)
             useDynamicSettersFat(CityFatWithTraitStatic)
@@ -60,7 +65,7 @@ class BenchmarkDatabindingService {
 
 
         println "\n - Binding is slow -> Simple without associations"
-        benchmarkDatabindingFile(CityFat)
+        benchmarkDatabindingFile(CityFatSimple)
         benchmarkDatabindingFile(CityFatStatic)
         println "\n - Binding with Traits are very slow"
         benchmarkDatabindingFile(CityFatWithTraitStatic)
@@ -248,10 +253,11 @@ class BenchmarkDatabindingService {
 
     void eachCity(String msg, Class domain, Closure rowClosure) {
         StopWatch watch = new StopWatch()
-        def instance = domain.newInstance()
         watch.start()
         for (Map row in cities) {
+            GormEntity instance = domain.newInstance()
             rowClosure.call(instance, row)
+            instance.validate([failOnError:true])
         }
         watch.stop()
         if(!mute) println "${watch.totalTimeSeconds}s $msg $domain.simpleName | ${cities.size()} rows"

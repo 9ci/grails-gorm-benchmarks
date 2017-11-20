@@ -1,5 +1,7 @@
-package gpbench
+package gpbench.model
 
+import gpbench.Country
+import gpbench.Region
 import groovy.transform.CompileStatic
 
 @CompileStatic

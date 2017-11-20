@@ -1,4 +1,4 @@
-package bugwork
+package gpbench.fat
 
 import grails.compiler.GrailsCompileStatic
 
