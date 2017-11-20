@@ -79,13 +79,13 @@ class BenchmarkRunnerService {
         //warmUpAndRun("# Gpars - standard grails binding with baseline",
         //    'runMultiCoreGrailsBaseline', 'grails')
 
-        warmUpAndRun("# Gpars - Assign Properties, no grails databinding",
+        warmUpAndRun("### Gpars - Assign Properties, no grails databinding",
             "runMultiCoreBaselineCompare", 'fast')
 
-        warmUpAndRun("# Gpars - standard grails binding with baseline Slower",
+        warmUpAndRun("### Gpars - standard grails binding with baseline Slower",
             "runMultiCoreBaselineCompare", 'grails')
 
-        warmUpAndRun("  - Performance (NO?) problems - standard grails binding with baseline",
+        warmUpAndRun("  - Performance problems go away without databinding on traits",
             "runMultiCoreSlower", 'fast')
 
         warmUpAndRun("  - Performance problems - standard grails binding with baseline",
@@ -154,11 +154,11 @@ class BenchmarkRunnerService {
 		runBenchmark(new GparsBaselineBenchmark(CityIdGenAssigned))
 
 		println "\n  - not much difference between static and dynamic method calls"
-		runBenchmark(new GparsDaoBenchmark(City,"setter"))
-		runBenchmark(new GparsDaoBenchmark(City,"fast"))
-
-		runBenchmark(new GparsDaoBenchmark(City,"bindWithSetters"))
-		runBenchmark(new GparsDaoBenchmark(City,"bindWithCopyDomain"))
+//		runBenchmark(new GparsDaoBenchmark(City,"setter"))
+//		runBenchmark(new GparsDaoBenchmark(City,"fast"))
+//
+//		runBenchmark(new GparsDaoBenchmark(City,"bindWithSetters"))
+//		runBenchmark(new GparsDaoBenchmark(City,"bindWithCopyDomain"))
 
 		new City().attached
 
