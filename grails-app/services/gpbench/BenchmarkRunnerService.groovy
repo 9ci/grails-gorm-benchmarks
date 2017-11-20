@@ -12,13 +12,13 @@ import groovyx.gpars.GParsPool
 import groovyx.gpars.util.PoolUtils
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 
-class LoaderSimpleService {
+class BenchmarkRunnerService {
 	static transactional = false
 
 	static int POOL_SIZE = PoolUtils.retrieveDefaultPoolSize()
 	static int BATCH_SIZE = 50 //this should match the hibernate.jdbc.batch_size in datasources
 
-	int loadIterations = System.getProperty("load.iterations", "10").toInteger()
+	int loadIterations = System.getProperty("load.iterations", "3").toInteger()
     int warmupCycles = 1
 	boolean muteConsole = false
 
@@ -97,7 +97,7 @@ class LoaderSimpleService {
         System.out.print("Warm up cycle ")
         muteConsole = true
         def oldLoadIterations = loadIterations
-        loadIterations = 3
+        loadIterations = 1
         //runMultiCoreGrailsBaseline("")
         (1..warmupCycles).each{
             "$runMethod"("", bindingMethod)
@@ -121,11 +121,11 @@ class LoaderSimpleService {
         runBenchmark(new GparsBaselineBenchmark(CityBaseline,bindingMethod))
         runBenchmark(new GparsBaselineBenchmark(City, bindingMethod))
 
-        //runBenchmark(new GparsFatBenchmark(CityFatAssocDynamic,bindingMethod,validation))
-        //runBenchmark(new GparsFatBenchmark(CityFatAssoc,bindingMethod,validation))
+        runBenchmark(new GparsFatBenchmark(CityFatAssocDynamic,bindingMethod))
+        logMessage "  - benefits of CompileStatic are more obvious with more fields"
+        runBenchmark(new GparsFatBenchmark(CityFatAssoc,bindingMethod))
 
         logMessage "\n  - These should all run within about 5% of baseline and each other"
-        runBenchmark(new GparsDaoBenchmark(City, bindingMethod))
         runBenchmark(new GparsDaoBenchmark(City, bindingMethod))
         runBenchmark(new GparsBaselineBenchmark(CityAuditTrail, bindingMethod))
         runBenchmark(new RxJavaBenchmark(City, bindingMethod))

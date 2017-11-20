@@ -7,7 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 
 class BootStrap {
 
-    LoaderSimpleService loaderSimpleService
+    BenchmarkRunnerService benchmarkRunnerService
     BenchmarkDatabindingService benchmarkDatabindingService
 
     def init = { servletContext ->
@@ -15,7 +15,7 @@ class BootStrap {
         benchmarkDatabindingService.runFat()
         //loaderNoPersistService.runFileLoad()
         //loaderNoPersistService.run()
-        loaderSimpleService.runBenchMarks()
+        benchmarkRunnerService.runBenchMarks()
     }
 
     void mockAuthentication() {
