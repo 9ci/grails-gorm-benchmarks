@@ -37,15 +37,15 @@ class CityDynamicDao extends GormDaoSupport<CityDynamic> {
 	//See at the bottom why we need this doXX methods
 	def insert( row, args) {
 		def entity
-		if(args.bindingMethod == 'grails'){
+		if(args.dataBinder == 'grails'){
 			entity = domainClass.newInstance()
 			entity.properties = row
 		}
-		else if(args.bindingMethod == 'copy'){
+		else if(args.dataBinder == 'copy'){
 			entity = bindWithCopyDomain(row)
 		}
 		else {
-			entity = "${args.bindingMethod}"(row)
+			entity = "${args.dataBinder}"(row)
 		}
 		if (fireEvents) super.beforeInsertSave(entity, row)
 		super.save(entity, [validate: args.validate?:false ])

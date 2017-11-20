@@ -22,7 +22,7 @@ abstract class BaseBatchInsertBenchmark<T> extends AbstractBenchmark {
 
 	boolean useDatabinding = true //use default grails databinding
 	boolean validate = true
-	String bindingMethod = 'grails' // can be copy or setter
+	String dataBinder = 'grails' // can be copy or setter
 
 	List<List<Map>> cities
 	int cityListSize = 37230
@@ -30,13 +30,13 @@ abstract class BaseBatchInsertBenchmark<T> extends AbstractBenchmark {
 
 	BaseBatchInsertBenchmark(boolean useDatabinding) {
 		this.useDatabinding = useDatabinding
-		if(!useDatabinding) bindingMethod = 'copy'
+		if(!useDatabinding) dataBinder = 'copy'
 	}
 
 	BaseBatchInsertBenchmark(Class<T> clazz, String bindingMethod = 'grails', boolean validate = true) {
 		if(bindingMethod != 'grails') useDatabinding = false
 		this.validate = validate
-		this.bindingMethod = bindingMethod
+		this.dataBinder = bindingMethod
 		domainClass = clazz
 	}
 
@@ -63,6 +63,6 @@ abstract class BaseBatchInsertBenchmark<T> extends AbstractBenchmark {
 	@Override
 	String getDescription() {
 		String validateDesc = validate ? "": ", validation: ${validate}"
-		return "${this.getClass().simpleName}<${domainClass.simpleName}> [ bindingMethod: ${bindingMethod} ${validateDesc}]"
+		return "${this.getClass().simpleName}<${domainClass.simpleName}> [ dataBinder: ${dataBinder} ${validateDesc}]"
 	}
 }

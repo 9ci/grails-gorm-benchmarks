@@ -12,19 +12,11 @@ import org.grails.datastore.gorm.GormEntity
 @Transactional
 @CompileStatic
 class CityDao extends GormDaoSupport<City> {
-	Class domainClass = City
+	//Class domainClass = City
 
-	@NotTransactional
-	//@CompileDynamic
-	City bindWithCopyDomain(Map row) {
-		//Region r = Region.load(row['region']['id'] as Long)
-		//Country country = Country.load(row['country']['id'] as Long)
-		City c = new City()
-		GormUtils.bindFast(c, row)
-		//c.region = r
-		//c.country = country
-		return c
-	}
+    CityDao(){
+        super(City)
+    }
 
 	@NotTransactional
 	//@CompileDynamic
@@ -48,30 +40,6 @@ class CityDao extends GormDaoSupport<City> {
 		City c = bindWithSetters(row)
 		((DaoDomainTrait)c).persist()
 		return c
-	}
-
-	City insert(Map row, Map args) {
-		City entity
-		if(args.bindingMethod == 'grails'){
-			return (City) super.insert(row).entity
-		}
-		else if(args.bindingMethod == 'copy'){
-			entity = bindWithCopyDomain(row)
-		}
-		else if(args.bindingMethod == 'setter'){
-			entity = bindWithSetters(row)
-		} else {
-			entity = (City) callBinderMethod(args.bindingMethod, row)
-		}
-		if (fireEvents) super.beforeInsertSave((GormEntity)entity, row)
-		super.save((GormEntity)entity, [validate: args.validate?:false ])
-		//DaoMessage.created(entity) slows it down by about 15-20%
-		return entity
-	}
-
-	@CompileDynamic
-	def callBinderMethod(method, row){
-		"${method}"(row)
 	}
 
 }

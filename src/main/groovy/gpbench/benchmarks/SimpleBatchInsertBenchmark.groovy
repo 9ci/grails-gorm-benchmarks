@@ -36,8 +36,7 @@ class SimpleBatchInsertBenchmark extends BaseBatchInsertBenchmark {
 	void insertBatch(List<Map> batch, CityDao dao) {
 		for (Map record : batch) {
 			try {
-				if (useDatabinding) dao.insert(record)
-				else dao.insertWithSetter(record)
+				dao.create(record, [dataBinder:dataBinder])
 			} catch (Exception e) {
 				e.printStackTrace()
 			}

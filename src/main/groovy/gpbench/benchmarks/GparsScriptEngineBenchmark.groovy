@@ -25,7 +25,7 @@ class GparsScriptEngineBenchmark<T> extends GparsBaselineBenchmark<T> {
 	@CompileDynamic
 	def execute() {
 		def scriptinsert = scriptEngine.run("insert-city.groovy",
-			new Binding([bindingMethod:bindingMethod]))//new Binding([batch:batch])
+			new Binding([dataBinder:dataBinder]))//new Binding([batch:batch])
 
 		def args = [poolSize:poolSize]
 		gparsLoadService.insertGpars(cities, args){ row, zargs ->

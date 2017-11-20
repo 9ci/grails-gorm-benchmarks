@@ -4,20 +4,12 @@ import gpbench.City
 
 //@GrailsCompileStatic
 class Loader {
-    String bindingMethod
+    String dataBinder
 
     String insertRow(Map row) {
-        if (bindingMethod == 'grails'){
-            City city = new City()
-            city.properties = row
-            city.persist()
-        }
-        else {
-            City.dao.insert(row, [validate:true, bindingMethod:bindingMethod])
-        }
-
+        City.dao.create(row, [dataBinder:dataBinder])
     }
 }
 
-new Loader(bindingMethod: bindingMethod)
+new Loader(dataBinder: dataBinder)
 

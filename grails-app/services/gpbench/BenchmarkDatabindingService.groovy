@@ -30,39 +30,45 @@ class BenchmarkDatabindingService {
 
         jsonReader._cache = [:]
         loadCities3xProps(loadCityTimes)
-        println "Warm up Associations"
+        println "Warm up logan  "
         mute = true
-        useStaticSettersInDomain(CityFatAssoc)
-        useGormUtilsBindFast(CityFatAssoc)
-        useSettersDynamic3x(CityFatAssoc)
-        useGormUtilsBindFast(CityFatAssocDynamic)
-        mute = false
-        println "With Associations CityFatAssoc"
-        useStaticSettersInDomain(CityFatAssoc)
-        useGormUtilsBindFast(CityFatAssoc)
-        useSettersDynamic3x(CityFatAssoc)
-        println "---"
-        useGormUtilsBindFast(CityFatAssocDynamic)
-        println "---"
-        benchmarkDatabindingFile(CityFatAssocDynamic)
-        benchmarkDatabindingFile(CityFatAssoc)
+        (1..2).each {
+            if(!mute) println "\n - setters or property copy on associations with 20 fields"
+            useStaticSettersInDomain(CityFatAssoc)
+            gormUtilsBindFast(CityFatAssoc)
+            daoCreateNewFast(CityFatAssoc)
+            useSetPropsFastIterate(CityFatAssoc)
+            useDynamicSettersFat(CityFatAssoc)
+            if(!mute) println " - Slower dynamic without @GrailsCompileStatic on domain"
+            gormUtilsBindFast(CityFatAssocDynamic)
+            mute = false
+        }
 
-        println "\nCitySimple3xProps"
+        mute = true
+        (1..2).each {
+            if(!mute) println "\n - setters, copy and fast bind on simple no associations"
+            gormUtilsBindFast(CityFatStatic)
+            useDynamicSettersFat(CityFatStatic)
+            if(!mute) println " - without CompileStatic on domains it slows down"
+            gormUtilsBindFast(CityFat)
+            useDynamicSettersFat(CityFat)
+            if(!mute) println "\n Using Traits with CompileStatic is fast using setters or copy (fast bind)"
+            gormUtilsBindFast(CityFatWithTraitStatic)
+            useDynamicSettersFat(CityFatWithTraitStatic)
+            mute = false
+        }
+
+
+        println "\n - Binding is slow -> Simple without associations"
         benchmarkDatabindingFile(CityFat)
         benchmarkDatabindingFile(CityFatStatic)
-        println ""
-        useGormUtilsBindFast(CityFat)
-        useGormUtilsBindFast(CityFatStatic)
-        println ""
-        useSettersDynamic3x(CityFat)
-        useSettersDynamic3x(CityFatStatic)
-
-        println ""
+        println "\n - Binding with Traits are very slow"
         benchmarkDatabindingFile(CityFatWithTraitStatic)
-        println ""
-        useGormUtilsBindFast(CityFatWithTraitStatic)
-        println ""
-        useSettersDynamic3x(CityFatWithTraitStatic)
+
+        println "\n - Gets worse when Binding with associations with 20 fields"
+        benchmarkDatabindingFile(CityFatAssoc)
+        println " - And even slower when not using @CompileStatic"
+        benchmarkDatabindingFile(CityFatAssocDynamic)
 
     }
 
@@ -170,15 +176,27 @@ class BenchmarkDatabindingService {
         }
     }
 
-    void useGormUtilsBindFast(Class domain) {
-        eachCity("useSetPropsFastIterate", domain){ instance , Map row ->
+    void useSetPropsFastIterate(Class domain) {
+        eachCity("setPropsFastIterate", domain){ instance , Map row ->
+            setPropsFastIterate(instance, row)
+        }
+    }
+
+    void gormUtilsBindFast(Class domain) {
+        eachCity("gormUtilsBindFast", domain){ instance , Map row ->
             GormUtils.bindFast(instance, row)
             //setPropsFastIterate(instance, row)
         }
     }
 
+    void daoCreateNewFast(Class domain) {
+        eachCity("daoCreateNewFast", domain){ instance , Map row ->
+            domain.dao.bindCreate(instance, row, [dataBinder:'fast'])
+        }
+    }
+
     void useSettersDynamicSimple(Class domain) {
-        eachCity("useSettersDynamic3x", domain){ instance , Map row ->
+        eachCity("useDynamicSettersFat", domain){ instance , Map row ->
             instance.name = row['name']
             instance.shortCode = row['shortCode']
             instance.state = row['state']
@@ -188,9 +206,9 @@ class BenchmarkDatabindingService {
         }
     }
 
-    void useSettersDynamic3x(Class domain) {
+    void useDynamicSettersFat(Class domain) {
 
-        eachCity("useSettersDynamic3x", domain){ instance , Map row ->
+        eachCity("useDynamicSettersFat", domain){ instance , Map row ->
             instance.name = row['name']
             instance.shortCode = row['shortCode']
             instance.state = row['state']

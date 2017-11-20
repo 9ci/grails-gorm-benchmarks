@@ -7,28 +7,29 @@ import grails.compiler.GrailsCompileStatic
  */
 @GrailsCompileStatic
 class City {
+    String name
+    String shortCode
 
-	String name
-	String shortCode
+    BigDecimal latitude
+    BigDecimal longitude
 
-	BigDecimal latitude
-	BigDecimal longitude
+    Date dateCreated
+    Date lastUpdated
 
-	Region region
-	Country country
+    //these don't do anything and are just here to equalize the number of fields
+    Long dateCreatedUser
+    Long lastUpdatedUser
+
+    Region region
+    Country country
     String state
     String countryName
 
-	Date dateCreated
-	Date lastUpdated
-	Long dateCreatedUser
-	Long lastUpdatedUser
+    static belongsTo = [region:Region, country:Country]
 
-	static belongsTo = [Region, Country]
-
-	static mapping = {
-		cache true
-	}
+    static mapping = {
+        //cache true
+    }
 
 	static constraints = {
         importFrom(CityBaseline)

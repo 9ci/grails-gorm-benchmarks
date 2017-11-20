@@ -1,10 +1,6 @@
 package gpbench.benchmarks
 
 import gorm.tools.GormUtils
-import gpbench.Country
-import gpbench.Region
-import grails.compiler.GrailsCompileStatic
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.mapping.model.PersistentProperty
@@ -23,7 +19,7 @@ class GparsBaselineBenchmark<T> extends BaseBatchInsertBenchmark<T> {
 
 	@Override
 	def execute() {
-		def args = [poolSize:poolSize, validate:validate, bindingMethod:bindingMethod ]
+		def args = [poolSize:poolSize]
 		gparsLoadService.insertGpars(cities, args){ Map row, Map zargs ->
 			insertRow(row)
 		}
@@ -31,7 +27,7 @@ class GparsBaselineBenchmark<T> extends BaseBatchInsertBenchmark<T> {
 
 	void insertRow(Map row) {
 
-		if (bindingMethod == 'grails') {
+		if (dataBinder == 'grails') {
 			T city = domainClass.newInstance()
 			city.properties = row
 			city.save(failOnError:true, validate:validate)

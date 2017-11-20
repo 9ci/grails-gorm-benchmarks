@@ -58,8 +58,8 @@ class BatchInsertWithDataFlowQueueBenchmark extends BaseBatchInsertBenchmark {
 	void insertBatch(List<Map> batch, CityDao dao) {
 		for (Map record : batch) {
 			try {
-				if (useDatabinding) dao.insert(record)
-				else dao.insert(record, [validate:true, bindingMethod:bindingMethod])
+                String dataBinder = dataBinder == 'copy' ? 'bindFast' : 'grailsWeb'
+                dao.create(record, [validate:true, dataBinder:dataBinder])
 			}catch (Exception e) {
 				e.printStackTrace()
 			}
