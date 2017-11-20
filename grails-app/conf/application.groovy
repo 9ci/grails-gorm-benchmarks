@@ -16,7 +16,7 @@ grails {
     }
 }
 
-grails.gorm.autowire = false//Boolean.valueOf(System.getProperty("autowire.enabled", "false"))
+grails.gorm.autowire = Boolean.valueOf(System.getProperty("autowire.enabled", "false"))
 hibernate.jdbc.batch_size = System.getProperty("jdbc.batchSize", "50").toInteger()
 
 
