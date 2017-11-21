@@ -48,7 +48,7 @@ class BenchmarkDatabindingService {
             if(!mute) println "\n - setters or property copy on associations with 20 fields"
             useStaticSettersInDomain(CityFat)
             useSetPropsFastIterate(CityFat)
-            //daoCreateNewFast(CityFat)
+            daoCreateNewFast(CityFat)
             useDynamicSettersFat(CityFat)
             if(!mute) println " - Dynamic is slower, ie without @GrailsCompileStatic on domain"
             useSetPropsFastIterate(CityFatDynamic)
