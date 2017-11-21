@@ -15,7 +15,7 @@ import grails.compiler.GrailsCompileStatic
 /**
  * Without @GrailsCompileStatic, fully dynamic
  */
-class CityFatAssocDynamic implements CityTraitFat, DateUserStamp{
+class CityFatDynamic implements CityTraitFat, DateUserStamp{
 
     static belongsTo = [region:Region, country:Country,
                         region2:Region, country2:Country,

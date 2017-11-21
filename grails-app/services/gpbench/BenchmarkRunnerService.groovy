@@ -1,8 +1,8 @@
 package gpbench
 
 import gpbench.benchmarks.*
-import gpbench.fat.CityFatAssoc
-import gpbench.fat.CityFatAssocDynamic
+import gpbench.fat.CityFat
+import gpbench.fat.CityFatDynamic
 import gpbench.helpers.BenchmarkHelper
 import gpbench.helpers.CsvReader
 import grails.core.GrailsApplication
@@ -103,16 +103,16 @@ class BenchmarkRunnerService {
 
 
     void runMultiCoreBaselineCompare(String msg, String bindingMethod = 'grails') {
-        runBenchmark(new GparsFatBenchmark(CityFatAssoc,bindingMethod))
+        runBenchmark(new GparsFatBenchmark(CityFat,bindingMethod))
         logMessage "\n$msg"
         logMessage "  - Grails Basic Baseline to measure against"
         runBenchmark(new GparsBaselineBenchmark(CityBaselineDynamic,bindingMethod))
         runBenchmark(new GparsBaselineBenchmark(CityBaseline,bindingMethod))
         runBenchmark(new GparsBaselineBenchmark(City, bindingMethod))
 
-        runBenchmark(new GparsFatBenchmark(CityFatAssocDynamic,bindingMethod))
+        runBenchmark(new GparsFatBenchmark(CityFatDynamic,bindingMethod))
         logMessage "  - benefits of CompileStatic are more obvious with more fields"
-        runBenchmark(new GparsFatBenchmark(CityFatAssoc,bindingMethod))
+        runBenchmark(new GparsFatBenchmark(CityFat,bindingMethod))
 
         logMessage "\n  - These should all run within about 5% of baseline and each other"
         runBenchmark(new GparsDaoBenchmark(City, bindingMethod))

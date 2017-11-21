@@ -1,8 +1,11 @@
 package gpbench.fat
 
+import grails.compiler.GrailsCompileStatic
+
 /**
  * No Association, not constraints, etc..
  */
+@GrailsCompileStatic
 class CityFatSimple {
     String name
     String shortCode

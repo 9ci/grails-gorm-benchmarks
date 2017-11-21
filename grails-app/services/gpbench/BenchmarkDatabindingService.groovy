@@ -1,20 +1,24 @@
 package gpbench
 
-import bugwork.*
 import gorm.tools.GormUtils
+import gorm.tools.beans.DateUtil
+import gpbench.fat.CityFatNoTraits
 import gpbench.fat.CityFatSimple
-import gpbench.fat.CityFatAssoc
-import gpbench.fat.CityFatAssocDynamic
-import gpbench.fat.CityFatStatic
-import gpbench.fat.CityFatWithTraitStatic
+import gpbench.fat.CityFat
+import gpbench.fat.CityFatDynamic
 import gpbench.helpers.JsonReader
 import gpbench.helpers.RecordsLoader
+import grails.databinding.converters.ValueConverter
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.util.StopWatch
+
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 
 class BenchmarkDatabindingService {
     JsonReader jsonReader
@@ -39,138 +43,29 @@ class BenchmarkDatabindingService {
         println "Warm up logan  "
         mute = true
         (1..2).each {
-            if(!mute) println "\n - setters or property copy on associations with 20 fields"
-            useStaticSettersInDomain(CityFatAssoc)
-            useSetPropsFastIterate(CityFatAssoc)
-            daoCreateNewFast(CityFatAssoc)
-            useDynamicSettersFat(CityFatAssoc)
-            if(!mute) println " - Dynamic is slower, ie without @GrailsCompileStatic on domain"
-            useSetPropsFastIterate(CityFatAssocDynamic)
-            mute = false
-        }
-
-        mute = true
-        (1..2).each {
             if(!mute) println "\n - setters, copy and fast bind on simple no associations"
-            gormUtilsBindFast(CityFatStatic)
-            useDynamicSettersFat(CityFatStatic)
-            if(!mute) println " - without CompileStatic on domains it slows down"
-            gormUtilsBindFast(CityFatSimple)
-            useDynamicSettersFat(CityFatSimple)
-            if(!mute) println "\n Using Traits with CompileStatic is fast using setters or copy (fast bind)"
-            gormUtilsBindFast(CityFatWithTraitStatic)
-            useDynamicSettersFat(CityFatWithTraitStatic)
+            useSetPropsFastIterate(CityFatSimple)
+            if(!mute) println "\n - setters or property copy on associations with 20 fields"
+            useStaticSettersInDomain(CityFat)
+            useSetPropsFastIterate(CityFat)
+            //daoCreateNewFast(CityFat)
+            useDynamicSettersFat(CityFat)
+            if(!mute) println " - Dynamic is slower, ie without @GrailsCompileStatic on domain"
+            useSetPropsFastIterate(CityFatDynamic)
             mute = false
         }
 
-
-        println "\n - Binding is slow -> Simple without associations"
-        benchmarkDatabindingFile(CityFatSimple)
-        benchmarkDatabindingFile(CityFatStatic)
-        println "\n - Binding with Traits are very slow"
-        benchmarkDatabindingFile(CityFatWithTraitStatic)
-
-        println "\n - Gets worse when Binding with associations with 20 fields"
-        benchmarkDatabindingFile(CityFatAssoc)
-        println " - And even slower when not using @CompileStatic"
-        benchmarkDatabindingFile(CityFatAssocDynamic)
+        println "\n - Binding is slower"
+        useDatabinding(CityFatNoTraits)
+        println "\n - Binding with Traits are very slow, especially with associations"
+        useDatabinding(CityFat)
+        //println " - And SUPER SLOW when not using @CompileStatic"
+        //useDatabinding(CityFatDynamic)
 
     }
 
-    def runFileLoad(){
-        mute = false
-        jsonReader._cache = [:]
-        loadCities(loadCityTimes)
-        //count = 100_000
-        println "\nbenchmark run load json file"
-        benchmarkDatabindingFile(CitySimple)
-        benchmarkDatabindingFile(CityBaselineDynamic)
-        benchmarkDatabindingFile(CityBaseline)
-        benchmarkDatabindingFile(CitySimpleWithTrait)
-        benchmarkDatabindingFile(CitySimpleWithTraitStatic)
-
-        copyPropsToDomainFromJson(CitySimple)
-        copyPropsToDomainFromJson(CityBaselineDynamic)
-        copyPropsToDomainFromJson(CityBaseline)
-        copyPropsToDomainFromJson(CitySimpleWithTrait)
-        copyPropsToDomainFromJson(CitySimpleWithTraitStatic)
-
-        staticSettersFromJson(CitySimple)
-        staticSettersFromJson(CityBaselineDynamic)
-        staticSettersFromJson(CityBaseline)
-        staticSettersFromJson(CitySimpleWithTrait)
-        staticSettersFromJson(CitySimpleWithTraitStatic)
-
-    }
-
-    def runSimple(){
-        println "warmup run"
-        mute = true
-        count = 10000
-        benchmarkDatabinding(CitySimple)
-        benchmarkDatabinding(CityBaselineDynamic)
-        benchmarkDatabinding(CityBaseline)
-        benchmarkDatabinding(CitySimpleStatic)
-        benchmarkDatabinding(GrailsCompileStaticCity)
-        benchmarkDatabinding(CitySimpleWithTrait)
-        benchmarkDatabinding(CitySimpleWithTraitStatic)
-        benchmarkManualAssignment(CitySimple)
-        benchmarkManualAssignment(CityBaselineDynamic)
-        benchmarkManualAssignment(CityBaseline)
-        benchmarkManualAssignment(CitySimpleStatic)
-        benchmarkManualAssignment(GrailsCompileStaticCity)
-        benchmarkManualAssignment(CitySimpleWithTrait)
-        benchmarkManualAssignment(CitySimpleWithTraitStatic)
-
-        mute = false
-        count = 111690
-        println "benchmark run"
-        benchmarkDatabinding(CitySimple)
-        benchmarkDatabinding(CityBaselineDynamic)
-        benchmarkDatabinding(CityBaseline)
-        benchmarkDatabinding(CitySimpleStatic)
-        benchmarkDatabinding(GrailsCompileStaticCity)
-        benchmarkDatabinding(CitySimpleWithTrait)
-        benchmarkDatabinding(CitySimpleWithTraitStatic)
-        benchmarkManualAssignment(CitySimple)
-        benchmarkManualAssignment(CityBaselineDynamic)
-        benchmarkManualAssignment(CityBaseline)
-        benchmarkManualAssignment(CitySimpleStatic)
-        benchmarkManualAssignment(GrailsCompileStaticCity)
-        benchmarkManualAssignment(CitySimpleWithTrait)
-        benchmarkManualAssignment(CitySimpleWithTraitStatic)
-
-    }
-
-    void benchmarkDatabinding(Class domain) {
-        StopWatch watch = new StopWatch()
-        def instance = domain.newInstance()
-        watch.start()
-        for (int i in (1..count)) {
-            instance.properties = props
-        }
-        watch.stop()
-        println "Took ${watch.totalTimeSeconds} seconds to databind domain $domain.simpleName $count times"
-    }
-
-    void benchmarkManualAssignment(Class domain) {
-        StopWatch watch = new StopWatch()
-        def instance = domain.newInstance()
-        watch.start()
-        for (int i in (1..count)) {
-            instance.name = props['name']
-            instance.shortCode = props['shortCode']
-            instance.state = props['state']
-            instance.countryName = props['countryName']
-            instance.latitude = props['latitude'] as BigDecimal
-            instance.longitude = props['longitude'] as BigDecimal
-        }
-        watch.stop()
-        if(!mute) println "Took ${watch.totalTimeSeconds} seconds to manually set props on domain $domain.simpleName $count times"
-    }
-
-    void benchmarkDatabindingFile(Class domain) {
-        eachCity("benchmarkDatabindingFile", domain){ instance , Map row ->
+    void useDatabinding(Class domain) {
+        eachCity("useDatabinding", domain){ instance , Map row ->
             instance.properties = row
         }
     }
@@ -235,6 +130,10 @@ class BenchmarkDatabindingService {
             instance.latitude3 = row['latitude3'] as BigDecimal
             instance.longitude3 = row['longitude3'] as BigDecimal
             //instance.properties = row
+            instance.date1 = DateUtil.parseJsonDate(row['date1'] as String)
+            instance.date2 = DateUtil.parseJsonDate(row['date2'] as String)
+            instance.date3 = DateUtil.parseJsonDate(row['date3'] as String)
+            instance.date4 = DateUtil.parseJsonDate(row['date4'] as String)
 
             setAssociations(instance, "region", Region, row)
             setAssociations(instance, "country", Country, row)
@@ -257,7 +156,7 @@ class BenchmarkDatabindingService {
         for (Map row in cities) {
             GormEntity instance = domain.newInstance()
             rowClosure.call(instance, row)
-            instance.validate([failOnError:true])
+            //instance.validate([failOnError:true])
         }
         watch.stop()
         if(!mute) println "${watch.totalTimeSeconds}s $msg $domain.simpleName | ${cities.size()} rows"
@@ -299,17 +198,23 @@ class BenchmarkDatabindingService {
             row.countryName3  = row.country.id
 
             row.name2 = row.name
-            row.shortCode2 = row.shortCode
-            row.latitude2 = row.latitude
-            row.longitude2 = row.longitude
+            row.shortCode2 = row.shortCode.toString()
+            row.latitude2 = row.latitude.toString()
+            row.longitude2 = row.longitude.toString()
 
             row.name3 = row.name
             row.shortCode3 = row.shortCode
-            row.latitude3 = row.latitude
-            row.longitude3 = row.longitude
+            row.latitude3 = row.latitude.toString()
+            row.longitude3 = row.longitude.toString()
+
+            row.date1 = '2017-11-20T23:28:56.782Z'
+            row.date2 = '2017-11-22'
+            row.date3 = '2017-11-22T23:28:56.782Z'
+            row.date4 = '2017-11-23'
             //row.remove('region')
             //row.remove('country')
             //instance.properties = row
+            //row.localDate =
         }
         List repeatedCity = []
         (1..mult).each { i ->
@@ -319,6 +224,7 @@ class BenchmarkDatabindingService {
         //cities = repeatedCity.collate(batchSize)
     }
 
+    DateFormat dateFormat = new SimpleDateFormat('yyyy-MM-dd')
     @CompileStatic
     Object setPropsFastIterate(Object obj, Map source, boolean ignoreAssociations = false) {
         //if (target == null) throw new IllegalArgumentException("Target is null")
@@ -331,20 +237,66 @@ class BenchmarkDatabindingService {
                 continue
             }
             def sval = source[prop.name]
+            def valToAssisgn = sval
+            Class typeToConvertTo = prop.getType()
             if (prop instanceof Association && sval['id']) {
                 if(ignoreAssociations) return
                 def asocProp = (Association)prop
                 def asc = GormEnhancer.findStaticApi(asocProp.associatedEntity.javaClass).load(sval['id'] as Long)
-                obj[prop.name] = asc
+                valToAssisgn = asc
             }
-            else{
-                obj[prop.name] = sval
+            else if (sval instanceof String) {
+                if(Number.isAssignableFrom(typeToConvertTo)){
+                    valToAssisgn = (sval as String).asType(typeToConvertTo)
+                }
+                else if(Date.isAssignableFrom(typeToConvertTo)){
+                    //valToAssisgn = dateFormat.parse(sval as String)
+                    valToAssisgn = DateUtil.parseJsonDate(sval as String)
+                    //println "converted $sval to ${valToAssisgn} for $prop.name with DateUtil.parseJsonDate"
+                }
+                else if(conversionHelpers.containsKey(typeToConvertTo)){
+                    def convertersList = conversionHelpers.get(typeToConvertTo)
+                    ValueConverter converter = convertersList?.find { ValueConverter c -> c.canConvert(sval) }
+                    if (converter) {
+                        valToAssisgn= converter.convert(sval)
+                        //println new Date()
+                        //println "converted $sval to ${valToAssisgn} for $prop.name with ${converter.class.name}"
+                    }
+                }
             }
+
+            // all else fails let groovy bind it
+            obj[prop.name] = valToAssisgn
+
             //println prop
             //println "${prop.name}: ${obj[prop.name]} -> region:${obj.region}"
         }
         return obj
     }
+
+
+    @Autowired(required=true)
+    @CompileStatic
+    void setValueConverters(ValueConverter[] converters) {
+        converters.each { ValueConverter converter ->
+            registerConverter converter
+        }
+    }
+    protected Map<Class, List<ValueConverter>> conversionHelpers = [:].withDefault { c -> [] }
+
+    @CompileStatic
+    void registerConverter(ValueConverter converter) {
+        println converter.targetType
+        //conversionHelpers[converter.targetType] == converter
+        conversionHelpers[converter.targetType] << converter
+    }
+
+//    @Autowired(required=false)
+//    void setFormattedValueConverters(FormattedValueConverter[] converters) {
+//        converters.each { FormattedValueConverter converter ->
+//            registerFormattedValueConverter converter
+//        }
+//    }
 
 
 }
