@@ -2,6 +2,7 @@ package gpbench
 
 import gorm.tools.GormUtils
 import gorm.tools.beans.DateUtil
+import gorm.tools.databinding.FastBinder
 import gpbench.fat.CityFatNoTraits
 import gpbench.fat.CityFatSimple
 import gpbench.fat.CityFat
@@ -22,6 +23,7 @@ import java.text.SimpleDateFormat
 
 class BenchmarkDatabindingService {
     JsonReader jsonReader
+    FastBinder fastBinder
 
     Long count = 111690
     Map props = [
@@ -48,10 +50,12 @@ class BenchmarkDatabindingService {
             if(!mute) println "\n - setters or property copy on associations with 20 fields"
             useStaticSettersInDomain(CityFat)
             useSetPropsFastIterate(CityFat)
-            daoCreateNewFast(CityFat)
+            useFastBinder(CityFat)
+            if(!mute) println " - Dynamic setters are slower"
             useDynamicSettersFat(CityFat)
-            if(!mute) println " - Dynamic is slower, ie without @GrailsCompileStatic on domain"
-            useSetPropsFastIterate(CityFatDynamic)
+            if(!mute) println " - Slower without @GrailsCompileStatic on domain"
+            useDynamicSettersFat(CityFatDynamic)
+            useFastBinder(CityFatDynamic)
             mute = false
         }
 
@@ -89,9 +93,9 @@ class BenchmarkDatabindingService {
         }
     }
 
-    void daoCreateNewFast(Class domain) {
-        eachCity("daoCreateNewFast", domain){ instance , Map row ->
-            domain.dao.bindCreate(instance, row, [dataBinder:'fast'])
+    void useFastBinder(Class domain) {
+        eachCity("useFastBinder", domain){ instance , Map row ->
+            fastBinder.bind(instance, row)
         }
     }
 
