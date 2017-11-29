@@ -2,8 +2,6 @@ package gpbench.model
 
 import groovy.transform.CompileStatic
 
-import java.time.LocalDate
-
 @CompileStatic
 trait DatesTrait{
     //LocalDate localDate

@@ -1,5 +1,6 @@
 package gpbench.benchmarks
 
+import gorm.tools.dao.DaoUtil
 import gorm.tools.jdbc.GrailsParameterMapRowMapper
 import gorm.tools.jdbc.ScrollableQuery
 import gpbench.City
@@ -7,7 +8,6 @@ import gpbench.CityDao
 import gpbench.helpers.BenchmarkHelper
 import gpbench.helpers.CsvReader
 import grails.gorm.transactions.Transactional
-import gorm.tools.dao.DaoUtil
 import groovy.sql.Sql
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode

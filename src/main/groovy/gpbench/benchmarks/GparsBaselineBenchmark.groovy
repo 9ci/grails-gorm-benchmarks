@@ -1,12 +1,7 @@
 package gpbench.benchmarks
 
-import gorm.tools.GormUtils
 import gorm.tools.databinding.FastBinder
-import groovy.transform.CompileStatic
-import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
-import org.grails.datastore.mapping.model.PersistentProperty
-import org.grails.datastore.mapping.model.types.Association
 
 /**
  * Baseline benchmark with grails out of the box

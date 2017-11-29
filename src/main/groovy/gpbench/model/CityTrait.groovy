@@ -2,7 +2,6 @@ package gpbench.model
 
 import gpbench.Country
 import gpbench.Region
-import grails.compiler.GrailsCompileStatic
 import groovy.transform.CompileStatic
 
 @CompileStatic

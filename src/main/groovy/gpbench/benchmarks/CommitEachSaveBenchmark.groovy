@@ -1,9 +1,9 @@
 package gpbench.benchmarks
 
+import gorm.tools.dao.DaoUtil
 import gpbench.City
 import gpbench.CityDao
 import grails.gorm.transactions.Transactional
-import gorm.tools.dao.DaoUtil
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 
