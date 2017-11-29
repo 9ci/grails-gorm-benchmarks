@@ -1,7 +1,7 @@
 package gpbench.benchmarks
 
 import grails.gorm.transactions.Transactional
-import grails.plugin.dao.DaoUtil
+import gorm.tools.dao.DaoUtil
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import io.reactivex.Flowable

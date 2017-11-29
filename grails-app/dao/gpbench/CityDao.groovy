@@ -1,18 +1,13 @@
 package gpbench
 
-import gorm.tools.GormUtils
-import grails.plugin.dao.DaoDomainTrait
-import grails.plugin.dao.GormDaoSupport
+import gorm.tools.dao.DefaultGormDao
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
-import org.grails.datastore.gorm.GormEntity
 
 @Transactional
 @CompileStatic
-class CityDao extends GormDaoSupport<City> {
-	//Class domainClass = City
+class CityDao extends DefaultGormDao<City> {
 
     CityDao(){
         super(City)
@@ -38,7 +33,7 @@ class CityDao extends GormDaoSupport<City> {
 
 	City insertWithSetter(Map row) {
 		City c = bindWithSetters(row)
-		((DaoDomainTrait)c).persist()
+		c.persist()
 		return c
 	}
 

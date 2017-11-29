@@ -3,7 +3,7 @@ package gpbench.benchmarks
 import gpbench.City
 import gpbench.CityDao
 import grails.gorm.transactions.Transactional
-import grails.plugin.dao.DaoUtil
+import gorm.tools.dao.DaoUtil
 import groovy.transform.CompileStatic
 
 /**
@@ -36,7 +36,7 @@ class SimpleBatchInsertBenchmark extends BaseBatchInsertBenchmark {
 	void insertBatch(List<Map> batch, CityDao dao) {
 		for (Map record : batch) {
 			try {
-				dao.create(record, [dataBinder:dataBinder])
+				dao.create(record)
 			} catch (Exception e) {
 				e.printStackTrace()
 			}

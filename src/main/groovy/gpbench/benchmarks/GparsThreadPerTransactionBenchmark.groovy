@@ -36,7 +36,7 @@ class GparsThreadPerTransactionBenchmark extends BaseBenchmark {
 	@Transactional
 	void insert(Map record, CityDao dao) {
 		try {
-			if (useDatabinding) dao.insert(record)
+			if (useDatabinding) dao.create(record)
 			else dao.insertWithSetter(record)
 		} catch (Exception e) {
 			e.printStackTrace()

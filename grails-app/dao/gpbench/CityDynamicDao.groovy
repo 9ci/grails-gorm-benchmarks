@@ -1,28 +1,14 @@
 package gpbench
 
 import gorm.tools.GormUtils
-import grails.compiler.GrailsCompileStatic
-import grails.plugin.dao.DaoDomainTrait
-import grails.plugin.dao.DaoMessage
-import grails.plugin.dao.DaoUtil
-import grails.plugin.dao.GormDaoSupport
-import grails.gorm.transactions.NotTransactional
+import gorm.tools.dao.DefaultGormDao
 import grails.gorm.transactions.Transactional
-import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
-import groovy.transform.TypeCheckingMode
-import groovyx.gpars.GParsPool
-import org.grails.datastore.gorm.GormEntity
 
 /**
  *vFuly dynamic compile with liberal use of defs and no typing
  */
 @Transactional
-class CityDynamicDao extends GormDaoSupport<CityDynamic> {
-
-	GparsLoadService gparsLoadService
-
-	Class domainClass = CityDynamic
+class CityDynamicDao extends DefaultGormDao<CityDynamic> {
 
 	def bindWithCopyDomain(Map row) {
 		def r = Region.load(row['region']['id'] as Long)

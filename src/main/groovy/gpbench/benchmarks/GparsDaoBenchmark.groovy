@@ -1,8 +1,4 @@
 package gpbench.benchmarks
-
-import grails.plugin.dao.DaoDomainTrait
-import groovy.transform.CompileStatic
-
 /**
  * Runs batch inserts in parallel using gparse.
  */

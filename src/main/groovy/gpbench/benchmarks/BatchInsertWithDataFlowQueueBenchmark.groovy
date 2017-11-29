@@ -3,7 +3,7 @@ package gpbench.benchmarks
 import gpbench.City
 import gpbench.CityDao
 import grails.gorm.transactions.Transactional
-import grails.plugin.dao.DaoUtil
+import gorm.tools.dao.DaoUtil
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import groovyx.gpars.dataflow.DataflowQueue
@@ -58,8 +58,8 @@ class BatchInsertWithDataFlowQueueBenchmark extends BaseBatchInsertBenchmark {
 	void insertBatch(List<Map> batch, CityDao dao) {
 		for (Map record : batch) {
 			try {
-                String dataBinder = dataBinder == 'copy' ? 'bindFast' : 'grailsWeb'
-                dao.create(record, [validate:true, dataBinder:dataBinder])
+                //String dataBinder = dataBinder == 'copy' ? 'bindFast' : 'grailsWeb'
+                dao.create(record)
 			}catch (Exception e) {
 				e.printStackTrace()
 			}

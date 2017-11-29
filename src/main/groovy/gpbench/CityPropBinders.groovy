@@ -1,14 +1,14 @@
 package gpbench
 
 import gorm.tools.GormUtils
+import gorm.tools.dao.DaoEntity
 import gpbench.model.CityModel
-import grails.plugin.dao.DaoDomainTrait
 import grails.gorm.transactions.NotTransactional
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 @CompileStatic
-class CityPropBinders<T extends CityModel>{
+class CityPropBinders<T extends CityModel & DaoEntity>{
 	private Class<T> domainClass
 
 	CityPropBinders(Class<T> clazz) {
@@ -46,7 +46,7 @@ class CityPropBinders<T extends CityModel>{
 
 	T insertWithSetter(Map row) {
 		T c = bindWithSetters(row)
-		((DaoDomainTrait)c).persist()
+        ((DaoEntity)c).persist()
 		return c
 	}
 

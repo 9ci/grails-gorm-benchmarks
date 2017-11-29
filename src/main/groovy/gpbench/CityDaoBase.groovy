@@ -1,10 +1,10 @@
 package gpbench
 
 import gorm.tools.GormUtils
+import gorm.tools.dao.DaoEntity
+import gorm.tools.dao.DaoUtil
+import gorm.tools.dao.DefaultGormDao
 import gpbench.model.CityModel
-import grails.plugin.dao.DaoDomainTrait
-import grails.plugin.dao.DaoUtil
-import grails.plugin.dao.GormDaoSupport
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
 import grails.web.databinding.WebDataBinding
@@ -15,7 +15,7 @@ import org.grails.datastore.gorm.GormEntity
 
 @Transactional
 @CompileStatic
-class CityDaoBase<T extends CityModel & GormEntity & WebDataBinding> extends GormDaoSupport<T> {
+class CityDaoBase<T extends CityModel & GormEntity & WebDataBinding & DaoEntity> extends DefaultGormDao<T> {
 
 
 	CityDaoBase(Class<T> clazz) {
@@ -56,7 +56,7 @@ class CityDaoBase<T extends CityModel & GormEntity & WebDataBinding> extends Gor
 
 	T insertWithSetter(Map row) {
 		T c = bindWithSetters(row)
-		((DaoDomainTrait)c).persist()
+        ((DaoEntity)c).persist()
 		return c
 	}
 
@@ -75,8 +75,7 @@ class CityDaoBase<T extends CityModel & GormEntity & WebDataBinding> extends Gor
 		} else {
 			entity = (T) callBinderMethod(args.bindingMethod, row)
 		}
-		if (fireEvents) super.beforeInsertSave((GormEntity)entity, row)
-		super.save((GormEntity)entity, [validate: args.validate?:false ])
+		super.persist((GormEntity)entity, [validate: args.validate?:false ])
 		//DaoMessage.created(entity) slows it down by about 15-20%
 		return entity //[ok: true, entity: entity, message: DaoMessage.created(entity)]
 	}

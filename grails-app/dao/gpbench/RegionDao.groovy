@@ -1,15 +1,14 @@
 package gpbench
 
 import gorm.tools.GormUtils
+import gorm.tools.dao.DefaultGormDao
 import grails.compiler.GrailsCompileStatic
-import grails.plugin.dao.GormDaoSupport
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
 
 @Transactional
 @GrailsCompileStatic
-class RegionDao extends GormDaoSupport<Region> {
-	Class domainClass = Region
+class RegionDao extends DefaultGormDao<Region> {
 
 	void beforeInsertSave(Region region, Map params) {
 		region.id = params.id as Long

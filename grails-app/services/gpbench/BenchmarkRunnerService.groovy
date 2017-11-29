@@ -1,13 +1,14 @@
 package gpbench
 
+import gorm.tools.dao.DefaultGormDao
+import gorm.tools.dao.GormDao
 import gpbench.benchmarks.*
 import gpbench.fat.CityFat
 import gpbench.fat.CityFatDynamic
 import gpbench.helpers.BenchmarkHelper
 import gpbench.helpers.CsvReader
 import grails.core.GrailsApplication
-import grails.plugin.dao.DaoUtil
-import grails.plugin.dao.GormDaoSupport
+import gorm.tools.dao.DaoUtil
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import groovyx.gpars.util.PoolUtils
@@ -173,9 +174,9 @@ class BenchmarkRunnerService {
 	}
 
 	@CompileStatic(TypeCheckingMode.SKIP)
-	void insert(List<List<Map>> batchList, GormDaoSupport dao) {
+	void insert(List<List<Map>> batchList, GormDao dao) {
         gparsLoadService.insertGpars(batchList, [poolSize:POOL_SIZE]){ Map row, args ->
-            dao.insert(row)
+            dao.create(row)
         }
 //		GParsPool.withPool(POOL_SIZE) {
 //			batchList.eachParallel { List<Map> batch ->
