@@ -138,7 +138,7 @@ class BenchmarkRunnerService {
 		runBenchmark(new GparsBaselineBenchmark(CityBaselineDynamic, 'fast', false))
 
 		println "\n - assign id inside domain with beforeValidate"
-		runBenchmark(new GparsBaselineBenchmark(CityIdGenAssigned))
+		//runBenchmark(new GparsBaselineBenchmark(CityIdGenAssigned))
 
 		println "\n  - not much difference between static and dynamic method calls"
 //		runBenchmark(new GparsDaoBenchmark(City,"setter"))
