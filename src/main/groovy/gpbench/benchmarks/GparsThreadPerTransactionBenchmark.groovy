@@ -7,6 +7,8 @@ import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import groovyx.gpars.GParsPool
 
+//import groovyx.gpars.GParsPool
+
 /**
  * Runs inserts in parallel using gparse with one thread per transaction.
  */
