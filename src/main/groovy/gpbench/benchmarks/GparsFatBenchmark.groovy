@@ -3,6 +3,7 @@ package gpbench.benchmarks
 import gpbench.helpers.RecordsLoader
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEnhancer
+import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
 
@@ -11,7 +12,7 @@ import org.grails.datastore.mapping.model.types.Association
  */
 
 //@GrailsCompileStatic
-class GparsFatBenchmark<T> extends GparsBaselineBenchmark<T> {
+class GparsFatBenchmark<T extends GormEntity> extends GparsBaselineBenchmark<T> {
 
 	GparsFatBenchmark(Class<T> clazz, String bindingMethod = 'grails', boolean validate = true) {
 		super(clazz, bindingMethod,validate)

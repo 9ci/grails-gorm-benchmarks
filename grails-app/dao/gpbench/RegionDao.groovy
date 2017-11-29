@@ -10,7 +10,7 @@ import grails.gorm.transactions.Transactional
 @GrailsCompileStatic
 class RegionDao extends DefaultGormDao<Region> {
 
-	void beforeInsertSave(Region region, Map params) {
+	void beforeCreate(Region region, Map params) {
 		region.id = params.id as Long
 	}
 

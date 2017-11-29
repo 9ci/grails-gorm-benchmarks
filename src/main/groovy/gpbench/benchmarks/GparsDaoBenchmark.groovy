@@ -11,9 +11,10 @@ class GparsDaoBenchmark<T> extends BaseBatchInsertBenchmark<T>  {
 
 	@Override
 	def execute() {
-		def args = [poolSize:poolSize]//, validate:validate, dataBinder:dataBinder ]
+		def args = [poolSize:poolSize]
 		gparsLoadService.insertGpars(cities, args){ Map row, zargs ->
-            domainClass.dao.create( row, [validate:validate, dataBinder:dataBinder ])
+            //domainClass.dao.create( row, [validate:validate, dataBinder:dataBinder ])
+            domainClass.dao.create( row)
 		}
 	}
 

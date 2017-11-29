@@ -11,7 +11,7 @@ import grails.gorm.transactions.Transactional
 class CountryDao extends DefaultGormDao<Country> {
 	Class domainClass = Country
 
-	void beforeInsertSave(Country country, Map params) {
+	void beforeCreate(Country country, Map params) {
 		country.id = params.id as Long
 	}
 

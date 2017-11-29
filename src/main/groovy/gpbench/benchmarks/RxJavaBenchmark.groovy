@@ -6,12 +6,13 @@ import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
+import org.grails.datastore.gorm.GormEntity
 
 /**
  * Calls external script for each row. The script does the insert.
  */
 @CompileStatic
-class RxJavaBenchmark<T> extends GparsBaselineBenchmark<T> {
+class RxJavaBenchmark<T extends GormEntity> extends GparsBaselineBenchmark<T> {
 
 	RxJavaBenchmark(Class<T> clazz, String bindingMethod = 'grails', boolean validate = true) {
 		super(clazz, bindingMethod,validate)

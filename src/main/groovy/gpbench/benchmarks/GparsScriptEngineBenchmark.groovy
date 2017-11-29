@@ -3,12 +3,13 @@ package gpbench.benchmarks
 import grails.core.GrailsApplication
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import org.grails.datastore.gorm.GormEntity
 
 /**
  * Calls external script for each row. The script does the insert.
  */
 @CompileStatic
-class GparsScriptEngineBenchmark<T> extends GparsBaselineBenchmark<T> {
+class GparsScriptEngineBenchmark<T extends GormEntity> extends GparsBaselineBenchmark<T> {
 	GroovyScriptEngine scriptEngine
 	GrailsApplication grailsApplication
 
