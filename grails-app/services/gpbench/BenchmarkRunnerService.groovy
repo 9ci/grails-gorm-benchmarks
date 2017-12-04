@@ -1,6 +1,5 @@
 package gpbench
 
-import gorm.tools.dao.DefaultGormDao
 import gorm.tools.dao.GormDao
 import gpbench.benchmarks.*
 import gpbench.fat.CityFat
@@ -12,6 +11,7 @@ import gorm.tools.dao.DaoUtil
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import groovyx.gpars.util.PoolUtils
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 
 class BenchmarkRunnerService {
@@ -22,7 +22,8 @@ class BenchmarkRunnerService {
 	static int POOL_SIZE = PoolUtils.retrieveDefaultPoolSize()
 
     //this should match the hibernate.jdbc.batch_size in datasources
-	static int BATCH_SIZE = System.getProperty("jdbc.batchSize", "50").toInteger()
+    @Value('${hibernate.jdbc.batch_size}')
+	int batchSize
 
 	int loadIterations = System.getProperty("load.iterations", "3").toInteger()
     int warmupCycles = 1
@@ -43,7 +44,7 @@ class BenchmarkRunnerService {
 		//println "Free memory: " + (Runtime.getRuntime().freeMemory() / 1024 ) + " KB"
 		println "Available processors: " + Runtime.getRuntime().availableProcessors()
 		println "Gpars pool size: " + POOL_SIZE
-        println "batch size: " + grailsApplication.config.hibernate.jdbc.batch_size
+        println "batch size: " + batchSize
 		println "Autowire enabled: " + grailsApplication.config.grails.gorm.autowire
 
 
@@ -83,10 +84,10 @@ class BenchmarkRunnerService {
 	}
 
     void warmUp(String runMethod, String bindingMethod){
-        System.out.print("Warm up cycle ")
         muteConsole = true
         def oldLoadIterations = loadIterations
         loadIterations = 1
+        System.out.print("Warm up pass with ${ loadIterations * 37230} records ")
         //runMultiCoreGrailsBaseline("")
         (1..warmupCycles).each{
             "$runMethod"("", bindingMethod)
@@ -104,22 +105,20 @@ class BenchmarkRunnerService {
 
 
     void runMultiCoreBaselineCompare(String msg, String bindingMethod = 'grails') {
-        runBenchmark(new GparsFatBenchmark(CityFat,bindingMethod))
         logMessage "\n$msg"
         logMessage "  - Grails Basic Baseline to measure against"
-        runBenchmark(new GparsBaselineBenchmark(CityBaselineDynamic,bindingMethod))
-        runBenchmark(new GparsBaselineBenchmark(CityBaseline,bindingMethod))
         runBenchmark(new GparsBaselineBenchmark(City, bindingMethod))
-
-        runBenchmark(new GparsFatBenchmark(CityFatDynamic,bindingMethod))
-        logMessage "  - benefits of CompileStatic are more obvious with more fields"
-        runBenchmark(new GparsFatBenchmark(CityFat,bindingMethod))
-
-        logMessage "\n  - These should all run within about 5% of baseline and each other"
-        runBenchmark(new GparsDaoBenchmark(City, bindingMethod))
+        runBenchmark(new GparsBaselineBenchmark(CityBaseline,bindingMethod))
+        runBenchmark(new GparsBaselineBenchmark(CityBaselineDynamic,bindingMethod))
+        logMessage "\n  - These should all run within about 5% of City and each other"
         runBenchmark(new GparsBaselineBenchmark(CityAuditTrail, bindingMethod))
         runBenchmark(new RxJavaBenchmark(City, bindingMethod))
         runBenchmark(new GparsScriptEngineBenchmark(City,bindingMethod))
+
+        logMessage "  - benefits of CompileStatic and 'fast' binding are more obvious with more fields"
+        runBenchmark(new GparsFatBenchmark(CityFatDynamic,bindingMethod))
+        runBenchmark(new GparsFatBenchmark(CityFat,bindingMethod))
+
     }
 
     void runMultiCoreSlower(String msg, String bindingMethod = 'grails') {
@@ -162,8 +161,8 @@ class BenchmarkRunnerService {
 
 	void prepareBaseData() {
 		benchmarkHelper.executeSqlScript("test-tables.sql")
-		List<List<Map>> countries = csvReader.read("Country").collate(BATCH_SIZE)
-		List<List<Map>> regions = csvReader.read("Region").collate(BATCH_SIZE)
+		List<List<Map>> countries = csvReader.read("Country").collate(batchSize)
+		List<List<Map>> regions = csvReader.read("Region").collate(batchSize)
 		insert(countries, countryDao)
 		insert(regions, regionDao)
 
@@ -193,7 +192,7 @@ class BenchmarkRunnerService {
 	@CompileStatic(TypeCheckingMode.SKIP)
 	void runBenchmark(AbstractBenchmark benchmark, boolean mute = false) {
 		if(benchmark.hasProperty("poolSize")) benchmark.poolSize = POOL_SIZE
-		if(benchmark.hasProperty("batchSize")) benchmark.batchSize = BATCH_SIZE
+		if(benchmark.hasProperty("batchSize")) benchmark.batchSize = batchSize
 		if(benchmark.hasProperty("repeatedCityTimes")) benchmark.repeatedCityTimes = loadIterations
         if(benchmark.hasProperty("disableSave")) benchmark.disableSave = disableSave
 

@@ -98,7 +98,7 @@ hibernate:
         use_query_cache: false
         region.factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
     jdbc:
-        #batch_size: 25 Set in application.groovy using system prop
+        # batch_size: 25 # Set in application.groovy using system prop
         order_inserts: true
         batch_versioned_data: true
 
