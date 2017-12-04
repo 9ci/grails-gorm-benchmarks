@@ -118,6 +118,7 @@ class BenchmarkRunnerService {
         logMessage "\n  - These should all run within about 5% of baseline and each other"
         runBenchmark(new GparsDaoBenchmark(City, bindingMethod))
         runBenchmark(new GparsBaselineBenchmark(CityAuditTrail, bindingMethod))
+        runBenchmark(new GparsBaselineBenchmark(CityAuditStampEvents, bindingMethod))
         runBenchmark(new RxJavaBenchmark(City, bindingMethod))
         runBenchmark(new GparsScriptEngineBenchmark(City,bindingMethod))
     }
