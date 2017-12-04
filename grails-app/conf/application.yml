@@ -94,7 +94,7 @@ hibernate:
         use_second_level_cache: false
         use_query_cache: false
     jdbc:
-        #batch_size: 25 Set in application.groovy using system prop
+        # batch_size: 25 # Set in application.groovy using system prop
         order_inserts: true
         batch_versioned_data: true
 dataSource:
