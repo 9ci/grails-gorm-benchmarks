@@ -8,7 +8,7 @@ import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
-import org.springframework.mock.web.MockHttpServletRequest
+//import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.stereotype.Component
 
 import javax.servlet.http.HttpServletRequest
@@ -110,12 +110,5 @@ class CsvReader extends RecordsLoader {
 		}
 
 	}
-
-	@CompileDynamic
-	private GrailsParameterMap toGrailsParamsMap(Map<String, String> map) {
-		HttpServletRequest request = new MockHttpServletRequest()
-		GrailsParameterMap gmap = new GrailsParameterMap(request)
-		gmap.updateNestedKeys(map)
-		return gmap
-	}
+//s
 }
