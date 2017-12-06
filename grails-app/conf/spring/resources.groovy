@@ -5,6 +5,8 @@ import groovy.io.FileType
 beans = {
 	jdbcTemplate(org.springframework.jdbc.core.JdbcTemplate, ref("dataSource"))
 
+    //see see https://docs.spring.io/spring/docs/5.0.2.RELEASE/spring-framework-reference/languages.html#dynamic-language-refreshable-beans
+
     xmlns lang:"http://www.springframework.org/schema/lang"
 
     File scriptsDir = new File("scripts")

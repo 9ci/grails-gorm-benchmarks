@@ -4,8 +4,8 @@ import grails.compiler.GrailsCompileStatic
 import groovy.transform.CompileStatic
 
 /**
- * Baseline stock grails domain. no DAO or anything else should be attached to this.
- * only Grails AST should have touched this.
+ * Baseline stock grails domain. no DAO, no Traits or anything else should be attached to this
+ * only stock out-of-the-box Grails/Gorm AST should have touched this.
  */
 @GrailsCompileStatic
 class CityBaseline {

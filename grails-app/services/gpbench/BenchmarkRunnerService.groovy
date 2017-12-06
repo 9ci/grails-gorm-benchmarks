@@ -16,10 +16,10 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 
 class BenchmarkRunnerService {
 
-    GparsLoadService gparsLoadService
+    GparsBatchService gparsBatchService
 	static transactional = false
 
-	static int POOL_SIZE = PoolUtils.retrieveDefaultPoolSize()
+	static int POOL_SIZE = 5 //PoolUtils.retrieveDefaultPoolSize()
 
     //this should match the hibernate.jdbc.batch_size in datasources
     @Value('${hibernate.jdbc.batch_size}')
@@ -66,6 +66,9 @@ class BenchmarkRunnerService {
         //warmUpAndRun("# Gpars - standard grails binding with baseline",
         //    'runMultiCoreGrailsBaseline', 'grails')
 
+        warmUpAndRun("### Gpars - fat props",
+            "runMultiCoreFat", 'fast')
+
         warmUpAndRun("### Gpars - Assign Properties, no grails databinding",
             "runMultiCoreBaselineCompare", 'fast')
 
@@ -111,15 +114,17 @@ class BenchmarkRunnerService {
         runBenchmark(new GparsBaselineBenchmark(CityBaseline,bindingMethod))
         runBenchmark(new GparsBaselineBenchmark(CityBaselineDynamic,bindingMethod))
         logMessage "\n  - These should all run within about 5% of City and each other"
+        runBenchmark(new GparsBaselineBenchmark(CityRefreshableBeanEvents, bindingMethod))
         runBenchmark(new GparsBaselineBenchmark(CityAuditTrail, bindingMethod))
         runBenchmark(new RxJavaBenchmark(City, bindingMethod))
         runBenchmark(new GparsScriptEngineBenchmark(City,bindingMethod))
+    }
 
+    void runMultiCoreFat(String msg, String bindingMethod = 'grails') {
+        logMessage "\n$msg"
         logMessage "  - benefits of CompileStatic and 'fast' binding are more obvious with more fields"
         runBenchmark(new GparsFatBenchmark(CityFatDynamic,bindingMethod))
         runBenchmark(new GparsFatBenchmark(CityFat,bindingMethod))
-
-        runBenchmark(new GparsBaselineBenchmark(CityAuditStampEvents, bindingMethod))
     }
 
     void runMultiCoreSlower(String msg, String bindingMethod = 'grails') {
@@ -145,7 +150,7 @@ class BenchmarkRunnerService {
 //		runBenchmark(new GparsDaoBenchmark(City,"fast"))
 //
 //		runBenchmark(new GparsDaoBenchmark(City,"bindWithSetters"))
-//		runBenchmark(new GparsDaoBenchmark(City,"bindWithCopyDomain"))
+//		runBenchmark(new GparsDaoBenchmark(City,"bindFast"))
 
 		new City().attached
 
@@ -175,7 +180,7 @@ class BenchmarkRunnerService {
 
 	@CompileStatic(TypeCheckingMode.SKIP)
 	void insert(List<List<Map>> batchList, GormDao dao) {
-        gparsLoadService.insertGpars(batchList, [poolSize:POOL_SIZE]){ Map row, args ->
+        gparsBatchService.eachBatch(batchList, [poolSize:POOL_SIZE]){ Map row, args ->
             dao.create(row)
         }
 //		GParsPool.withPool(POOL_SIZE) {

@@ -5,22 +5,25 @@ import grails.gorm.transactions.Transactional
 import groovyx.gpars.GParsPool
 
 //@CompileStatic
-class GparsLoadService {
+class GparsBatchService {
 
-	void insertGpars(List<List<Map>> batchList, Map args, Closure insertRowCl) {
+    /**
+     * Uses collate to break list into batches and then runs with eachParralel
+     */
+	void eachBatch(List<List<Map>> batchList, Map args, Closure clos) {
 		//println "batchList size ${batchList.size()}"
 		GParsPool.withPool(args.poolSize) {
 			batchList.eachParallel { List<Map> batch ->
 				//println "eachParallel batch size ${batch.size()}"
-				insertBatch(batch, args, insertRowCl)
+				processBatch(batch, args, clos)
 			}
 		}
 	}
 
 	@Transactional
-	void insertBatch(List<Map> batch,  Map args, Closure insertRowCl) {
+	void processBatch(List<Map> batch,  Map args, Closure clos) {
 		for (Map record : batch) {
-			insertRowCl(record, args)
+			clos(record, args)
 		}
 		DaoUtil.flushAndClear()
 	}

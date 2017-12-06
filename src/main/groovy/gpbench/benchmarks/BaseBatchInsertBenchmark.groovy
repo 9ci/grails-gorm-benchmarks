@@ -1,7 +1,7 @@
 package gpbench.benchmarks
 
 import gpbench.City
-import gpbench.GparsLoadService
+import gpbench.GparsBatchService
 import gpbench.helpers.JsonReader
 import gpbench.helpers.RecordsLoader
 import grails.plugin.springsecurity.SpringSecurityService
@@ -12,7 +12,7 @@ abstract class BaseBatchInsertBenchmark<T> extends AbstractBenchmark {
 	int poolSize
 	int batchSize
 
-	GparsLoadService gparsLoadService
+	GparsBatchService gparsBatchService
 
 	JsonReader jsonReader
 

@@ -19,7 +19,7 @@ class GparsBaselineBenchmark<T extends GormEntity> extends BaseBatchInsertBenchm
 	@Override
 	def execute() {
 		def args = [poolSize:poolSize]
-		gparsLoadService.insertGpars(cities, args){ Map row, Map zargs ->
+		gparsBatchService.eachBatch(cities, args){ Map row, Map zargs ->
 			insertRow(row)
 		}
 	}
@@ -32,7 +32,7 @@ class GparsBaselineBenchmark<T extends GormEntity> extends BaseBatchInsertBenchm
 			city.save(failOnError:true, validate:validate)
 		}
 		else {
-			T city = bindWithCopyDomain(row)
+			T city = bindFast(row)
 			city.save(failOnError:true, validate:validate)
 		}
 	}
@@ -42,7 +42,7 @@ class GparsBaselineBenchmark<T extends GormEntity> extends BaseBatchInsertBenchm
 		city.properties = row
 	}
 
-	T bindWithCopyDomain(Map row) {
+	T bindFast(Map row) {
 		//Region r = Region.load(row['region']['id'] as Long)
 		//Country country = Country.load(row['country']['id'] as Long)
 

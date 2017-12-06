@@ -290,7 +290,7 @@ class BenchmarkDatabindingService {
 
     @CompileStatic
     void registerConverter(ValueConverter converter) {
-        println converter.targetType
+        //println converter.targetType
         //conversionHelpers[converter.targetType] == converter
         conversionHelpers[converter.targetType] << converter
     }

@@ -29,7 +29,7 @@ class GparsScriptEngineBenchmark<T extends GormEntity> extends GparsBaselineBenc
 			new Binding([dataBinder:dataBinder]))//new Binding([batch:batch])
 
 		def args = [poolSize:poolSize]
-		gparsLoadService.insertGpars(cities, args){ row, zargs ->
+		gparsBatchService.eachBatch(cities, args){ row, zargs ->
 			scriptinsert.insertRow(row)
 		}
 	}

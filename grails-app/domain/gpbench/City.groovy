@@ -1,29 +1,16 @@
 package gpbench
 
+import gpbench.model.CityTrait
+import gpbench.model.CityTraitConstraints
+import gpbench.model.DateUserStamp
+import gpbench.model.DateUserStampConstraints
 import grails.compiler.GrailsCompileStatic
 
 /**
  * Dao Baseline. This has a DAO and has been touched by the gorm-tools AST
  */
 @GrailsCompileStatic
-class City {
-    String name
-    String shortCode
-
-    BigDecimal latitude
-    BigDecimal longitude
-
-    Date dateCreated
-    Date lastUpdated
-
-    //these don't do anything and are just here to equalize the number of fields
-    Long dateCreatedUser
-    Long lastUpdatedUser
-
-    Region region
-    Country country
-    String state
-    String countryName
+class City implements CityTrait, DateUserStamp{
 
     static belongsTo = [region:Region, country:Country]
 
@@ -31,9 +18,10 @@ class City {
         //cache true
     }
 
-	static constraints = {
-        importFrom(CityBaseline)
-	}
+    static constraints = {
+        importFrom CityTraitConstraints
+        importFrom DateUserStampConstraints
+    }
 
 	String toString() { name }
 
