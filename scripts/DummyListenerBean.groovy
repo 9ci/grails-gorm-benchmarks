@@ -23,14 +23,14 @@ class DummyListenerBean {
 
     }
 
-    @Listener
-    void beforeInsert(PreInsertEvent event) {
-
-    }
-
-    @Listener
-    void beforeUpdate(PreUpdateEvent event) {
-
-    }
+//    @Listener
+//    void beforeInsert(PreInsertEvent event) {
+//
+//    }
+//
+//    @Listener
+//    void beforeUpdate(PreUpdateEvent event) {
+//
+//    }
 
 }
