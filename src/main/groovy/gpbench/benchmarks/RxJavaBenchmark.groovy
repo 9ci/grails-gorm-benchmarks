@@ -29,7 +29,7 @@ class RxJavaBenchmark<T extends GormEntity> extends GparsBaselineBenchmark<T> {
 	}
 
 	@Transactional
-	@CompileStatic(TypeCheckingMode.SKIP)
+	//@CompileStatic(TypeCheckingMode.SKIP)
 	void insertBatch(List<Map> batch) {
 		for(Map row : batch) {
 			insertRow(row)

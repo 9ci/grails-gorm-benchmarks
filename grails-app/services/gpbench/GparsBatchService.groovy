@@ -25,6 +25,7 @@ class GparsBatchService {
 		for (Map record : batch) {
 			clos(record, args)
 		}
+        //println "processBatch"
 		DaoUtil.flushAndClear()
 	}
 

@@ -192,30 +192,33 @@ It can be seen that cpu load goes highest during Gparse batch insert
 The key conclusions Are as below
 
 1. Gparse with batch insert is the optimum way to do large batch inserts.
-2. Gparse batch insert along with data binding and validation disabled has best performance.
-3. Inserting each record in seperate transaction has worst performance
-4. Grails databinding almost doubles the time required for inserts.
-5. use small transaction batches and keep them the same size as the jdbc.batch_size. DO NOT (auto)commit on every insert
-6. JDBC Batch size of 50 Gave the best results, as batch size goes higher, performance started to degrade.
-7. Disabling validation improves performance eg. ```domain.save(false)```
-8. Grails Date stamp fields does not have any noticeable effect on performance.
+2. Grails Databinding has BIG (2-6x slower) performance penalty and an even bigger hit when using Traits for fields on the domain. 
+   See [grails issue #10862](https://github.com/grails/grails-core/issues/10862) 
+3. Inserting each record in seperate transaction has a BIG performance penalty and should be avoided when updating or inserting data.
+5. use small transaction batches (50-100 items) and keep them the same size as the jdbc.batch_size. DO NOT (auto)commit on every insert
+6. JDBC Batch size of 50-100 Gave the best results, as batch size goes higher, performance started to degrade.
+7. Disabling validation improves performance only slightly and performs well eg. ```domain.save(false)```
+8. Grails Date stamp fields has a negligible effect on performance.
 9. AuditTrail stamp affects performance (see below for details)
 10. Did not see any noticeable difference if Domain autowiring is enabled or disabled. (Domain with dependency on one service).
 11. Dao does not have any major noticable effect on performance.
 12. Disabling validation has slight performance benifits but not significant (see below for details)
-13. Using custom [idgenerator](https://yakworks.github.io/gorm-tools/id-generation/) does not have any noticable effect  
-14. From above table, it can be seen that
-   Going from 2 cores to 4 improves numbers significantly
-   Going from 4 cores to 8 numbers improves slowly
-   from pool size 9 onward, performance starts degrading   
+13. Using custom [idgenerator](https://yakworks.github.io/gorm-tools/id-generation/) improves greatly over auto 
+   as it allows hibernate to use the jdbc.batch_size. see links above
+14. Using listeners and grails @Listener events slows it down a bit. With out specs about 3 seconds for synchronous single thread processing 100k+ records. 
+   which drops to <1 second when doing the same thing asyncronously (gpars parralel batches)
+15. From above table, it can be seen that
+    * Going from 2 cores to 4 improves numbers significantly  
+    * Going from 4 cores to 8 numbers either degrades or improves only slightly on an intel 4 core with hyper-threading simulating 8 cores
+    * from pool size 9 onward, performance defintely starts degrading as expected with threads fighting for resources. 
 
 
 ### Optimum setting for Gpars pool size.
 
-It is observed that 9 core gave the best results for [i7-4870HQ](https://ark.intel.com/products/83504) which has four physical cores.
-But the system shows the OS and Java total of 8 cores and uses Hyper threading.
+It is observed that 5-9 core gave the best results for [i7-4870HQ](https://ark.intel.com/products/83504) which has four(4) physical cores.
+Intel hyper-threading simulates to the OS and Java a total of 8 cores and uses Hyper threading.
 
-Gparse will utilize and benefit if it is given 8 cores even if there are just four physical cores and four virtual cores.
+Gparse will utilize may benefit if it is given 8 cores even if there are just four physical cores and four virtual cores.
 
 The default Gpars pool size is Runtime.getRuntime().availableProcessors() + 1 see ()here](https://github.com/vaclav/GPars/blob/master/src/main/groovy/groovyx/gpars/util/PoolUtils.java#L43)
 And this indeed gives better performance.

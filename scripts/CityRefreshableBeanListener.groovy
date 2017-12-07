@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired
  */
 
 @CompileStatic
-class CityRefreshableBean {
+class CityRefreshableBeanListener {
 
     @Listener(CityRefreshableBeanEvents)
     void beforeValidate(ValidationEvent event) {

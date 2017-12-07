@@ -20,6 +20,7 @@ class GparsBaselineBenchmark<T extends GormEntity> extends BaseBatchInsertBenchm
 	def execute() {
 		def args = [poolSize:poolSize]
 		gparsBatchService.eachBatch(cities, args){ Map row, Map zargs ->
+            //println "insertingRow $row"
 			insertRow(row)
 		}
 	}
