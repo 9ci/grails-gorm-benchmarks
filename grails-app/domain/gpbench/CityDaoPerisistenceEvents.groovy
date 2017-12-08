@@ -7,10 +7,10 @@ import gpbench.model.DateUserStampConstraints
 import grails.compiler.GrailsCompileStatic
 
 /**
- * Dao Baseline. This has a DAO and has been touched by the gorm-tools AST
+ * Audist stamp fields are set from dao persistence events listener.
  */
 @GrailsCompileStatic
-class City implements CityTrait, DateUserStamp {
+class CityDaoPerisistenceEvents implements CityTrait, DateUserStamp {
 
     static belongsTo = [region:Region, country:Country]
 
@@ -24,13 +24,4 @@ class City implements CityTrait, DateUserStamp {
     }
 
 	String toString() { name }
-
-    def beforeInsert() {
-        dateCreatedUser = SecUtil.userId
-    }
-
-    def beforeUpdate() {
-        lastUpdatedUser = SecUtil.userId
-    }
-
 }

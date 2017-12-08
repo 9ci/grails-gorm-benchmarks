@@ -19,7 +19,7 @@ trait CityTrait {
 }
 
 //@GrailsCompileStatic
-class CityTraitConstraints implements CityTrait{
+class CityTraitConstraints implements CityTrait {
 
     static constraints = {
         name blank: false, nullable: false

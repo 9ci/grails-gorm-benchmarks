@@ -8,7 +8,7 @@ import grails.compiler.GrailsCompileStatic
  Audit stamp fields are set by a gorm event listener defined in external groovy script.
  */
 @GrailsCompileStatic
-class CityRefreshableBeanEvents implements CityTrait{
+class CityRefreshableBeanEvents implements CityTrait {
 
     static belongsTo = [region:Region, country:Country]
 

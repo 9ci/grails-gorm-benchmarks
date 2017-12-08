@@ -83,15 +83,14 @@ class BenchmarkRunnerService {
 		//runMultiCoreGrailsBaseline("## Pass 1 multi-thread - standard grails binding baseline")
         //warmUpAndRun("# Gpars - standard grails binding with baseline",
         //    'runMultiCoreGrailsBaseline', 'grails')
-
-        warmUpAndRun("### Gpars - fat props",
-            "runFat", binderType)
-
-        warmUpAndRun("### Gpars - Assign Properties, no grails databinding",
-            "runBaselineCompare", binderType)
+        
+        warmUpAndRun("### Gpars - fat props","runFat", binderType)
+        warmUpAndRun("### Gpars - Assign Properties, no grails databinding", "runBaselineCompare", binderType)
 
         if(eventListenerCount)
             warmUpAndRun("### Gpars - with events in refreshable groovy script bean", "runWithEvents", binderType)
+
+        warmUpAndRun("### Dao events", "runDaoEvents", binderType)
 
         if(auditTrailEnabled)
             warmUpAndRun("### Gpars - audit trail",  "runWithAuditTrail", binderType)
@@ -146,6 +145,12 @@ class BenchmarkRunnerService {
     void runWithEvents(String msg, String bindingMethod = 'grails') {
         logMessage "\n$msg"
         runBenchmark(new GparsBaselineBenchmark(CityRefreshableBeanEvents, bindingMethod))
+    }
+
+    void runDaoEvents(String msg, String bindingMethod = 'grails') {
+        logMessage "\n$msg"
+        runBenchmark(new GparsDaoBenchmark(CityMethodEvents, bindingMethod))
+        runBenchmark(new GparsDaoBenchmark(CityDaoPerisistenceEvents, bindingMethod))
     }
 
     void runWithAuditTrail(String msg, String bindingMethod = 'grails') {
